@@ -42,7 +42,7 @@ Abre **http://127.0.0.1:3000** en el mismo equipo. Mantén el servidor encendido
 ## Primera prueba: demo técnica
 
 1. Pulsa **Cargar demo técnica**. Se cargan tres JSON de Vision existentes y datos manuales simulados.
-2. Registra el revisor y confirma o rechaza cada sospecha de Vision. Completa los campos pendientes.
+2. Las fotos/detecciones positivas aparecen marcadas. Desmarca las que no sean oleocelosis, registra el revisor una sola vez y pulsa **Aplicar selección**. Completa los campos pendientes.
 3. Evalúa la captura y revisa la sugerencia de cada paleta. La demo contiene 36 frutos y 3 sospechas; solo las confirmadas cuentan como oleocelosis.
 4. Para ensayar una ampliación, elige **EXTEND** y carga `examples/vision/DEMO_ADDITIONAL_BOX_001.json`. Contiene 12 frutos ficticios y 2 sospechas. Revísalas y completa los defectos de esta segunda caja; la paleta queda **COMPLETE**, sin tercera caja.
 5. Revisa el reporte, registra el inspector y sus decisiones y confirma expresamente cuando corresponda. Puedes descargar Excel/JSON y abrir la vista imprimible.
@@ -60,7 +60,7 @@ Manifiesto CSV → seleccionar u omitir paleta → fotos grupales o JSON histór
               → reporte Excel/JSON y vista imprimible
 ```
 
-Al cargar un manifiesto, selecciona libremente las paletas que inspeccionarás y omite las restantes con un motivo opcional. El reporte diferencia una paleta omitida de una inspeccionada sin defectos. `Sample` procede de las imágenes únicas y oleocelosis de los positivos confirmados por QC; los otros quince defectos se registran manualmente. Confirma que la caja está completamente inspeccionada antes de evaluarla. Una ampliación conserva ambas cajas y recalcula el acumulado.
+Al cargar un manifiesto, selecciona libremente las paletas que inspeccionarás y omite las restantes con un motivo opcional. El reporte diferencia una paleta omitida de una inspeccionada sin defectos. `Sample` procede de las imágenes únicas y oleocelosis de los positivos incluidos en la selección confirmada por QC; los otros quince defectos se registran manualmente. Para fotos procesadas, **Incorporar fotos** confirma el conjunto de checks; para JSON importados, se usa **Aplicar selección**. Confirma que la caja está completamente inspeccionada antes de evaluarla. Una ampliación conserva ambas cajas y recalcula el acumulado.
 
 El navegador conserva el borrador en IndexedDB. Recuperarlo exige evaluar de nuevo y volver a confirmar las decisiones. El guardado automático no confirma reportes ni sustituye una copia de seguridad.
 

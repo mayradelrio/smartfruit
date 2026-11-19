@@ -20,7 +20,7 @@ La severidad 1 sugiere STANDARD; las severidades 2 y 3 sugieren EXTEND. La segun
 ## Cambios
 
 - **Decisión y paletas:** `business_rules.py`, `decision.py`, `additional_review.py`, `lot_inspection.py`, `inspection.py` y `workflow.py`. Estados PENDING, SELECTED, IN_PROGRESS, COMPLETED y SKIPPED; las omitidas no generan mediciones y se conservan en el padrón del lote.
-- **Revisión de Vision:** `vision.py`, `vision_review.py`, `vision_validation.py` y `web/vision_review.js`. Cada positivo conserva clase, probabilidad y confianza originales, además de estado, revisor, fecha y corrección. Solo los confirmados intervienen en el conteo operativo. Rechazar como styler/scar/inking/clean/other no incrementa los defectos manuales.
+- **Revisión de Vision:** `vision.py`, `vision_review.py`, `vision_validation.py` y `web/vision_review.js`. Cada positivo conserva clase, probabilidad y confianza originales, además de estado, revisor, fecha y corrección. Un check por foto/detección permite incluir o excluir oleocelosis; todos comienzan marcados, salvo rechazos ya guardados. Una sola confirmación del conjunto sustituye los botones por positivo. Las exclusiones no incrementan otros defectos manuales.
 - **Procesamiento:** `vision_capture.py` y `vision_inference.py`. Fases observables, avance por fotografías/frutos, prevención del doble envío, error/timeout diferenciados y reintento explícito. Las fotos de entrada se conservan en el trabajo local.
 - **Interfaz:** `web/index.html`, `web/vision_capture.js` y utilidades de captura. Selección de paletas, revisión por detección, fotos grupales prioritarias y acciones según la etapa. Se reducen textos técnicos y explicaciones repetidas.
 - **Reportes:** `qc_report.py`, `print_report.py`, `report_evidence.py` y `evidence_display.py`. Conteo confirmado, padrón con omisiones, auditoría de Vision, versiones y procedencia; se conservan las fotografías también al rechazar una predicción. Excel incorpora hojas Vision QC, Vision validation y Vision metrics.
@@ -29,6 +29,8 @@ La severidad 1 sugiere STANDARD; las severidades 2 y 3 sugieren EXTEND. La segun
 ## Compatibilidad
 
 Los campos y clases del JSON binario original de Vision se conservan. Un positivo histórico sin revisión se considera pendiente; debe revisarse antes de evaluar. Las importaciones previas y los recortes individuales siguen disponibles. El adaptador del navegador incluye los módulos y assets nuevos.
+
+Los checks son una selección de trabajo, almacenada opcionalmente en `qc_included`. Marcado incluye la detección y desmarcado la excluye; puede corregirse de nuevo antes de cerrar la caja. QC registra su nombre una vez y confirma el conjunto con **Aplicar selección** para JSON importados o **Incorporar fotos** para resultados procesados. Hasta ese paso los positivos nuevos siguen pendientes para el servidor. Una exclusión sin clasificación específica conserva `override_label: "other"` y el motivo `Excluido por QC mediante el check de oleocelosis.`, sin exigir otro formulario. La predicción original y su evidencia permanecen intactas.
 
 Los thresholds y sus fronteras existentes se conservan. Los reportes históricos pueden mostrar EXPAND/ESCALATE; las capturas nuevas usan STANDARD/EXTEND/COMPLETE. EXPAND se admite como alias de entrada de EXTEND, sujeto al límite de dos cajas. No se migran ni sobrescriben archivos de reportes históricos.
 
@@ -61,9 +63,9 @@ No hay una muestra operativa completa adjudicada por QC en el repositorio. Su ca
 ## Demo
 
 1. Ejecutar `python -m smartfruit.app` y abrir `http://127.0.0.1:3000`.
-2. Usar **Cargar demo técnica**. Revisar las tres sospechas; confirmar una y rechazar otra como scar o clean. Verificar que los conteos originales se conservan y el operativo cambia.
+2. Usar **Cargar demo técnica**. Las tres sospechas aparecen marcadas; desmarcar una, registrar el revisor una vez y pulsar **Aplicar selección**. Verificar que el conteo operativo queda en dos y que las predicciones originales se conservan.
 3. Completar los defectos manuales y cerrar la captura de la primera caja. Evaluar y elegir STANDARD o EXTEND.
-4. Para EXTEND importar `examples/vision/DEMO_ADDITIONAL_BOX_001.json`, revisar sus dos sospechas y completar sus defectos. Verificar COMPLETE y ausencia de una tercera caja.
+4. Para EXTEND importar `examples/vision/DEMO_ADDITIONAL_BOX_001.json`, ajustar los checks de sus dos sospechas, aplicar la selección y completar sus defectos. Verificar COMPLETE y ausencia de una tercera caja.
 5. Para probar paletas, cargar `examples/reception/SmartFruit_reception_manifest_demo.csv`, abrir el lote 5815, seleccionar una paleta y omitir otra con motivo. Completar u omitir todas las pendientes antes de confirmar el lote.
 6. Registrar el inspector y el Level Flag humano. Confirmar y descargar Excel/JSON; abrir la vista imprimible. Verificar las omisiones, auditoría y ambas cajas.
 7. Con pesos locales disponibles, seleccionar varias fotos grupales de una caja. Observar progreso automático; un segundo clic no debe iniciar otro trabajo. Un fallo permite reintentar.
@@ -79,5 +81,7 @@ npm.cmd test
 Las nuevas pruebas cubren decisiones L1/L2/L3, cierre de segunda caja y rechazo de tercera, selección/omisión y persistencia, confirmación/rechazo y auditoría, dominancia por fruto, avance/doble envío/errores/reintentos, métricas parciales y reportes con evidencia tras una corrección. Los datos operativos, pesos, fotografías y reportes locales siguen excluidos de Git.
 
 Resultado de esta iteración: **736 tests Python aprobados, 2 omitidos; 154 tests JavaScript aprobados; Ruff sin errores**. FastAPI/Starlette emite un aviso de deprecación del transporte httpx del entorno, sin fallos de prueba. `npm.cmd` evita depender de la política de ejecución de scripts PowerShell.
+
+Actualización de checks: **168 tests JavaScript aprobados; 152 tests Python de los módulos afectados aprobados, 1 omitido; Ruff sin errores**. Incluyen selección inicial activa, desmarcar/volver a marcar, exclusiones guardadas, auditoría del conjunto y conservación de evidencia.
 
 La prueba gráfica quedó pendiente: Chrome local no habilitó la conexión de automatización en el entorno de ejecución. Los tests JavaScript ejecutan las funciones reales con un DOM de prueba; no acreditan paginación ni gestos en un navegador. La inferencia se verifica con stubs controlados; falta adjudicar fotografías operativas con QC y medir el modelo real.

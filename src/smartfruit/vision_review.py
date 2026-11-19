@@ -21,6 +21,11 @@ def validate_prediction_review(prediction: Mapping[str, Any], reference: str) ->
     status = review_status(prediction)
     if not isinstance(status, str) or status not in REVIEW_STATUSES:
         raise ValueError(f"{reference}: review_status debe ser pending, confirmed o rejected.")
+    if "qc_included" in prediction and not isinstance(prediction["qc_included"], bool):
+        raise ValueError(f"{reference}: qc_included debe ser booleano.")
+    included = prediction.get("qc_included")
+    if status == "confirmed" and included is False or status == "rejected" and included is True:
+        raise ValueError(f"{reference}: qc_included no coincide con la revisión QC.")
     for field in _AUDIT_FIELDS:
         value = prediction.get(field)
         if value is not None and not isinstance(value, str):
@@ -91,5 +96,7 @@ def review_vision_prediction(
         "override_label": override_label,
         "override_reason": override_reason,
     })
+    if "qc_included" in prediction:
+        prediction["qc_included"] = status == "confirmed"
     validate_prediction_review(prediction, f"{result['image_id']}/{crop_id}")
     return deepcopy(result)

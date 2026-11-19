@@ -248,21 +248,37 @@
       if(job.status==="failed"){result.append(make("p",job.error||"No se pudieron procesar las fotos.","notice"));return;}
       if(job.status!=="ready")return;
       result.setAttribute("data-job-state",confirmed?"COMPLETED":"REVIEW_READY");
-      const context=job.context,records=job.records||[],total=records.reduce((sum,record)=>sum+record.total_fruits,0),affected=records.reduce((sum,record)=>sum+record.oleocellosis_count,0);
-      const reviewed=scope.SmartFruitVisionReview?.summary(records);
-      result.append(make("strong",restored?"Fotos incorporadas a la paleta":confirmed?"Fotos incorporadas a la caja":"Resultados listos para revisión"),make("p","Paleta "+context.pallet_id+" · "+total+" frutos · "+affected+" sospechas"+(reviewed?" · "+reviewed.confirmed+" confirmadas por QC":""),"vision-context"));
-      drawPositiveGallery(job);
+      const context=job.context,records=confirmed&&savedRecords.length?savedRecords:job.records||[],total=records.reduce((sum,record)=>sum+record.total_fruits,0),affected=records.reduce((sum,record)=>sum+record.oleocellosis_count,0);
+      const contextText=make("p",undefined,"vision-context");
+      const updateContext=()=>{const selection=scope.SmartFruitVisionReview?.selectionSummary(records);contextText.textContent="Paleta "+context.pallet_id+" · "+(selection?.total??total)+" frutos · "+(selection?.suspected??affected)+" sospechas"+(selection?" · "+selection.included+" activas":"");};
+      updateContext();result.append(make("strong",restored?"Fotos incorporadas a la paleta":confirmed?"Fotos incorporadas a la caja":"Resultados listos para revisión"),contextText);
+      if(!scope.SmartFruitVisionReview)drawPositiveGallery(job);
       const details=make("details");details.append(make("summary","Ver resultados generados por fotografía"));const list=make("ul",undefined,"file-list");for(const record of records)list.append(make("li",record.image_id+": "+record.oleocellosis_count+" / "+record.total_fruits+" con oleocelosis"));details.append(list);result.append(details);
+      const validation=make("p");validation.setAttribute("role","alert");let reviewUI=null;
+      if(scope.SmartFruitVisionReview&&(!confirmed||options.showConfirmedReview!==false)){
+        const reviewHost=make("section");result.append(reviewHost);
+        reviewUI=scope.SmartFruitVisionReview.render(reviewHost,records,{
+          reviewer:options.getReviewer?.()||memory.reviewer||"",photos:job.photos||catalogue?.photos||[],deferApply:true,disabled:busy||confirmed,
+          onReviewer:name=>{memory.reviewer=name;options.onReviewer?.(name);validation.textContent="";},onChange:updateContext,
+          onOpenImage:photo=>{largeImage.src=photo.url;largeImage.alt=photo.name;imageTitle.textContent=photo.name;imageCaption.textContent="Detección de Vision";imageDialog.hidden=false;if(typeof imageDialog.showModal==="function")imageDialog.showModal();else imageDialog.setAttribute("open","");imageClose.focus?.();},
+        });
+      }
       if(confirmed)return;
-      const confirm=make("button",context.review_kind==="additional"?"Incorporar fotos de la segunda caja":"Incorporar fotos a la caja");confirm.type="button";confirm.disabled=busy||Boolean(reviewed?.pending);
-      if(scope.SmartFruitVisionReview){const reviewHost=make("section");result.append(reviewHost);scope.SmartFruitVisionReview.render(reviewHost,records,{reviewer:options.getReviewer?.()||memory.reviewer||"",photos:job.photos||catalogue?.photos||[],onReviewer:name=>{memory.reviewer=name;options.onReviewer?.(name);},onChange:()=>{const counts=scope.SmartFruitVisionReview.summary(records);confirm.disabled=busy||counts.pending>0;}});}
-      confirm.addEventListener("click",()=>run(async()=>{
-        const current=getContext();const records=checkReady(memory.job,current);
-        await onConfirm(records,memory.job);
-        memory.confirmedJob=memory.job;memory.confirmedSelectionKey=defaultSelectionKey();
-        memory.job=null;memory.selected.clear();
-        options.onStatus?.(current.review_kind==="additional"?"Tanda confirmada para la caja adicional. Puedes añadir más fotos antes de finalizarla.":"Tanda confirmada para la caja de la paleta "+current.pallet_id+". Continúa con los grupos restantes antes de finalizarla.");
-      }));result.append(confirm);
+      const confirm=make("button",context.review_kind==="additional"?"Incorporar fotos de la segunda caja":"Incorporar fotos a la caja");confirm.type="button";confirm.disabled=busy;
+      result.append(validation);
+      confirm.addEventListener("click",async()=>{
+        if(busy)return;
+        // A missing reviewer is a form correction; keep the photos and checks visible.
+        try{checkReady(memory.job,getContext());reviewUI?.applySelection();}
+        catch(error){validation.textContent=error.message;return;}
+        await run(async()=>{
+          const current=getContext();const records=checkReady(memory.job,current);
+          await onConfirm(records,memory.job);
+          memory.confirmedJob=memory.job;memory.confirmedSelectionKey=defaultSelectionKey();
+          memory.job=null;memory.selected.clear();
+          options.onStatus?.(current.review_kind==="additional"?"Tanda confirmada para la caja adicional. Puedes añadir más fotos antes de finalizarla.":"Tanda confirmada para la caja de la paleta "+current.pallet_id+". Continúa con los grupos restantes antes de finalizarla.");
+        });
+      });result.append(confirm);
     }
 
     function drawPositiveGallery(job) {

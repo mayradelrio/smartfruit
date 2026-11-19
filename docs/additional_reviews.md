@@ -13,7 +13,7 @@ El motor utiliza **EXTEND** para los niveles 2 y 3 y conserva `EXPAND` como alia
 1. Evalúa la inspección inicial y revisa la sugerencia de la paleta.
 2. En esa misma paleta, selecciona **EXTEND**. Se habilita **EXTEND · revisar otra caja**.
 3. Carga uno o varios **JSON de Vision de la caja adicional**. Deben corresponder a esa paleta y contener fotografías distintas de las utilizadas anteriormente.
-4. Confirma o rechaza cada sospecha de Vision de la caja adicional. **Sample se calcula a partir de los JSON únicos** y oleocelosis usa solo confirmados QC. Registra los **quince defectos manuales de esa caja**, sin repetir las cantidades de la primera revisión.
+4. Ajusta los checks de oleocelosis de la caja adicional: todos aparecen marcados inicialmente; desmarca los falsos positivos. Registra el revisor una vez y confirma el conjunto con **Aplicar selección** para JSON importados o **Incorporar fotos** para resultados procesados. **Sample se calcula a partir de los JSON únicos** y oleocelosis usa solo los incluidos y confirmados por QC. Registra los **quince defectos manuales de esa caja**, sin repetir las cantidades de la primera revisión.
 5. Si ya comprobaste que los defectos todavía vacíos están ausentes, puedes usar **Registrar pendientes de esta caja en 0**. Los vacíos no se convierten automáticamente en cero y las cantidades ya registradas se conservan.
 6. Añade observaciones de esta revisión.
 7. Pulsa **Agregar caja y actualizar resultados**. La aplicación valida toda la revisión antes de incorporar sus datos.
@@ -23,7 +23,7 @@ Las otras paletas conservan sus cantidades y estados provisionales. La confirmac
 
 La demo permite simular la revisión adicional con otro JSON válido disponible. Un archivo ya utilizado no se vuelve a contar como una caja nueva: se debe elegir una fotografía con otro `image_id` y verificar que represente frutos distintos.
 
-Para probar se incluye [DEMO_ADDITIONAL_BOX_001.json](../examples/vision/DEMO_ADDITIONAL_BOX_001.json): **12 frutos ficticios y 2 sospechas**, identificado como `SIMULATED_DEMO`. Si QC confirma los cinco positivos entre ambas cajas, el acumulado es **48 frutos y 5 con oleocelosis (10,4167%)**. Rechazar sospechas reduce el conteo operativo. Es una simulación técnica y no corresponde a una caja comercial.
+Para probar se incluye [DEMO_ADDITIONAL_BOX_001.json](../examples/vision/DEMO_ADDITIONAL_BOX_001.json): **12 frutos ficticios y 2 sospechas**, identificado como `SIMULATED_DEMO`. Si QC mantiene marcados y confirma los cinco positivos entre ambas cajas, el acumulado es **48 frutos y 5 con oleocelosis (10,4167%)**. Desmarcar sospechas reduce el conteo operativo una vez aplicada la selección. Es una simulación técnica y no corresponde a una caja comercial.
 
 ## Cómo se suman los resultados
 

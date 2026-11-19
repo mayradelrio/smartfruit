@@ -236,7 +236,8 @@ class VisionCapture:
                     value = deepcopy(value)
                     for prediction in value.get("fruit_predictions", []):
                         for field in ("review_status", "reviewed_by", "reviewed_at",
-                                      "override_label", "override_reason", "qc_final_label"):
+                                      "override_label", "override_reason", "qc_final_label",
+                                      "qc_included"):
                             prediction.pop(field, None)
                     return value
 

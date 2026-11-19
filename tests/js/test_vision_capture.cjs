@@ -203,19 +203,86 @@ test("a timeout is visible and an explicit retry can finish the same photo selec
   }finally{fixture.cleanup();}
 });
 
-test("the photo widget requires human adjudication before incorporating raw positives",async()=>{
+test("the photo widget starts every positive checked and applies the batch on incorporation",async()=>{
   const previous=global.SmartFruitVisionReview;global.SmartFruitVisionReview=require("../../src/smartfruit/web/vision_review.js");
-  const fixture=componentFixture();
+  const fixture=componentFixture({getReviewer:()=>"QC Test"});
   try{
     await fixture.load();selectGroup(fixture);
     await fixture.nodes().find(node=>node.textContent==="Procesar fotos de esta caja").listeners.click();
-    const incorporate=fixture.nodes().find(node=>node.textContent==="Incorporar fotos a la caja");assert.equal(incorporate.disabled,true);
-    fixture.nodes().find(node=>node.placeholder==="Nombre del inspector").value="QC Test";
-    fixture.nodes().find(node=>node.textContent==="Confirmar oleocelosis").listeners.click();
-    assert.equal(incorporate.disabled,false);await incorporate.listeners.click();
+    const checks=fixture.nodes().filter(node=>node.tagName==="INPUT"&&node.type==="checkbox"&&node.attributes?.["aria-label"]?.includes("oleocelosis"));
+    assert.equal(checks.length,1);assert.equal(checks[0].checked,true);
+    assert.equal(fixture.nodes().some(node=>node.textContent==="Confirmar oleocelosis"||node.textContent==="Rechazar positivo"),false);
+    assert.equal(fixture.confirmed.length,0);
+    const incorporate=fixture.nodes().find(node=>node.textContent==="Incorporar fotos a la caja");assert.equal(incorporate.disabled,false);
+    await incorporate.listeners.click();
     assert.equal(fixture.confirmed.length,1);
     assert.equal(fixture.confirmed[0][0].fruit_predictions[0].review_status,"confirmed");
+    assert.equal(fixture.confirmed[0][0].fruit_predictions[0].reviewed_by,"QC Test");
     assert.equal(fixture.confirmed[0][0].oleocellosis_count,1);
+  }finally{fixture.cleanup();global.SmartFruitVisionReview=previous;}
+});
+
+test("a missing reviewer can be completed without losing checkbox choices or processing photos again",async()=>{
+  const previous=global.SmartFruitVisionReview;global.SmartFruitVisionReview=require("../../src/smartfruit/web/vision_review.js");
+  const photos=[localPhoto("A","fruit.jpg")],job={job_id:"J",status:"ready",context,photos,records:[classified("A","fruit.jpg")]};let submissions=0;
+  const fixture=componentFixture({photos,request:async url=>({json:async()=>{
+    if(url==="/api/vision/photos")return {photos,runtime:{available:true}};
+    submissions++;return job;
+  }})});
+  try{
+    await fixture.load();selectGroup(fixture);
+    await fixture.nodes().find(node=>node.textContent==="Procesar fotos de esta caja").listeners.click();
+    const incorporate=fixture.nodes().find(node=>node.textContent==="Incorporar fotos a la caja");
+    if(!incorporate.disabled)await incorporate.listeners.click();
+    assert.equal(fixture.confirmed.length,0);assert.equal(fixture.memory.job.status,"ready");
+    const reviewer=fixture.nodes().find(node=>node.placeholder==="Nombre del inspector");
+    assert.ok(reviewer,"reviewer entry remains available after validation");reviewer.value="QC Test";
+    reviewer.listeners.input?.({target:reviewer});reviewer.listeners.change?.({target:reviewer});
+    const current=fixture.nodes().find(node=>node.textContent==="Incorporar fotos a la caja");
+    assert.equal(current.disabled,false);await current.listeners.click();
+    assert.equal(fixture.confirmed.length,1);assert.equal(submissions,1);
+  }finally{fixture.cleanup();global.SmartFruitVisionReview=previous;}
+});
+
+test("one checkbox excludes one scene detection while preserving the other detections and raw output",async()=>{
+  const previous=global.SmartFruitVisionReview;global.SmartFruitVisionReview=require("../../src/smartfruit/web/vision_review.js");
+  const photo={...localPhoto("SCENE","whole.jpg"),input_kind:"scene"};
+  const scene={image_id:"SCENE",total_fruits:3,oleocellosis_count:2,fruit_predictions:[prediction("crop1"),prediction("crop2"),prediction("crop3",false)],inference:{source_filename:"whole.jpg",input_kind:"scene"}};
+  const fixture=componentFixture({photos:[photo],job:{job_id:"J",status:"ready",context,photos:[photo],records:[scene]},getReviewer:()=>"QC Test"});
+  try{
+    await fixture.load();selectGroup(fixture);
+    await fixture.nodes().find(node=>node.textContent==="Procesar fotos de esta caja").listeners.click();
+    const checks=fixture.nodes().filter(node=>node.tagName==="INPUT"&&node.type==="checkbox"&&node.attributes?.["aria-label"]?.includes("oleocelosis"));
+    assert.equal(checks.length,2);assert.ok(checks.every(check=>check.checked));
+    checks[1].checked=false;checks[1].listeners.change({target:checks[1]});
+    await fixture.nodes().find(node=>node.textContent==="Incorporar fotos a la caja").listeners.click();
+    assert.equal(fixture.confirmed.length,1);
+    const saved=fixture.confirmed[0][0];
+    assert.equal(saved.oleocellosis_count,2);
+    assert.equal(saved.fruit_predictions[0].review_status,"confirmed");
+    assert.equal(saved.fruit_predictions[1].review_status,"rejected");
+    assert.equal(saved.fruit_predictions[1].predicted_class,"con_oleocelosis");
+    assert.equal(saved.fruit_predictions[1].override_label,"other");
+    assert.match(saved.fruit_predictions[1].override_reason,/check de oleocelosis/);
+    assert.equal(saved.fruit_predictions[2].review_status,undefined);
+  }finally{fixture.cleanup();global.SmartFruitVisionReview=previous;}
+});
+
+test("a confirmed capture uses the current box selection without reopening stale job checkboxes",async()=>{
+  const previous=global.SmartFruitVisionReview;global.SmartFruitVisionReview=require("../../src/smartfruit/web/vision_review.js");
+  const photo=localPhoto("A","fruit.jpg"),original=[classified("A","fruit.jpg")];
+  global.SmartFruitVisionReview.applySelection(original,"QC");
+  const current=structuredClone(original);
+  global.SmartFruitVisionReview.setIncluded(current,"A","fruit.jpg",false);
+  global.SmartFruitVisionReview.applySelection(current,"QC correction");
+  const fixture=componentFixture({photos:[photo],showConfirmedReview:false,getConfirmedRecords:()=>current,
+    memory:{confirmedJob:{job_id:"J",status:"ready",context,photos:[photo],records:original}}});
+  try{
+    await fixture.load();fixture.widget.refresh();
+    assert.equal(fixture.nodes().filter(node=>node.tagName==="INPUT"&&node.type==="checkbox"&&node.attributes?.["aria-label"]?.includes("oleocelosis")).length,0);
+    assert.equal(fixture.nodes().some(node=>String(node.textContent).includes("1 activas")),false);
+    assert.equal(current[0].fruit_predictions[0].review_status,"rejected");
+    assert.equal(original[0].fruit_predictions[0].review_status,"confirmed");
   }finally{fixture.cleanup();global.SmartFruitVisionReview=previous;}
 });
 

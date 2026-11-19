@@ -49,6 +49,49 @@ def test_historical_positive_is_pending_and_never_an_operational_count():
     assert summary["vision_review"][0]["review_status"] == "pending"
 
 
+@pytest.mark.parametrize("included", [True, False])
+def test_checkbox_selection_stays_pending_until_qc_applies_it(included):
+    source = raw_record()
+    for prediction in source["fruit_predictions"][:2]:
+        prediction["qc_included"] = included
+    original = deepcopy(source)
+    summary = aggregate_vision_sample([source], "S")["vision_summary"]
+    assert summary["oleocellosis_count"] == 0
+    assert summary["pending_review_count"] == 2
+    assert summary["raw_oleocellosis_count"] == 2
+    assert source == original
+
+
+@pytest.mark.parametrize("included", [None, 0, 1, "true", [], {}])
+def test_checkbox_selection_requires_an_explicit_boolean(included):
+    source = raw_record()
+    source["fruit_predictions"][0]["qc_included"] = included
+    with pytest.raises(ValueError, match="qc_included"):
+        load_vision_json(source)
+
+
+@pytest.mark.parametrize("index,included", [(0, False), (1, True)])
+def test_checkbox_cannot_contradict_an_applied_qc_review(index, included):
+    source = reviewed()
+    source["fruit_predictions"][index]["qc_included"] = included
+    with pytest.raises(ValueError, match="qc_included"):
+        load_vision_json(source)
+
+
+def test_explicit_review_keeps_an_existing_checkbox_consistent_with_its_outcome():
+    source = raw_record()
+    source["fruit_predictions"][0]["qc_included"] = True
+    excluded = review_vision_prediction(
+        source, "FRUIT_0", "rejected", "QC", override_label="other",
+        override_reason="Excluido por QC mediante el check de oleocelosis.",
+    )
+    assert excluded["fruit_predictions"][0]["qc_included"] is False
+    restored = review_vision_prediction(excluded, "FRUIT_0", "confirmed", "QC")
+    assert restored["fruit_predictions"][0]["qc_included"] is True
+    assert restored["oleocellosis_count"] == source["oleocellosis_count"]
+    assert restored["fruit_predictions"][0]["predicted_class"] == "con_oleocelosis"
+
+
 def test_confirmed_counts_and_rejected_positive_preserves_original_and_override():
     source = raw_record()
     result = reviewed()

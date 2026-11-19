@@ -198,6 +198,42 @@ test("native selector input then change switches pallet values without invalidat
   assert.equal(byId("inspector-confirmation").checked,true);
 });
 
+test("box checkboxes update the preview and apply one review without changing manual defects",()=>{
+  const previousDocument=global.document;
+  global.document={createElement:tag=>new Node(tag)};
+  try{
+    const {context,byId}=setup();
+    const review=require("../../src/smartfruit/web/vision_review.js");context.SmartFruitVisionReview=review;
+    byId("inspector-name").value="QC Test";
+    const record={image_id:"GROUP",total_fruits:3,oleocellosis_count:2,fruit_predictions:[
+      {crop_id:"A",predicted_class:"con_oleocelosis",oleocellosis_probability:.9,confidence:.9},
+      {crop_id:"B",predicted_class:"con_oleocelosis",oleocellosis_probability:.8,confidence:.8},
+      {crop_id:"C",predicted_class:"sin_oleocelosis",oleocellosis_probability:.1,confidence:.9},
+    ]};
+    const raw=structuredClone(record);
+    const sample=context.addSample({...reception("P1","Original"),records:[record]});
+    sample.controls.scars.value="1";
+    const checks=sample.reviewHost.querySelectorAll("input").filter(node=>node.type==="checkbox");
+    assert.deepEqual(checks.map(check=>check.checked),[true,true]);
+    assert.equal(sample.controls.oleocellosis.value,"2");
+    checks[1].checked=false;
+    for(const handler of checks[1].listeners.change)handler({stopPropagation(){}});
+    assert.equal(sample.controls.oleocellosis.value,"1");
+    assert.equal(sample.metricValues[2].textContent,"1");
+    assert.equal(sample.controls.scars.value,"1");
+    sample.reviewHost.querySelectorAll("button").find(button=>button.textContent==="Aplicar selección").click();
+    assert.equal(review.summary(sample.records).pending,0);
+    assert.equal(record.fruit_predictions[0].review_status,"confirmed");
+    assert.equal(record.fruit_predictions[1].review_status,"rejected");
+    assert.equal(record.fruit_predictions[1].qc_included,false);
+    assert.equal(record.oleocellosis_count,raw.oleocellosis_count);
+    assert.equal(record.fruit_predictions[1].predicted_class,raw.fruit_predictions[1].predicted_class);
+    const restoredChecks=sample.reviewHost.querySelectorAll("input").filter(node=>node.type==="checkbox");
+    assert.deepEqual(restoredChecks.map(check=>check.checked),[true,false]);
+    assert.equal(sample.controls.oleocellosis.value,"1");
+  }finally{global.document=previousDocument;}
+});
+
 test("Vision derives a readonly Sample from unique JSONs and requires explicit box completion",()=>{
   const {context,byId}=setup(["valueOf","collectPayload","validateForEvaluation"]);
   const first={image_id:"FIRST",total_fruits:12,oleocellosis_count:1,fruit_predictions:[]};

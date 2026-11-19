@@ -59,9 +59,10 @@ def test_reviewed_counts_and_raw_predictions_survive_all_report_formats(tmp_path
         predictions = payload["samples"][0]["vision_records"][0]["fruit_predictions"]
         for prediction in predictions:
             prediction.update(review_status="confirmed", reviewed_by="QC",
-                              reviewed_at="2026-11-18T14:00:00Z")
-        predictions[1].update(review_status="rejected", override_label="scar",
-                              override_reason="Cicatriz verificada por QC")
+                              reviewed_at="2026-11-18T14:00:00Z", qc_included=True)
+        exclusion_reason = "Excluido por QC mediante el check de oleocelosis."
+        predictions[1].update(review_status="rejected", override_label="other",
+                              override_reason=exclusion_reason, qc_included=False)
         payload.update(inspector_name="QC", confirmed=True,
                        final_decisions={"SAMPLE": "STANDARD"})
         response = client.post("/api/finalize", json=payload)
@@ -80,12 +81,14 @@ def test_reviewed_counts_and_raw_predictions_survive_all_report_formats(tmp_path
         assert source == payload
         audit = sample["inspection_summary"]["vision_review"][1]
         assert audit["predicted_class"] == "con_oleocelosis"
-        assert audit["override_label"] == "scar"
+        assert audit["override_label"] == "other"
+        assert audit["override_reason"] == exclusion_reason
+        assert audit["qc_included"] is False
         workbook = openpyxl.load_workbook(BytesIO(client.get(saved["downloads"]["xlsx"]).content))
         assert workbook["Report"]["R16"].value == 1
         assert workbook["Vision QC"].max_row == 3
         text = client.get(saved["downloads"]["print"]).text
-        assert "rejected" in text and "scar" in text
+        assert "rejected" in text and exclusion_reason in text
         assert "Level Flag: 3" in text
         assert sample["predictive"]["enabled"] is False
         validation = client.post("/api/vision/validation", json={
