@@ -138,6 +138,66 @@ test("switching pallets preserves entered amounts and zero fill is explicit and 
   assert.equal(state.selectedPallet,String(first.serial));
 });
 
+test("native selector input then change switches pallet values without invalidating the inspection",()=>{
+  const {context,state,byId}=setup(["handleInspectionEdit","invalidate"]);
+  const first=context.addSample(reception("P1","First label"));
+  const second=context.addSample(reception("P2","Second label"));
+  for(const [sample,total,oleo,decay,size,note]of [
+    [first,"12","1","2","42","First pallet note"],
+    [second,"30","4","7","60","Second pallet note"],
+  ]){
+    sample.inspectionStatus="COMPLETED";
+    Object.assign(sample.controls.sample_count,{value:total});
+    Object.assign(sample.controls.oleocellosis,{value:oleo});
+    Object.assign(sample.controls.decay,{value:decay});
+    Object.assign(sample.controls.size,{value:size});
+    sample.observations.value=note;
+  }
+  state.workflowStep=2;state.revision=42;state.evaluatedRevision=42;
+  const report={samples:[{sample_id:first.id.value},{sample_id:second.id.value}]};
+  const payload={qc_header:{lot_id:"LOT"}};
+  state.report=report;state.payload=payload;
+  first.inspectorChoice="STANDARD";second.inspectorChoice="EXTEND";
+  byId("inspector-confirmation").checked=true;
+  // Reproduce the real cascade: a bubbled edit refreshes the whole form.
+  context.captureChanged=()=>context.refreshWorkflow();
+  const selector=byId("vision-pallet-select");selector.id="vision-pallet-select";selector.tagName="SELECT";
+  const binding=html.split("\n").find(line=>line.trim().startsWith('byId("vision-pallet-select").addEventListener("change",'));
+  assert.ok(binding,"the actual selector change handler exists");
+  vm.runInContext(binding,context);
+  context.selectQCPallet(first.serial);
+  function choose(sample){
+    selector.value=String(sample.serial);
+    // A native select emits input on the form before its own change handler.
+    context.handleInspectionEdit({type:"input",target:selector});
+    for(const handler of selector.listeners.change||[])handler({type:"change",target:selector});
+    context.handleInspectionEdit({type:"change",target:selector});
+  }
+  choose(second);
+  assert.equal(selector.value,String(second.serial));
+  assert.equal(state.selectedPallet,String(second.serial));
+  assert.equal(first.card.hidden,true);assert.equal(second.card.hidden,false);
+  assert.equal(first.qcEditor.hidden,true);assert.equal(second.qcEditor.hidden,false);
+  assert.equal(second.controls.label_brand.value,"Second label");
+  assert.equal(second.controls.size.value,"60");
+  assert.equal(second.controls.sample_count.value,"30");
+  assert.equal(second.controls.oleocellosis.value,"4");
+  assert.equal(second.controls.decay.value,"7");
+  assert.equal(second.observations.value,"Second pallet note");
+  choose(first);
+  assert.equal(first.card.hidden,false);assert.equal(first.qcEditor.hidden,false);
+  assert.equal(second.card.hidden,true);assert.equal(second.qcEditor.hidden,true);
+  assert.equal(first.controls.label_brand.value,"First label");
+  assert.equal(first.controls.sample_count.value,"12");
+  assert.equal(first.controls.oleocellosis.value,"1");
+  assert.equal(first.controls.decay.value,"2");
+  assert.equal(first.observations.value,"First pallet note");
+  assert.equal(state.revision,42);assert.equal(state.evaluatedRevision,42);
+  assert.equal(state.report,report);assert.equal(state.payload,payload);
+  assert.equal(first.inspectorChoice,"STANDARD");assert.equal(second.inspectorChoice,"EXTEND");
+  assert.equal(byId("inspector-confirmation").checked,true);
+});
+
 test("Vision derives a readonly Sample from unique JSONs and requires explicit box completion",()=>{
   const {context,byId}=setup(["valueOf","collectPayload","validateForEvaluation"]);
   const first={image_id:"FIRST",total_fruits:12,oleocellosis_count:1,fruit_predictions:[]};

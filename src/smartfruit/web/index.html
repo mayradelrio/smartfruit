@@ -651,6 +651,8 @@
     captureChanged();return true;
   }
   function handleInspectionEdit(event) {
+    // El selector navega entre paletas; no debe invalidar ni restaurar la captura.
+    if(event.target===byId("vision-pallet-select"))return;
     if(event.target.type==="file"||event.target.closest?.(".additional-review")||event.target.closest?.(".vision-capture")||event.target.dataset?.sampleId)return;
     const finalField=["Level_Flag","reason","remarks","grade","color","plu_pct"].some(key=>headerControls[key]===event.target);
     if(finalField||Object.values(summaryControls).includes(event.target)||event.target===byId("inspection-observations"))syncReviewMetadata();else invalidate();
