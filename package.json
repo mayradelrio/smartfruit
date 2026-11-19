@@ -1,0 +1,10 @@
+{
+  "name": "smartfruit-client-checks",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/js/*.cjs"
+  },
+  "devDependencies": {
+    "fake-indexeddb": "6.2.4"
+  }
+}

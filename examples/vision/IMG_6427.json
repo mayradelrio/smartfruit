@@ -1,0 +1,82 @@
+{
+    "image_id": "IMG_6427",
+    "partition": "test",
+    "total_fruits": 12,
+    "oleocellosis_count": 1,
+    "oleocellosis_pct": 8.3333,
+    "mean_confidence": 0.997465,
+    "fruit_predictions": [
+        {
+            "crop_id": "IMG_6427_L06.jpg",
+            "predicted_class": "con_oleocelosis",
+            "oleocellosis_probability": 0.999851,
+            "confidence": 0.999851
+        },
+        {
+            "crop_id": "IMG_6427_L01.jpg",
+            "predicted_class": "sin_oleocelosis",
+            "oleocellosis_probability": 4.7e-05,
+            "confidence": 0.999953
+        },
+        {
+            "crop_id": "IMG_6427_L02.jpg",
+            "predicted_class": "sin_oleocelosis",
+            "oleocellosis_probability": 0.002234,
+            "confidence": 0.997766
+        },
+        {
+            "crop_id": "IMG_6427_L03.jpg",
+            "predicted_class": "sin_oleocelosis",
+            "oleocellosis_probability": 0.000128,
+            "confidence": 0.999872
+        },
+        {
+            "crop_id": "IMG_6427_L04.jpg",
+            "predicted_class": "sin_oleocelosis",
+            "oleocellosis_probability": 0.002334,
+            "confidence": 0.997666
+        },
+        {
+            "crop_id": "IMG_6427_L05.jpg",
+            "predicted_class": "sin_oleocelosis",
+            "oleocellosis_probability": 0.007328,
+            "confidence": 0.992672
+        },
+        {
+            "crop_id": "IMG_6427_L07.jpg",
+            "predicted_class": "sin_oleocelosis",
+            "oleocellosis_probability": 0.000388,
+            "confidence": 0.999613
+        },
+        {
+            "crop_id": "IMG_6427_L08.jpg",
+            "predicted_class": "sin_oleocelosis",
+            "oleocellosis_probability": 0.003837,
+            "confidence": 0.996163
+        },
+        {
+            "crop_id": "IMG_6427_L09.jpg",
+            "predicted_class": "sin_oleocelosis",
+            "oleocellosis_probability": 0.000776,
+            "confidence": 0.999224
+        },
+        {
+            "crop_id": "IMG_6427_L10.jpg",
+            "predicted_class": "sin_oleocelosis",
+            "oleocellosis_probability": 0.000203,
+            "confidence": 0.999797
+        },
+        {
+            "crop_id": "IMG_6427_L11.jpg",
+            "predicted_class": "sin_oleocelosis",
+            "oleocellosis_probability": 0.007541,
+            "confidence": 0.992459
+        },
+        {
+            "crop_id": "IMG_6427_L12.jpg",
+            "predicted_class": "sin_oleocelosis",
+            "oleocellosis_probability": 0.005458,
+            "confidence": 0.994542
+        }
+    ]
+}

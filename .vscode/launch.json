@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "SmartFruit · iniciar QC (Predictive OFF)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "smartfruit.app",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "env": {"USE_PREDICTIVE": "False", "PORT": "3000", "SMARTFRUIT_REPORTS_DIR": "reports"}
+    }
+  ]
+}

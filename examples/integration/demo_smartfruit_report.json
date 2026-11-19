@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.0",
+  "lot_id": "LOT_DEMO_001",
+  "pallet_id": "PALLET_DEMO_01",
+  "sample_id": "SAMPLE_DEMO_001",
+  "inspection_summary": {
+    "images_processed": 3,
+    "image_ids": [
+      "IMG_6426",
+      "IMG_6427",
+      "IMG_6428"
+    ],
+    "total_fruits": 36,
+    "oleocellosis_count": 3,
+    "oleocellosis_pct": 8.3333,
+    "mean_confidence": 0.997422,
+    "low_confidence_threshold": 0.7,
+    "low_confidence_count": 0,
+    "low_confidence_items": [],
+    "duplicate_image_ids_ignored": []
+  },
+  "defects": {
+    "scars_pct": {
+      "business_name": "Cicatrices / defectos de piel",
+      "group": "quality",
+      "source": "qc_manual",
+      "pct": 2.0,
+      "business_level": 1
+    },
+    "blanching_pct": {
+      "business_name": "Blanqueamiento / decoloración",
+      "group": "quality",
+      "source": "qc_manual",
+      "pct": 0.0,
+      "business_level": 1
+    },
+    "yellow_color_pct": {
+      "business_name": "Color amarillo / sobremaduro",
+      "group": "quality",
+      "source": "qc_manual",
+      "pct": 0.0,
+      "business_level": 1
+    },
+    "oleocellosis_pct": {
+      "business_name": "Oleocelosis",
+      "group": "condition",
+      "source": "vision_ai",
+      "pct": 8.3333,
+      "business_level": 2
+    },
+    "styler_pct": {
+      "business_name": "Styler (limes)",
+      "group": "condition",
+      "source": "qc_manual",
+      "pct": 0.0,
+      "business_level": 1
+    },
+    "skin_breakdown_pct": {
+      "business_name": "Skin Breakdown / Fumigation Damage",
+      "group": "condition",
+      "source": "qc_manual",
+      "pct": 0.0,
+      "business_level": 1
+    },
+    "mold_pct": {
+      "business_name": "Moho",
+      "group": "condition",
+      "source": "qc_manual",
+      "pct": 0.0,
+      "business_level": 1
+    },
+    "decay_pct": {
+      "business_name": "Pudrición",
+      "group": "condition",
+      "source": "qc_manual",
+      "pct": 0.0,
+      "business_level": 1
+    }
+  },
+  "business_severity": {
+    "boundary_policy": "higher",
+    "quality_max_level": 1,
+    "condition_max_level": 2,
+    "business_max_level": 2,
+    "recommendation": "EXPAND",
+    "reasons": [
+      "Oleocelosis"
+    ]
+  },
+  "predictive": {
+    "enabled": false,
+    "experimental": true,
+    "predicted_loss_pct": null,
+    "decision": null
+  },
+  "final_recommendation": "EXPAND",
+  "recommendation_reasons": [
+    "Oleocelosis"
+  ],
+  "human_confirmation_required": true,
+  "inspector_final_decision": null
+}

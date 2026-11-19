@@ -1,0 +1,974 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>AgroPeru · QUALITY INSPECTION · SmartFruit</title>
+  <style>
+    :root{--ink:#20342d;--muted:#5d7067;--green:#176649;--green-dark:#104c36;--pale:#edf5ef;--line:#cfdbd2;--paper:#fff;--background:#f4f6f3;--warning:#fff4d9;--danger:#a0302e;--radius:12px}
+    *{box-sizing:border-box}body{margin:0;background:var(--background);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5;font-size:15px}button,input,select,textarea{font:inherit}button,a,input,select,textarea{touch-action:manipulation}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #bb8919;outline-offset:3px}button{min-height:44px;cursor:pointer;border:1px solid var(--green);border-radius:7px;background:var(--green);color:#fff;padding:.65rem 1rem;font-weight:650}button:hover{background:var(--green-dark)}button:disabled{opacity:.55;cursor:wait}.secondary{background:#fff;color:var(--green)}.secondary:hover{background:var(--pale)}.quiet{border-color:var(--line);background:#fff;color:var(--muted);font-weight:500}.quiet:hover{background:var(--background)}.danger{color:var(--danger);border-color:#e2bfbc;background:#fff}.danger:hover{background:#fff0ee}input,select,textarea{width:100%;min-height:44px;border:1px solid #aebfb3;background:#fff;border-radius:6px;padding:.55rem .65rem;color:var(--ink)}input[readonly]{background:var(--pale);border-color:var(--line)}input[type=checkbox]{width:22px;min-height:22px;height:22px;accent-color:var(--green);flex-shrink:0}textarea{resize:vertical;min-height:85px}label{display:block;font-size:.88rem;font-weight:600;margin-bottom:.3rem}small,.muted,.hint{color:var(--muted)}small{display:block;font-size:.8rem;margin-top:.2rem}.hint{font-size:.88rem;margin:.4rem 0 0}h1,h2,h3,p{margin-top:0}h1{font-size:1.75rem;line-height:1.2;margin-bottom:.45rem}h2{font-size:1.16rem;margin-bottom:1rem}h3{font-size:1rem}header{background:var(--green-dark);color:#fff}.topbar{max-width:1220px;margin:auto;padding:1.35rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}.brand{font-weight:750;font-size:1.15rem;letter-spacing:.02em}.topbar p{color:#d8e9dd;margin:.2rem 0 0;font-size:.9rem}.badge{display:inline-flex;align-items:center;border-radius:99px;font-size:.8rem;font-weight:700;padding:.35rem .75rem;background:#fff;color:var(--green-dark);white-space:nowrap}.badge.experimental{background:#fff0c7;color:#78510a}main{max-width:1220px;padding:1.5rem;margin:auto}.page-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:1.5rem;margin:.25rem 0 1.3rem}.page-heading p{margin-bottom:0;max-width:740px;color:var(--muted)}.actions{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap}.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:1.4rem;margin:1.1rem 0;box-shadow:0 1px 2px #19342305}.card-heading{display:flex;justify-content:space-between;gap:1rem;align-items:center;margin-bottom:1rem}.card-heading h2{margin:0}.step{display:inline-flex;width:26px;height:26px;background:var(--pale);color:var(--green);border-radius:50%;align-items:center;justify-content:center;font-size:.85rem;margin-right:.5rem}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}.field.wide{grid-column:span 2}.field.full{grid-column:1/-1}.group-title{margin:1.3rem -1.4rem 1rem;padding:.55rem 1.4rem;background:var(--pale);font-size:.93rem;font-weight:750;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.group-title:first-child{margin-top:0}.condition-title{background:#eaf1ed}.quality-title{background:#eff4dc}.sample-title{font-size:1.1rem;font-weight:700;margin:0}.sample-number{font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:.2rem}.vision-area{border:1px dashed #93b19d;border-radius:8px;background:#f8fbf7;padding:1rem;margin:1.2rem 0}.vision-heading{display:flex;justify-content:space-between;align-items:center;gap:.7rem}.vision-heading h3{margin-bottom:0}.auto-tag{font-size:.75rem;font-weight:700;color:var(--green);background:#dfeee2;padding:.2rem .45rem;border-radius:4px}.file-input{margin:.6rem 0;background:#fff}.vision-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.65rem;margin:.9rem 0}.metric{padding:.65rem;background:#fff;border:1px solid var(--line);border-radius:7px}.metric span{display:block;font-size:.78rem;color:var(--muted)}.metric strong{display:block;font-size:1.2rem;margin-top:.15rem}.file-list{font-size:.82rem;max-height:100px;overflow:auto;margin:.4rem 0;padding-left:1.2rem;color:var(--muted)}.notice{border-left:4px solid #b68d30;background:var(--warning);padding:.85rem 1rem;border-radius:4px;font-size:.9rem;margin:1rem 0}.notice p:last-child{margin-bottom:0}.notice.success{background:#eaf5ed;border-color:var(--green)}.error{border:1px solid #d9a7a2;border-left:4px solid var(--danger);background:#fff1ee;padding:1rem;border-radius:6px;margin:1rem 0;white-space:pre-line}.loading{padding:1.5rem;color:var(--muted)}.rule-note{font-size:.86rem;background:#f6f7f4;border:1px solid var(--line);border-radius:7px;padding:.8rem 1rem;margin:1rem 0}.rule-note summary{cursor:pointer;font-weight:600}.rule-note p{margin:.5rem 0 0}.footer-actions{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin:1.2rem 0}.review-result{border:1px solid var(--line);border-radius:8px;margin:1rem 0;overflow:hidden}.result-top{display:flex;justify-content:space-between;align-items:center;gap:1rem;background:#f7faf6;padding:1rem}.result-top h3{margin:0}.recommendation{font-weight:750;font-size:.9rem;border-radius:5px;padding:.35rem .65rem;background:#e4f1e6;color:#24633a}.recommendation.EXPAND{background:#fff0bf;color:#775316}.recommendation.ESCALATE{background:#fce6e1;color:#9e352b}.result-body{padding:1rem}.result-body p:last-child{margin-bottom:0}.result-body ul{padding-left:1.25rem}.result-detail{font-size:.85rem;color:var(--muted)}.result-body .field{max-width:440px;margin-top:1rem}.signing{border-top:1px solid var(--line);padding-top:1rem;margin-top:1.3rem}.check-label{display:flex;align-items:flex-start;gap:.65rem;font-weight:500;margin:1rem 0;max-width:850px}.check-label span{padding-top:.05rem}.download-links a{display:inline-block;min-height:44px;border:1px solid var(--green);border-radius:7px;padding:.6rem 1rem;color:var(--green);background:#fff;text-decoration:none;font-weight:650}.download-links a:hover{background:var(--pale)}footer{max-width:1220px;padding:.4rem 1.5rem 2rem;margin:auto;font-size:.82rem;color:var(--muted)}[hidden]{display:none!important}.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .reception-status{margin:.8rem 0;color:var(--muted);font-size:.9rem}.scan-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) auto;align-items:end;gap:1rem;margin-top:1rem}.scan-layout button{white-space:nowrap}.reception-table-wrap{max-width:100%;overflow:auto;border:1px solid var(--line);border-radius:7px;margin:1rem 0}.reception-table{border-collapse:collapse;width:100%;font-size:.82rem}.reception-table th,.reception-table td{text-align:left;vertical-align:top;border-bottom:1px solid var(--line);padding:.65rem .75rem;min-width:125px;overflow-wrap:anywhere}.reception-table th{background:var(--pale);font-weight:700}.reception-table tr:last-child td{border-bottom:0}.reception-table td{max-width:250px}.reception-values{display:flex;gap:.5rem 1.5rem;flex-wrap:wrap;margin:.65rem 0}.reception-values p{margin:0;font-size:.9rem}.bound-note{border:1px solid var(--line);background:#f7faf6;border-radius:7px;padding:.7rem 1rem;margin-top:1rem;font-size:.86rem}.bound-note summary{cursor:pointer;font-weight:650}.bound-note p{margin:.6rem 0 0}.persistence-issue{color:#78510a;background:var(--warning);padding:.65rem .8rem;border-radius:5px;font-size:.85rem;margin-top:.8rem}
+    .draft-bar{display:flex;gap:1rem;justify-content:space-between;align-items:center;padding:.8rem 1rem;border:1px solid var(--line);border-radius:8px;background:#fff;margin:1rem 0}.draft-bar p{margin:0;font-size:.87rem}.draft-bar .not-saved{color:var(--danger)}.field-source{display:inline-block;font-size:.67rem;line-height:1.35;font-weight:650;background:#edf2ed;color:var(--muted);padding:.13rem .35rem;margin-left:.35rem;border-radius:4px;vertical-align:middle}.field-state{font-size:.76rem;margin-top:.25rem}.field-state.pending{color:#856016}.vision-context{padding:.7rem .8rem;margin:.75rem 0;background:#e8f1e9;border-radius:6px;font-weight:650;font-size:.9rem;overflow-wrap:anywhere}.context-issue{white-space:pre-line}.pending-list{max-height:220px;overflow:auto;padding-left:1.3rem;font-size:.85rem}.draft-recovery{white-space:pre-line}
+    .workflow-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.5rem;margin:1rem 0}.workflow-nav button{display:flex;align-items:center;gap:.5rem;text-align:left;background:#fff;color:var(--muted);border-color:var(--line);font-size:.85rem;padding:.7rem}.workflow-nav button span{display:inline-flex;width:25px;height:25px;align-items:center;justify-content:center;border-radius:50%;background:var(--pale);flex-shrink:0}.workflow-nav button[aria-current=step]{color:var(--green-dark);border-color:var(--green);background:#eaf3ec}.workflow-nav button[aria-current=step] span{background:var(--green);color:#fff}.lot-banner{display:flex;gap:.5rem 1.3rem;align-items:center;justify-content:space-between;background:#e2eee5;border:1px solid #b9ccbf;border-radius:8px;padding:.8rem 1rem;margin:1rem 0}.lot-banner span{font-size:.86rem;color:var(--muted)}.vision-selector{max-width:560px;margin:1.2rem 0}.qc-table-scroll{overflow:auto;max-width:100%;max-height:70vh;border:1px solid #b9cbbf;border-radius:9px;background:#fff}.qc-table{border-collapse:separate;border-spacing:0;table-layout:fixed;min-width:4200px;width:100%;font-size:.82rem}.qc-table th,.qc-table td{min-width:140px;width:140px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);vertical-align:top;padding:.6rem}.qc-table thead th{text-align:center;background:#e9f1eb;position:sticky;z-index:3}.qc-table thead tr:first-child th{top:0;height:38px;font-weight:750;padding:.55rem}.qc-table thead tr:nth-child(2) th{top:38px;min-height:64px}.qc-table thead th.quality-group{background:#eaf1cf}.qc-table tbody td:first-child,.qc-table tfoot tr:first-child td:first-child{position:sticky;left:0;z-index:2;background:#fff}.qc-table tbody td:nth-child(2),.qc-table tfoot tr:first-child td:nth-child(2){position:sticky;left:140px;z-index:2;background:#f6faf6}.qc-table input,.qc-table select,.qc-table textarea{min-height:42px;max-width:100%;padding:.45rem;font-size:.85rem}.qc-table .field{min-width:0}.qc-table .field-source{margin:.25rem .2rem 0 0}.qc-table .field-state{display:inline-block;margin-top:.25rem;font-size:.68rem}.qc-table .field small:not(.field-state){font-size:.69rem}.qc-table tbody tr:focus-within td{background:#fafcf5}.qc-table tfoot td,.qc-table tfoot th{background:#edf3ee;font-size:.82rem;font-weight:650}.qc-table tfoot th{text-align:left}.qc-table .row-tools{margin-top:.5rem;display:grid;gap:.4rem}.qc-table .row-tools button{font-size:.73rem;min-height:36px;padding:.35rem}.qc-table .row-tools textarea{min-height:62px}.lot-summary-values{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem;margin:1rem 0}.lot-summary-values .metric{background:#f7faf6}.summary-defects{border-collapse:collapse;width:100%;font-size:.9rem}.summary-defects th,.summary-defects td{padding:.55rem;border-bottom:1px solid var(--line);text-align:left}.summary-defects th{background:var(--pale)}.generated-reason{white-space:pre-line;margin:.8rem 0}.lot-roster{display:flex;gap:.4rem;flex-wrap:wrap;margin:.8rem 0}.lot-roster span{padding:.25rem .5rem;border:1px solid var(--line);border-radius:4px;background:#f7faf6;font-size:.84rem}
+    @media(max-width:900px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.page-heading{display:block}.page-heading .actions{margin-top:1rem}.vision-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.scan-layout{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}.scan-layout button{grid-column:1/-1}.workflow-nav{grid-template-columns:repeat(2,minmax(0,1fr))}.lot-summary-values{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:620px){main{padding:.8rem}.topbar{padding:1rem;align-items:flex-start}.topbar .brand{font-size:1rem}.topbar p{max-width:210px;font-size:.8rem}.badge{font-size:.7rem;padding:.35rem .5rem}.card{padding:1rem}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}.group-title{margin-left:-1rem;margin-right:-1rem;padding-left:1rem;padding-right:1rem}.field.wide{grid-column:1/-1}.footer-actions{align-items:stretch;flex-direction:column}.footer-actions button{width:100%}.result-top{align-items:flex-start}.result-top h3{font-size:.9rem}h1{font-size:1.5rem}.page-heading p{font-size:.9rem}.card-heading{align-items:flex-start}.card-heading .quiet{font-size:.8rem}.vision-heading{align-items:flex-start}.actions{gap:.5rem}.scan-layout{grid-template-columns:1fr}.scan-layout button{grid-column:auto}footer{padding-left:1rem;padding-right:1rem}}
+    .vision-capture{margin:1rem 0 1.2rem;padding-bottom:1.2rem;border-bottom:1px solid var(--line)}.vision-capture h4{margin:0}.vision-photo-controls{display:flex;gap:.6rem;margin:1rem 0}.vision-photo-controls input{max-width:360px}.vision-photo-controls button{flex-shrink:0}.vision-photo-groups{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem}.vision-photo-group{background:#fff;border:1px solid var(--line);border-radius:9px;padding:.75rem;min-width:0}.vision-group-label{display:flex;align-items:center;gap:.65rem;margin-bottom:.6rem}.vision-group-label span{min-width:0;overflow-wrap:anywhere}.vision-group-label small{font-weight:400}.vision-group-thumbnails{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.35rem}.vision-group-thumbnails img{width:100%;height:76px;object-fit:contain;background:#f1f4f0;border-radius:4px}.vision-photo-details{font-size:.78rem;margin-top:.65rem}.vision-photo-details summary{cursor:pointer;min-height:32px;padding:.3rem 0}.vision-individual-photos{display:grid;gap:.4rem;max-height:290px;overflow:auto;margin-top:.5rem}.vision-individual-photo{display:flex;align-items:center;gap:.4rem;font-size:.7rem;font-weight:400;overflow-wrap:anywhere}.vision-individual-photo img{width:46px;height:46px;object-fit:contain;flex-shrink:0}.vision-individual-photo span{min-width:0}.vision-photo-navigation{display:flex;gap:.8rem;justify-content:center;align-items:center;margin:.8rem 0}.vision-photo-navigation button{font-size:.8rem;min-height:36px;padding:.4rem .6rem}.vision-capture>.actions{margin-top:.6rem}.vision-capture-result{margin-top:1rem}.vision-capture-result>button{margin-top:.8rem}.vision-processing{border-radius:7px;padding:.8rem 1rem;background:#e7f1e9;color:var(--green-dark)}.additional-review .vision-photo-groups{grid-template-columns:repeat(2,minmax(0,1fr))}@media(max-width:800px){.vision-photo-groups{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.vision-photo-groups,.additional-review .vision-photo-groups{grid-template-columns:1fr}.vision-photo-controls{flex-wrap:wrap}.vision-photo-controls input{max-width:none}}
+    [hidden]{display:none!important}
+    :root{--background:#f5f7f6;--line:#dce5df;--radius:14px}
+    main{max-width:1280px}.topbar{max-width:1280px}.page-heading{margin:.7rem 0 1.6rem}.page-heading h1{font-size:1.8rem;letter-spacing:.025em}.page-heading p{font-size:.95rem;max-width:650px}.card{box-shadow:none;padding:1.5rem}.workflow-nav{gap:.75rem;margin:1.5rem 0}.workflow-nav button{padding:.85rem 1rem;border-radius:10px}.lot-banner{background:#fff;border-color:var(--line);padding:1rem 1.2rem}.draft-bar{background:transparent;border:0;padding:.3rem 0}.draft-bar button{font-size:.8rem;min-height:36px;padding:.4rem .7rem}.draft-bar p{font-size:.8rem}.field-source{font-size:.65rem;background:#eaf3ed;color:var(--green);font-weight:600}.field-state:not(.pending){display:none}.field-state.pending{font-size:.72rem;color:var(--muted)}.field label{font-weight:550}.field input[readonly]{color:#456352;border-color:#dde8df;background:#f2f7f3}.lot-picker{display:grid;grid-template-columns:minmax(200px,1fr) auto;gap:1rem;align-items:end;max-width:620px;margin:1rem 0}.scan-layout{grid-template-columns:minmax(0,1fr) auto;max-width:620px}.scan-layout button{grid-column:auto}.reception-values{gap:.7rem 2rem}.lot-roster span{border-radius:6px;padding:.4rem .65rem}.sample-card{border:0;box-shadow:none;padding:0;margin:1.3rem 0}.sample-card .card-heading{margin-bottom:.75rem}.sample-card .vision-area{margin-top:1rem}.capture-intro{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start}.capture-intro p{max-width:650px}.capture-legend{display:flex;gap:.5rem;flex-wrap:wrap;margin:1rem 0 0}.capture-legend span{font-size:.75rem;border:1px solid var(--line);border-radius:6px;padding:.3rem .55rem;color:var(--muted);background:#fff}.capture-legend .receipt-key{background:#f2f7f3;color:#456352}.qc-workspace{display:grid;grid-template-columns:210px minmax(0,1fr);gap:1.25rem;align-items:start;margin:1.25rem 0}.qc-sidebar{position:sticky;top:1rem;background:#fff;border:1px solid var(--line);border-radius:12px;padding:.75rem}.qc-sidebar h3{font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:.3rem .4rem;margin:0 0 .4rem}.qc-pallet-list{display:grid;gap:.4rem;max-height:70vh;overflow:auto}.qc-pallet-button{display:block;text-align:left;background:#fff;color:var(--ink);border-color:transparent;border-radius:8px;padding:.8rem;font-weight:600}.qc-pallet-button:hover{background:#f5f8f5}.qc-pallet-button[aria-current=true]{background:#eaf4ec;border-color:#9dbfa8;color:var(--green-dark)}.qc-pallet-button small{font-weight:400;font-size:.75rem;line-height:1.5}.qc-editor{background:#fff;border:1px solid var(--line);border-radius:12px;padding:1.5rem}.qc-editor-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:1.5rem}.qc-editor-heading h3{font-size:1.2rem;margin:0 0 .3rem}.qc-editor-heading p{margin:0;font-size:.85rem;color:var(--muted)}.qc-editor-heading button{font-size:.78rem;padding:.4rem .6rem;min-height:36px}.qc-fieldset{min-width:0;border:0;border-top:1px solid var(--line);padding:1.1rem 0 0;margin:1.6rem 0 0}.qc-fieldset legend{padding:0 .75rem 0 0;color:var(--green-dark);font-size:.9rem;font-weight:700;letter-spacing:.015em}.qc-fieldset .grid{gap:1rem}.qc-fieldset .defect-field input{font-size:1.15rem;min-height:48px}.qc-fieldset .defect-field label{min-height:2.5em;display:flex;align-items:flex-end;flex-wrap:wrap;gap:.15rem}.qc-fieldset .defect-field .field-source{margin-left:0}.qc-fieldset.quality-fields{border-color:#dce4bd}.qc-fieldset.quality-fields legend{color:#656c30}.qc-editor-tools{padding:1rem;border:1px solid var(--line);border-radius:8px;background:#f8faf8;margin:1.3rem 0}.qc-editor-tools button{font-size:.85rem}.qc-editor-tools .hint{font-size:.78rem;max-width:620px}.qc-editor-total{max-width:350px;margin-top:1rem}.qc-editor-footer{display:flex;gap:1rem;justify-content:space-between;align-items:center;margin-top:1rem}.qc-editor-footer p{font-size:.8rem;color:var(--muted);margin:0}.qc-editor-footer .actions{flex-wrap:nowrap}.qc-editor-footer button{font-size:.8rem;min-height:38px;padding:.5rem .7rem}.overview{padding:1.2rem 1.5rem;background:#fff;border:1px solid var(--line);border-radius:12px;margin:1.25rem 0}.overview>summary{cursor:pointer;font-weight:650;color:var(--green-dark)}.overview .hint{margin:.6rem 0 1rem}.qc-table-scroll{max-height:none;margin-top:1rem;border-color:var(--line)}.qc-table{min-width:760px;table-layout:auto;font-size:.85rem}.qc-table th,.qc-table td{min-width:0;width:auto;padding:.85rem .7rem;vertical-align:middle;border-right:0}.qc-table thead tr:first-child th{position:static;height:auto;text-align:left;background:#f3f7f3;font-size:.8rem}.qc-table tbody td:first-child,.qc-table tbody td:nth-child(2),.qc-table tfoot tr:first-child td:first-child,.qc-table tfoot tr:first-child td:nth-child(2){position:static;background:transparent}.qc-table tbody tr[aria-current=true]{background:#f0f7f1}.qc-table tbody button{font-size:.78rem;min-height:34px;padding:.35rem .6rem}.qc-table tfoot td{font-size:.8rem;background:#f3f7f3}.optional-summary{padding:.3rem 0}.optional-summary>summary{cursor:pointer;font-weight:600}.optional-summary .grid{margin-top:1rem}.report-context{margin-bottom:1rem}.report-context>summary{font-size:.85rem;font-weight:600;cursor:pointer;color:var(--muted)}
+    .field,.qc-workspace>*{min-width:0}.qc-pallet-list{min-width:0;max-width:100%}.lot-roster span,.reception-values p{overflow-wrap:anywhere;max-width:100%}
+    .pallet-choice{border-top:1px solid var(--line);padding-top:1rem;margin-top:1rem}.pallet-choice .field{margin-top:.3rem}.inspector-status{font-weight:700;color:var(--green-dark);margin-bottom:.6rem}.additional-review{background:#f5f9f5;border:1px solid #c3d8c8;border-radius:10px;padding:1.2rem;margin-top:1.2rem}.additional-review h4{font-size:1rem;margin:0 0 .4rem}.additional-review .field{max-width:none;margin-top:0}.additional-review .qc-fieldset{margin:1.2rem 0}.additional-review>.file-input{margin-bottom:1rem}.additional-review .check-label{margin:1rem 0}.additional-review .vision-context{font-size:.85rem}.additional-review textarea{margin-bottom:.8rem}.draft-bar .actions{justify-content:flex-end}
+    @media(max-width:1050px){.qc-workspace{grid-template-columns:175px minmax(0,1fr)}.qc-fieldset .grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    @media(max-width:760px){.qc-workspace{grid-template-columns:minmax(0,1fr)}.qc-sidebar{position:static;padding:.6rem}.qc-pallet-list{display:flex;overflow:auto;max-height:none}.qc-pallet-button{flex:0 0 150px}.qc-editor{padding:1rem}.qc-fieldset .grid{grid-template-columns:repeat(2,minmax(0,1fr))}.qc-editor-heading{flex-wrap:wrap}.capture-intro{display:block}.lot-banner{align-items:flex-start;flex-direction:column}.qc-editor-footer{align-items:flex-start;flex-direction:column}.lot-picker{grid-template-columns:1fr}.scan-layout{grid-template-columns:1fr}.page-heading h1{font-size:1.45rem}.overview{padding:1rem}.qc-editor-footer .actions{width:100%;justify-content:space-between}}
+    .vision-positive-gallery{margin:1rem 0;padding:1rem;background:#fffaf0;border:1px solid #e4d5b4;border-radius:9px}.vision-positive-gallery h4{margin:0 0 .35rem}.vision-positive-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.8rem;margin-top:.8rem}.vision-positive-card{min-width:0;margin:0;background:#fff;border:1px solid #e0d6c4;border-radius:7px;overflow:hidden}.vision-positive-open{display:block;width:100%;padding:.35rem;background:#fff;border:0;border-radius:0;color:var(--green-dark);min-height:0}.vision-positive-open:hover{background:#f4f0e7}.vision-positive-open img{display:block;width:100%;height:160px;object-fit:contain;border-radius:4px}.vision-positive-caption{padding:.65rem;font-size:.82rem;overflow-wrap:anywhere}.vision-positive-caption strong{display:block}.vision-positive-caption small{margin-top:.25rem}.vision-image-dialog{width:min(960px,calc(100vw - 2rem));max-height:calc(100vh - 2rem);padding:1rem;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 50px #0004;overflow:auto}.vision-image-dialog::backdrop{background:#102019bb}.vision-image-large{display:block;max-width:100%;width:100%;max-height:72vh;object-fit:contain;margin:.8rem auto;background:#f4f5f1}.vision-image-close{display:block;margin-left:auto}.vision-image-dialog h4{margin:.5rem 0;overflow-wrap:anywhere}@media(max-width:520px){.vision-positive-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.vision-positive-open img{height:130px}.vision-image-dialog{padding:.75rem}}
+    .vision-positive-card>img{display:block;width:100%;height:160px;object-fit:contain;background:#fff}.vision-positive-card>figcaption{padding:.65rem;font-size:.82rem;overflow-wrap:anywhere}
+    .company-brand{display:flex;align-items:center;gap:1rem;min-width:0}.company-logo{display:block;width:230px;max-width:45vw;height:68px;padding:8px 12px;object-fit:contain;background:#fff;border-radius:8px}@media(max-width:620px){.company-brand{align-items:flex-start;flex-direction:column;gap:.6rem}.company-logo{width:180px;max-width:48vw;height:54px}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="topbar">
+    <div class="company-brand"><img class="company-logo" src="/assets/agroperu-logo.png" alt="AgroPeru"><div><div class="brand">SmartFruit QC</div><p>Control de calidad · inspección por lote</p></div></div>
+    <span id="predictive-badge" class="badge">Predictive: cargando…</span>
+  </div>
+</header>
+<main>
+  <div class="page-heading">
+    <div><h1>QUALITY INSPECTION</h1><p>Abre tu lote, carga las fotografías y completa la inspección de cada paleta.</p></div>
+    <div class="actions"><button id="new-inspection-button" class="quiet" type="button" hidden>Nueva inspección</button><button id="demo-button" class="secondary" type="button" disabled>Cargar demo técnica</button></div>
+  </div>
+  <div id="app-error" class="error" role="alert" hidden></div>
+  <div id="app-status" class="visually-hidden" role="status" aria-live="polite"></div>
+  <div id="draft-bar" class="draft-bar" hidden><p id="draft-status" role="status" aria-live="polite">Preparando guardado del borrador…</p><div class="actions"><button id="resume-draft" type="button" hidden>Continuar borrador</button><button id="start-new-from-draft" class="secondary" type="button" hidden>Empezar otra inspección</button><button id="save-draft-now" class="secondary" type="button" disabled>Guardar borrador ahora</button></div></div>
+  <div id="draft-recovery-note" class="notice draft-recovery" hidden></div>
+  <div id="demo-notice" class="notice" hidden><strong>Demo técnica · datos simulados de inspección.</strong> Las tres salidas Vision son ejemplos existentes. No están asociadas a un lote comercial real; los demás datos de esta demo se completan como ejemplo.</div>
+  <div id="loading" class="loading">Preparando la inspección…</div>
+  <nav id="workflow-nav" class="workflow-nav" aria-label="Pasos de la inspección" hidden>
+    <button type="button" data-go-step="1"><span>1</span> Recepción y lote</button>
+    <button type="button" data-go-step="2" disabled><span>2</span> Vision por paleta</button>
+    <button type="button" data-go-step="3" disabled><span>3</span> Inspección QC</button>
+    <button type="button" data-go-step="4" disabled><span>4</span> Revisión y reporte</button>
+  </nav>
+  <div id="lot-banner" class="lot-banner" hidden><strong id="lot-banner-title"></strong><span id="lot-banner-detail"></span></div>
+  <div id="legacy-warning" class="notice" hidden></div>
+  <section id="reception-card" class="card workflow-panel" data-workflow-step="1" aria-labelledby="reception-title" hidden>
+    <h2 id="reception-title"><span class="step" aria-hidden="true">1</span>Cargar manifiesto y abrir lote</h2>
+    <p class="hint">El manifiesto trae las paletas y sus datos de recepción. Si contiene un solo lote, lo seleccionamos automáticamente.</p>
+    <label for="manifest-file">Cargar manifiesto CSV</label>
+    <input id="manifest-file" class="file-input" type="file" accept=".csv,text/csv" disabled>
+    <p id="manifest-status" class="reception-status" role="status">Todavía no hay un manifiesto cargado.</p>
+    <p id="manifest-storage-status" class="hint" hidden></p>
+    <div class="actions"><button id="forget-manifest" class="quiet" type="button" hidden>Borrar manifiesto guardado en este navegador</button></div>
+    <form id="lot-form" class="lot-picker">
+      <div class="field"><label for="scan-lot">Lote del manifiesto</label><select id="scan-lot" disabled><option value="">Selecciona un lote</option></select></div>
+      <button id="open-lot-button" type="submit" disabled>Revisar lote</button>
+    </form>
+    <details class="rule-note"><summary>También puedes buscar por número de paleta</summary><form id="reception-form" class="scan-layout">
+      <div class="field"><label for="scan-input">N° PALLET / código de etiqueta</label><input id="scan-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Por ejemplo: 5645" disabled required></div>
+      <button id="resolve-scan-button" type="submit" disabled>Buscar paleta</button>
+    </form></details>
+    <div id="reception-selection" hidden>
+      <h3 id="selection-title" style="margin-top:1.4rem"></h3>
+      <div id="selection-values" class="reception-values"></div>
+      <div id="selection-origin-warning" class="notice" hidden></div>
+      <div id="selection-pallets" class="lot-roster" aria-label="Paletas del lote"></div>
+      <div id="selection-records"></div>
+      <div class="footer-actions"><p class="hint">Label y los datos disponibles del manifiesto ya estarán completos.</p><button id="start-qc" type="button" disabled>Continuar · procesar fotos</button></div>
+    </div>
+  </section>
+  <form id="inspection-form" hidden novalidate>
+    <section id="vision-panel" class="card workflow-panel" data-workflow-step="2" hidden aria-labelledby="vision-panel-title">
+      <h2 id="vision-panel-title"><span class="step" aria-hidden="true">2</span>Procesar fotos de la paleta</h2>
+      <p class="hint">Selecciona la paleta y las fotos de su caja. Vision genera los resultados; revísalos y confírmalos para incorporarlos a la inspección.</p>
+      <div class="vision-selector"><label for="vision-pallet-select">Paleta / muestra de destino</label><select id="vision-pallet-select"></select><p id="vision-progress" class="hint"></p></div>
+      <div class="actions"><button id="add-sample" class="quiet" type="button" hidden>+ Añadir muestra de esta paleta</button></div>
+      <div id="sample-list"></div>
+      <div class="footer-actions"><button class="secondary" type="button" data-go-step="1">Anterior</button><button type="button" data-next-step="3">Continuar · inspección QC</button></div>
+    </section>
+    <section id="qc-panel" class="workflow-panel" data-workflow-step="3" hidden aria-labelledby="qc-panel-title">
+      <div class="card"><div class="capture-intro"><div><h2 id="qc-panel-title"><span class="step" aria-hidden="true">3</span>Completar inspección QC</h2><p class="hint">Elige una paleta y completa los campos en blanco. Registra los defectos como cantidad de frutos; los porcentajes se calculan automáticamente.</p></div></div><div class="capture-legend"><span class="receipt-key">Manifiesto · datos precargados</span><span>Vision · Sample y oleocelosis</span><span>Inspector · observaciones y otros defectos</span></div><details class="report-context" style="margin-top:1rem"><summary>Datos generales del lote</summary><div id="header-fields" class="grid" style="margin-top:1rem"></div></details></div>
+      <div class="qc-workspace"><aside class="qc-sidebar" aria-label="Elegir paleta para inspeccionar"><h3>Paletas del lote</h3><div id="qc-pallet-list" class="qc-pallet-list"></div></aside><div><div id="qc-editor-list"></div><div class="qc-editor-footer"><p id="qc-capture-progress" role="status" aria-live="polite"></p><div class="actions"><button id="qc-prev" class="secondary" type="button">← Paleta anterior</button><button id="qc-next" class="secondary" type="button">Siguiente paleta →</button></div></div></div></div>
+      <details class="overview"><summary>Ver resumen de todas las paletas</summary><p class="hint">Revisa el avance del lote. Para completar datos, abre la paleta correspondiente.</p><div class="qc-table-scroll" tabindex="0" role="region" aria-label="Resumen QC del lote"><table id="qc-table" class="qc-table"><caption class="visually-hidden">QUALITY INSPECTION · resumen por paleta</caption><thead id="qc-table-head"></thead><tbody id="qc-table-body"></tbody><tfoot id="qc-table-foot"></tfoot></table></div></details>
+      <div class="card"><details class="rule-note"><summary id="pending-summary">Campos QC pendientes</summary><p class="hint">Incluye campos opcionales del reporte. Puedes completarlos durante la inspección; este listado no añade requisitos para guardar o cerrar el QC.</p><ul id="pending-fields" class="pending-list"></ul></details><details class="rule-note"><summary id="coverage-summary">Cobertura de las reglas de SmartFruit</summary><p id="coverage-description"></p><p id="boundary-description"></p></details></div>
+      <div class="footer-actions"><button class="secondary" type="button" data-go-step="2">Anterior</button><button id="evaluate-button" type="submit">Siguiente · revisar lote</button></div>
+    </section>
+    <section id="final-panel" class="workflow-panel" data-workflow-step="4" hidden aria-labelledby="final-panel-title">
+      <div class="card"><h2 id="final-panel-title"><span class="step" aria-hidden="true">4</span>Revisar resultados y decidir</h2><p class="hint">Primero revisa los defectos del lote y las sugerencias de cada paleta. Después registra el Level Flag y tus decisiones finales.</p><div id="lot-summary-values" class="lot-summary-values"><p class="hint">Evalúa la inspección para ver los resultados.</p></div><div id="lot-defect-summary"></div></div>
+      <div id="review-required" class="notice"><p>Completa la inspección y calcula las sugerencias antes de registrar tu decisión.</p><button type="submit">Calcular resultados y sugerencias</button></div>
+      <section id="system-review" class="card" aria-labelledby="system-review-title" hidden><h2 id="system-review-title">Resultados y sugerencias por paleta</h2><p class="hint">Cada sugerencia SmartFruit se basa en los defectos con reglas disponibles. Revisa los resultados de todas las paletas antes de decidir.</p><div id="results"></div></section>
+      <section id="reason-panel" class="card" aria-labelledby="reason-title" hidden><h2 id="reason-title">Reason · resumen de los defectos</h2><p class="hint">Se genera a partir de las cantidades, porcentajes y paletas afectadas del lote. Puedes revisar la redacción antes de confirmar.</p><div id="reason-field" style="margin-top:1rem"></div><p id="reason-source-note" class="hint"></p><div class="actions" style="margin-top:1rem"><button id="edit-reason" class="quiet" type="button">Ajustar redacción</button><button id="use-generated-reason" class="secondary" type="button" hidden>Volver al resumen calculado</button></div><details class="rule-note"><summary>Ver resumen calculado original</summary><p id="generated-reason" class="generated-reason"></p></details></section>
+      <section class="card" aria-labelledby="summary-title"><details class="optional-summary"><summary id="summary-title">Datos opcionales del resumen QC</summary><p class="hint">Label, Packing date y PLU/Coo se precargan cuando son uniformes en el manifiesto. Puedes revisarlos aquí.</p><div id="summary-fields" class="grid"></div></details></section>
+      <section id="final-decision-panel" class="card" aria-labelledby="header-title" hidden><h2 id="header-title">Criterio final del inspector</h2><p class="hint">Con los resultados y sugerencias a la vista, registra el Level Flag del lote y tus observaciones. El nivel final lo decides tú.</p><div id="final-header-fields" class="grid" style="margin-top:1rem"></div><label for="inspection-observations">Observaciones de la inspección</label><textarea id="inspection-observations" placeholder="Información adicional del inspector"></textarea></section>
+      <p id="review-refresh-needed" class="notice" hidden>Los datos QC cambiaron. Vuelve a calcular los resultados antes de decidir.</p><div class="footer-actions"><button class="secondary" type="button" data-go-step="3">Anterior · inspección QC</button><button id="refresh-review" type="submit">Volver a calcular resultados</button></div>
+    </section>
+  </form>
+  <section id="review" class="card" aria-labelledby="review-title" hidden>
+    <div class="card-heading"><h2 id="review-title">Resumen de decisiones y confirmación</h2><span id="review-state" class="muted">Pendiente de confirmación</span></div>
+    <p class="hint">Elige el estado de cada paleta junto a su sugerencia. EXTEND permite incorporar otra caja y actualizar sus resultados antes de confirmar.</p>
+    <div id="inspector-decisions"></div>
+    <div id="signing" class="signing">
+      <div class="grid"><div class="field wide"><label for="inspector-name">Inspector · nombre</label><input id="inspector-name" autocomplete="name" maxlength="200" placeholder="Nombre de quien confirma"></div></div>
+      <label class="check-label" for="inspector-confirmation"><input id="inspector-confirmation" type="checkbox"><span>He revisado los datos y la cobertura de las reglas. Confirmo las decisiones finales seleccionadas para cada muestra y autorizo el cierre de esta inspección.</span></label>
+      <div class="actions"><button id="finalize-button" type="button">Confirmar y generar reporte</button><button id="draft-button" class="secondary" type="button">Descargar Excel · borrador</button><button id="print-report" class="secondary" type="button">Ver reporte / imprimir PDF · borrador</button></div>
+      <p class="hint">Cualquier cambio en la inspección requiere evaluar de nuevo y volver a confirmar.</p>
+    </div>
+    <div id="saved-report" class="notice success" hidden><strong>Inspección confirmada y guardada.</strong><p id="saved-description" class="hint"></p><div id="download-links" class="actions download-links"></div></div>
+  </section>
+</main>
+<footer>Vision automatiza únicamente oleocelosis. Los otros defectos se registran manualmente. Predictive es experimental y no sustituye las reglas ni la decisión del inspector.</footer>
+<script src="/assets/drafts.js"></script>
+<script src="/assets/field_sources.js"></script>
+<script src="/assets/vision_defaults.js"></script>
+<script src="/assets/vision_capture.js"></script>
+<script>
+"use strict";
+(() => {
+  const byId = id => document.getElementById(id);
+  const state = {config:null, samples:[], nextSample:1, revision:0, evaluatedRevision:null, payload:null, report:null, busy:false, manifestCsv:null, manifestFilename:"", manifestInfo:null, receptionSelection:null, activeReception:null, scanRevision:0, demoMode:false, storedManifestPresent:false,draftStore:null,draftReady:false,draftBlocked:false,draftPaused:false,pendingDraft:null,draftTimer:null,draftEpoch:0,draftEdit:0,restoring:false,finalized:false,lotReception:null,workflowStep:1,generatedReason:"",reasonSource:"defect_summary",selectedPallet:""};
+  const decisions = ["STANDARD", "EXPAND", "ESCALATE"];
+  function canonicalDecision(value) {return value==="EXTEND"?"EXPAND":value||"";}
+  function decisionLabel(value) {return canonicalDecision(value)==="EXPAND"?"EXTEND":value||"Pendiente";}
+  const defectKeys = new Set(["decay","styler","mold","soft","skin_breakdown","oleocellosis","wounds","int_dryness","black_tips","skin_defect","scars","white_stain","blanching","yellow_color","stain","undersize"]);
+  const fallbackColumns = [
+    ["label_brand","Label","general"],["pallet_id","N° PALLET","general"],["grower","Grower","general"],["packing_date","Packing date","general"],["size","Size","general"],["avg_count_per_box","Avg. Count per Box.","general"],["plu_pct","PLU (%)","general"],["plu_coo","PLU/Coo","general"],["sample_count","Sample","general"],
+    ["open_rating","Open Rating","condition"],["color_rating","Color Rating","condition"],["pulp_temp","Pulp","condition"],["decay","Decay","condition"],["styler","Styler","condition"],["mold","Mold","condition"],["soft","Soft","condition"],["skin_breakdown","Skin breakdown","condition"],["oleocellosis","Oleocellosis","condition"],["wounds","Wounds","condition"],["int_dryness","Int. Dryness","condition"],["black_tips","Black tips","condition"],
+    ["skin_defect","Skin defect","quality"],["scars","Scars","quality"],["white_stain","White stain","quality"],["blanching","Blanching","quality"],["yellow_color","Yellow color","quality"],["stain","Stain","quality"],["undersize","Undersize","quality"]
+  ].map(([key,label,group]) => ({key,label,group}));
+  const fallbackHeaders = [
+    ["inspection_date","Inspection Date"],["lot_id","AgroPeru Lot Number"],["country_origin","Country Of Origin"],["vessel","Vessel"],["container","Container"],["Level_Flag","Level Flag"],["reason","Reason"],["grade","Grade"],["color","Color"],["plu_pct","PLU%"],["remarks","Remarks"]
+  ].map(([key,label]) => ({key,label}));
+  const headerControls = {};
+  const summaryControls = {};
+  const sourceNodes = new WeakMap();
+  function element(tag, text, className) { const node=document.createElement(tag); if(text!==undefined)node.textContent=text; if(className)node.className=className; return node; }
+  function status(message) { byId("app-status").textContent=message; }
+  function error(message) { const area=byId("app-error"); area.textContent=message; area.hidden=false; area.scrollIntoView({behavior:"smooth",block:"center"}); status(message); }
+  function clearError() { byId("app-error").hidden=true; byId("app-error").textContent=""; }
+  function copy(value) { return JSON.parse(JSON.stringify(value)); }
+  function setDraftStatus(message,failed=false) {byId("draft-status").textContent=message;byId("draft-status").className=failed?"not-saved":"";}
+  function draftSnapshot() {
+    const raw=controls=>Object.fromEntries(Object.entries(controls).map(([key,control])=>[key,control.value]));
+    return {version:1,saved_at:new Date().toISOString(),workflow_step:state.workflowStep,reason_source:state.reasonSource,...(state.lotReception?{lot_reception:copy(state.lotReception)}:{}),qc_header:raw(headerControls),qc_summary:raw(summaryControls),samples:state.samples.map(sample=>({sample_id:sample.id.value,pallet_id:sample.controls.pallet_id.value,qc_fields:raw(sample.controls),vision_records:copy(sample.records),image_bindings:copy(sample.imageBindings),coverage_choice:sample.boxInspection?(sample.boxInspection.status==="completed"?"true":"false"):(sample.records.length?"true":""),...(sample.boxInspection?{box_inspection:copy(sample.boxInspection)}:{}),...(sample.photoPools?{photo_pools:copy(sample.photoPools)}:{}),observations:sample.observations.value,review_choice:sample.inspectorChoice||"",...(sample.reviewHistory?{review_history:copy(sample.reviewHistory)}:{}),...(sample.pendingAdditional?{pending_additional:pendingAdditionalSnapshot(sample)}:{}),...(sample.reception?{reception:copy(sample.reception)}:{})})),observations:byId("inspection-observations").value,inspector_name:byId("inspector-name").value,demo_mode:state.demoMode};
+  }
+  function pendingAdditionalContext(sample) {
+    return {lot_id:headerControls.lot_id.value.trim(),pallet_id:sample.controls.pallet_id.value.trim(),sample_id:sample.id.value.trim()};
+  }
+  function samePendingContext(first,second) {
+    return ["lot_id","pallet_id","sample_id"].every(key=>first?.[key]===second?.[key]);
+  }
+  function sameVisionRecord(first,second) {
+    if(first===second)return true;
+    if(!first||!second||typeof first!=="object"||typeof second!=="object"||Array.isArray(first)!==Array.isArray(second))return false;
+    const keys=Object.keys(first);return keys.length===Object.keys(second).length&&keys.every(key=>Object.hasOwn(second,key)&&sameVisionRecord(first[key],second[key]));
+  }
+  function pendingAdditionalSnapshot(sample) {
+    const pending=sample.pendingAdditional;if(!pending)return null;
+    const manual=Object.fromEntries(Array.from(defectKeys).filter(key=>key!=="oleocellosis").map(key=>[key,sample.additionalControls?.[key]?.value??pending.manualValues?.[key]??""]));
+    return {vision_records:copy(pending.visionRecords),box_inspection:copy(pending.boxInspection),manual_defects:manual,observations:sample.additionalObservations?.value??pending.observations??"",context:copy(pending.context||pendingAdditionalContext(sample))};
+  }
+  function retainPendingAdditional(sample) {
+    const saved=pendingAdditionalSnapshot(sample);if(!saved)return;
+    Object.assign(sample.pendingAdditional,{manualValues:saved.manual_defects,observations:saved.observations,context:saved.context});
+  }
+  function decodePendingAdditional(value,sample,lot) {
+    const object=item=>item&&typeof item==="object"&&!Array.isArray(item),keys=Array.from(defectKeys).filter(key=>key!=="oleocellosis"),box=value?.box_inspection;
+    if(!object(value)||!Array.isArray(value.vision_records)||!value.vision_records.length||!value.vision_records.every(object)||!object(value.manual_defects)||Object.keys(value.manual_defects).length!==keys.length||!keys.every(key=>typeof value.manual_defects[key]==="string")||typeof value.observations!=="string"||!object(box)||typeof box.sample_box_id!=="string"||!box.sample_box_id.trim()||!["capturing","completed"].includes(box.status)||typeof box.coverage_confirmed!=="boolean"||(box.status==="completed"&&!box.coverage_confirmed)||(box.manifest_record_index!==null&&(!Number.isInteger(box.manifest_record_index)||box.manifest_record_index<0))||!samePendingContext(value.context,{lot_id:lot.trim(),pallet_id:sample.pallet_id.trim(),sample_id:sample.sample_id.trim()}))throw Error("La caja adicional del borrador no tiene datos o contexto recuperables. Se conserva el borrador anterior.");
+    const unique=new Map();for(const record of value.vision_records){if(typeof record.image_id!=="string"||!record.image_id.trim()||!Number.isInteger(record.total_fruits)||record.total_fruits<0||!Number.isInteger(record.oleocellosis_count)||record.oleocellosis_count<0||record.oleocellosis_count>record.total_fruits||(unique.has(record.image_id)&&!sameVisionRecord(unique.get(record.image_id),record)))throw Error("Los JSON de la caja adicional guardada no son coherentes. Se conserva el borrador anterior.");unique.set(record.image_id,record);}
+    const records=Array.from(unique.values()),total=records.reduce((sum,record)=>sum+record.total_fruits,0),affected=records.reduce((sum,record)=>sum+record.oleocellosis_count,0);
+    return {visionRecords:copy(value.vision_records),boxInspection:copy(box),manualValues:copy(value.manual_defects),observations:value.observations,context:copy(value.context),needsReview:true,summary:{images_processed:records.length,total_fruits:total,oleocellosis_count:affected,oleocellosis_pct:total?100*affected/total:0}};
+  }
+  function ensureNoPendingAdditional() {
+    const sample=state.samples.find(item=>item.pendingAdditional);
+    if(sample)throw Error("La paleta "+sample.controls.pallet_id.value+" tiene una caja adicional pendiente. Incorpórala mediante EXTEND o descártala expresamente antes de confirmar el reporte.");
+  }
+  async function saveActiveDraft() {
+    if(!state.draftReady||state.draftPaused||state.pendingDraft||state.finalized||!state.samples.length)return false;
+    if(state.draftBlocked||!state.draftStore){setDraftStatus("Borrador sin guardar. Recupera o descarta explícitamente el borrador anterior desde Nueva inspección.",true);return false;}
+    clearTimeout(state.draftTimer);state.draftTimer=null;const epoch=state.draftEpoch;const edit=state.draftEdit;const snapshot=draftSnapshot();setDraftStatus("Guardando borrador en este navegador…");
+    try{const saved=await state.draftStore.save(snapshot);if(epoch!==state.draftEpoch||state.finalized)return true;if(edit!==state.draftEdit){setDraftStatus("Hay cambios pendientes de guardar…");return true;}const when=new Date(saved.saved_at).toLocaleString("es-PE",{timeZone:"America/Lima"});setDraftStatus("Borrador guardado en este navegador · "+when);return true;}
+    catch(e){if(epoch===state.draftEpoch)setDraftStatus("Borrador NO guardado: "+e.message+" La captura actual permanece en pantalla.",true);throw e;}
+  }
+  function scheduleDraft(immediate=false) {
+    if(state.restoring||!state.draftReady||state.draftPaused||state.pendingDraft||state.finalized||!state.samples.length)return;
+    clearTimeout(state.draftTimer);state.draftTimer=null;
+    if(state.draftBlocked||!state.draftStore){setDraftStatus("Borrador NO guardado: el almacenamiento no está disponible o requiere descartar explícitamente el borrador anterior.",true);return;}
+    setDraftStatus("Cambios pendientes de guardar…");
+    if(immediate){saveActiveDraft().catch(()=>{});return;}
+    state.draftTimer=setTimeout(()=>{state.draftTimer=null;saveActiveDraft().catch(()=>{});},200);
+  }
+  function applySource(control,description) {
+    if(!control||!description)return;const nodes=sourceNodes.get(control);if(!nodes)return;
+    nodes.tag.textContent=description.source==="Recepción"?"Manifiesto":description.source;nodes.tag.hidden=description.source==="Inspector";nodes.hint.textContent=description.state;nodes.hint.className="field-state"+(description.state==="Pendiente"?" pending":"");nodes.hint.hidden=false;
+  }
+  function updateFieldSources() {
+    if(!state.config)return;
+    if(!window.SmartFruitFieldSources?.describe){byId("pending-summary").textContent="No se pudo mostrar la procedencia de los campos";return;}
+    try{const result=window.SmartFruitFieldSources.describe(collectPayload(),state.config);const pending=[];
+      for(const item of result.header||[]){applySource(headerControls[item.key],item);if(item.state==="Pendiente")pending.push("Reporte · "+item.label);}
+      for(const item of result.summary||[]){applySource(summaryControls[item.key],item);if(item.state==="Pendiente")pending.push("Resumen QC · "+item.label);}
+      for(const group of result.samples||[]){const sample=state.samples.find(s=>s.id.value.trim()===String(group.sample_id));if(!sample)continue;for(const item of group.fields||[]){applySource(sample.controls[item.key],item);if(item.state==="Pendiente")pending.push(String(group.sample_id)+" · "+item.label);}}
+      byId("pending-summary").textContent="Campos QC sin registrar: "+String(result.pending_count??pending.length);byId("pending-fields").replaceChildren(...(pending.length?pending.map(text=>element("li",text)):[element("li","Todos los campos mostrados tienen un valor registrado.")]));
+    }catch(_){byId("pending-summary").textContent="No se pudo actualizar la procedencia de los campos; la captura se conserva";}
+  }
+  function updateSampleContext(sample) {
+    const lot=headerControls.lot_id?.value.trim()||"";const pallet=sample.controls.pallet_id?.value.trim()||"";const id=sample.id.value.trim();
+    if(sample.context)sample.context.textContent="Lote "+(lot||"Pendiente")+" · Paleta "+(pallet||"Pendiente");
+    const issues=[...(sample.restoreIssues||[])];const expected=new Set(sample.records.map(record=>String(record.image_id||"")));const bindings=new Map();
+    for(const binding of sample.imageBindings){const image=String(binding.image_id||"");if(bindings.has(image))issues.push("Hay una asociación de imagen repetida en el borrador.");bindings.set(image,binding);if(String(binding.lot_id).trim()!==lot||String(binding.pallet_id).trim()!==pallet||String(binding.sample_id).trim()!==id)issues.push("La asociación recuperada de "+image+" no coincide con lote, paleta y muestra visibles.");}
+    if(sample.records.length&&(!lot||!pallet||!id))issues.push("Falta identidad de lote, paleta o muestra para las imágenes recuperadas.");
+    if(sample.records.length&&(bindings.size!==expected.size||Array.from(expected).some(image=>!bindings.has(image))))issues.push("Las imágenes recuperadas no tienen una asociación completa. Retira los JSON y vuelve a importarlos en el contexto correcto.");
+    if(sample.receptionLot&&sample.receptionLot!==lot)issues.push("El lote visible no coincide con la recepción recuperada.");
+    sample.contextIssues=Array.from(new Set(issues));if(sample.contextIssue){sample.contextIssue.textContent=sample.contextIssues.join("\n");sample.contextIssue.hidden=!sample.contextIssues.length;}
+    sample.id.readOnly=sample.records.length>0;sample.controls.pallet_id.readOnly=Boolean(sample.reception)||sample.records.length>0;
+  }
+  function updateCapturePresentation() {
+    for(const sample of state.samples){updateSampleContext(sample);updateReviewLocks(sample);if(sample.boxInspection)updateBoxCapture(sample);if(sample.pendingAdditional?.boxInspection)updateBoxCapture(sample,"additional");}
+    if(headerControls.lot_id)headerControls.lot_id.readOnly=state.samples.some(sample=>Boolean(sample.reception)||sample.records.length>0);
+    updateReasonSource();updateFieldSources();refreshWorkflow();updateTableTotals();
+  }
+  function captureChanged(immediate=false) {
+    updateCapturePresentation();if(state.restoring)return;
+    if(state.finalized){state.finalized=false;state.draftPaused=false;}
+    state.draftEdit++;scheduleDraft(immediate);
+  }
+  async function clearActiveDraft(message) {
+    clearTimeout(state.draftTimer);state.draftTimer=null;state.draftPaused=true;state.draftEpoch++;
+    if(!state.draftStore){setDraftStatus("No se pudo borrar el borrador guardado: el almacenamiento no está disponible.",true);return false;}
+    try{try{await state.draftStore.flush();}catch(_){}await state.draftStore.clear();state.draftBlocked=false;state.pendingDraft=null;setDraftStatus(message);return true;}
+    catch(e){setDraftStatus("No se pudo borrar el borrador guardado: "+e.message+" No se sobrescribirá automáticamente.",true);return false;}
+  }
+  function unambiguous(rows,key) {const values=Array.from(new Set(rows.map(row=>String(row[key]??"").trim())));return values.length===1?values[0]:"";}
+  function receptionFromSample(sample) {
+    if(!sample.reception)return null;const rows=copy(sample.reception.records);const lot=sample.receptionLot||headerControls.lot_id.value.trim();const pallet=sample.controls.pallet_id.value.trim();
+    return {scan_input:sample.reception.scan_input,records:rows,lot_id:lot,pallet_id:pallet,qc_header:{lot_id:lot,country_origin:unambiguous(rows,"country_origin")},qc_fields:{pallet_id:pallet,label_brand:unambiguous(rows,"label_brand"),packing_date:unambiguous(rows,"packing_date"),size:unambiguous(rows,"size_declared")}};
+  }
+  function restoreSnapshot(snapshot) {
+    if(!snapshot||snapshot.version!==1||!snapshot.qc_header||!Array.isArray(snapshot.samples)||!snapshot.samples.length)throw Error("El borrador no tiene una versión o estructura recuperable.");
+    const rawObject=value=>value&&typeof value==="object"&&!Array.isArray(value)&&Object.values(value).every(item=>typeof item==="string");
+    if(!rawObject(snapshot.qc_header)||(snapshot.qc_summary!==undefined&&!rawObject(snapshot.qc_summary)))throw Error("Los campos guardados del reporte no son válidos.");
+    for(const sample of snapshot.samples){const object=item=>item&&typeof item==="object"&&!Array.isArray(item);if(!sample||typeof sample.sample_id!=="string"||typeof sample.pallet_id!=="string"||!rawObject(sample.qc_fields)||!Array.isArray(sample.vision_records)||!sample.vision_records.every(object)||!Array.isArray(sample.image_bindings)||!sample.image_bindings.every(object)||!["","true","false"].includes(sample.coverage_choice)||typeof sample.observations!=="string")throw Error("Una muestra del borrador no se puede recuperar sin cambiar sus datos.");if(sample.reception&&(!Array.isArray(sample.reception.records)||!sample.reception.records.length||!sample.reception.records.every(object)||typeof sample.reception.scan_input!=="string"))throw Error("La recepción del borrador no es válida.");}
+    const pending=snapshot.samples.map(sample=>sample.pending_additional===undefined?null:decodePendingAdditional(sample.pending_additional,sample,snapshot.qc_header.lot_id||""));
+    state.restoring=true;state.draftPaused=true;
+    try{invalidate();byId("sample-list").replaceChildren();byId("qc-editor-list").replaceChildren();state.samples=[];state.nextSample=1;state.demoMode=Boolean(snapshot.demo_mode);state.activeReception=null;state.lotReception=snapshot.lot_reception?copy(snapshot.lot_reception):null;state.workflowStep=snapshot.workflow_step||2;state.reasonSource=snapshot.reason_source||(snapshot.qc_header.reason?.trim()?"inspector":"defect_summary");
+      for(const [key,control]of Object.entries(headerControls))control.value=snapshot.qc_header[key]??"";
+      for(const [key,control]of Object.entries(summaryControls))control.value=snapshot.qc_summary?.[key]??"";
+      for(const saved of snapshot.samples){const lot=saved.reception?unambiguous(saved.reception.records,"lot_id"):null;addSample({sample_id:saved.sample_id,pallet_id:saved.pallet_id,qc_fields:saved.qc_fields,records:copy(saved.vision_records),image_bindings:copy(saved.image_bindings),coverage_choice:saved.coverage_choice,box_inspection:saved.box_inspection,photo_pools:saved.photo_pools,observations:saved.observations,review_choice:saved.review_choice,review_history:saved.review_history,reception:saved.reception?copy(saved.reception):null,receptionLot:lot,restore:true});}
+      for(let index=0;index<state.samples.length;index++){const sample=state.samples[index];sample.inspectorChoice=pending[index]?"":canonicalDecision(snapshot.samples[index].review_choice);sample.pendingAdditional=pending[index];sample.additionalControls=null;sample.additionalObservations=null;}
+      byId("inspection-observations").value=snapshot.observations??"";byId("inspector-name").value=snapshot.inspector_name??"";byId("inspector-confirmation").checked=false;state.activeReception=receptionFromSample([...state.samples].reverse().find(sample=>sample.reception)||{});byId("inspection-form").hidden=false;byId("demo-notice").hidden=!state.demoMode;byId("draft-recovery-note").textContent="Borrador recuperado. Se conservaron los datos de captura y las asociaciones de imágenes. Debes evaluar de nuevo y volver a seleccionar y confirmar la decisión final del inspector."+(pending.some(Boolean)?" También se recuperaron cajas adicionales pendientes: después de evaluar, elige EXTEND en su paleta para revisarlas y continuar.":"");byId("draft-recovery-note").hidden=false;updateCapturePresentation();refreshReceptionControls();
+    }finally{state.restoring=false;state.draftPaused=false;}
+  }
+  async function restoreDraft() {
+    try{if(!window.SmartFruitDrafts?.createStore)throw Error("No se cargó el módulo de guardado de borradores.");state.draftStore=window.SmartFruitDrafts.createStore();const snapshot=await state.draftStore.load();if(snapshot){state.pendingDraft=copy(snapshot);state.draftPaused=true;setDraftStatus("Borrador disponible del lote "+(snapshot.qc_header.lot_id||"sin identificar")+". Elige Continuar borrador o Empezar otra inspección.");}else setDraftStatus("Sin borrador QC activo. Puedes abrir un lote para comenzar.");}
+    catch(e){state.draftBlocked=true;setDraftStatus("No se pudo recuperar el borrador: "+e.message+" No se sobrescribirá automáticamente.",true);byId("draft-recovery-note").textContent="El borrador anterior se conserva. Para descartarlo expresamente, usa Nueva inspección. Si continúas capturando en esta sesión, no se guardará encima del borrador anterior.";byId("draft-recovery-note").hidden=false;}
+    finally{state.draftReady=true;byId("draft-bar").hidden=false;refreshReceptionControls();}
+  }
+  function resumeSavedDraft() {
+    if(!state.pendingDraft)return false;if(state.samples.length)throw Error("Hay una inspección abierta. Comienza otra inspección antes de recuperar el borrador.");
+    const snapshot=copy(state.pendingDraft);clearReceptionSelection();
+    try{restoreSnapshot(snapshot);}catch(error){state.draftPaused=true;state.draftBlocked=true;throw error;}
+    state.pendingDraft=null;state.draftPaused=false;setDraftStatus("Borrador recuperado. Revisa los resultados y confirma de nuevo la decisión final.");refreshReceptionControls();return true;
+  }
+  function showPersistence(message,issue=false) {
+    const node=byId("manifest-storage-status");node.textContent=message;node.className=issue?"persistence-issue":"hint";node.hidden=!message;
+  }
+  function receptionStorage(action,value) {
+    return new Promise((resolve,reject)=>{
+      if(!window.indexedDB){reject(Error("Este navegador no ofrece almacenamiento IndexedDB."));return;}
+      let opening,db,transaction,settled=false;
+      let timer=setTimeout(()=>finish(Error("El navegador tardó demasiado al abrir el manifiesto guardado. Puedes cargar otro CSV.")),4000);
+      function finish(cause,result){if(settled)return;settled=true;clearTimeout(timer);if(cause&&transaction)try{transaction.abort();}catch(_){}if(db)db.close();if(cause)reject(cause);else resolve(result);}
+      try{opening=window.indexedDB.open("smartfruit-reception",1);}catch(_){finish(Error("No se pudo abrir el almacenamiento del manifiesto."));return;}
+      opening.onupgradeneeded=()=>{if(settled){try{opening.transaction.abort();}catch(_){}return;}const database=opening.result;if(!database.objectStoreNames.contains("active"))database.createObjectStore("active");};
+      opening.onerror=()=>finish(Error("No se pudo abrir el almacenamiento del manifiesto."));
+      opening.onblocked=()=>finish(Error("Otra pestaña impide abrir el almacenamiento del manifiesto."));
+      opening.onsuccess=()=>{
+        db=opening.result;if(settled){db.close();return;}db.onversionchange=()=>db.close();clearTimeout(timer);
+        let operation,result;
+        try{transaction=db.transaction("active",action==="get"?"readonly":"readwrite");const store=transaction.objectStore("active");operation=action==="get"?store.get("manifest"):action==="put"?store.put(value,"manifest"):store.delete("manifest");}
+        catch(_){finish(Error("No se pudo acceder a la copia guardada del manifiesto."));return;}
+        timer=setTimeout(()=>finish(Error("El almacenamiento del manifiesto tardó demasiado. La operación no se confirmó.")),8000);
+        operation.onsuccess=()=>{result=operation.result;};
+        transaction.oncomplete=()=>finish(null,result);
+        transaction.onerror=()=>finish(Error("No se pudo completar el almacenamiento del manifiesto."));
+        transaction.onabort=()=>finish(Error("El almacenamiento del manifiesto fue interrumpido."));
+      };
+    });
+  }
+  function refreshReceptionControls() {
+    const ready=Boolean(state.config)&&state.draftReady&&!state.busy;const hasManifest=ready&&typeof state.manifestCsv==="string";
+    byId("manifest-file").disabled=!ready;
+    for(const id of ["scan-input","scan-lot","resolve-scan-button"])byId(id).disabled=!hasManifest;
+    byId("open-lot-button").disabled=!hasManifest||!byId("scan-lot").value;
+    byId("start-qc").disabled=!ready||!state.receptionSelection||Boolean(state.pendingDraft);
+    byId("resume-draft").hidden=!state.pendingDraft;byId("resume-draft").disabled=!ready;byId("start-new-from-draft").hidden=!state.pendingDraft;byId("start-new-from-draft").disabled=!ready;
+    byId("demo-button").disabled=!ready||Boolean(state.pendingDraft);
+    byId("forget-manifest").hidden=!state.manifestCsv&&!state.storedManifestPresent;
+    byId("forget-manifest").disabled=!ready;
+    byId("forget-manifest").textContent=state.storedManifestPresent?"Borrar manifiesto guardado en este navegador":"Retirar manifiesto de esta sesión";
+    byId("new-inspection-button").hidden=state.samples.length===0&&!state.draftBlocked&&!state.pendingDraft&&!state.receptionSelection;
+    byId("new-inspection-button").disabled=!ready;
+    byId("add-sample").disabled=!ready||(!state.activeReception&&!state.demoMode);
+    byId("add-sample").textContent=state.demoMode?"+ Añadir muestra de demo":"+ Añadir muestra de esta paleta";
+    byId("start-qc").textContent="Continuar · procesar fotos";byId("add-sample").hidden=true;
+    byId("save-draft-now").disabled=!ready||!state.draftReady||state.draftBlocked||state.draftPaused||state.finalized||!state.samples.length;
+    byId("save-draft-now").hidden=!state.samples.length||Boolean(state.pendingDraft);
+    if(headerControls.lot_id)headerControls.lot_id.readOnly=state.samples.some(sample=>Boolean(sample.reception)||sample.records.length>0);
+  }
+  function clearReceptionSelection() {
+    state.scanRevision++;state.receptionSelection=null;byId("reception-selection").hidden=true;for(const id of ["selection-title","selection-values","selection-pallets","selection-records"])byId(id).replaceChildren();if(!state.samples.length&&headerControls.lot_id)headerControls.lot_id.value="";refreshWorkflow();refreshReceptionControls();
+  }
+  async function manifestReady(csv,filename,info,options={}) {
+    if(!info||!Array.isArray(info.records)||!Array.isArray(info.lot_ids))throw Error("La respuesta del manifiesto no contiene las filas y lotes esperados.");
+    state.manifestCsv=csv;state.manifestFilename=filename;state.manifestInfo=info;clearReceptionSelection();
+    byId("scan-input").value="";const selector=byId("scan-lot");selector.replaceChildren();const all=element("option","Selecciona un lote");all.value="";selector.append(all);
+    for(const lot of info.lot_ids){const option=element("option",String(lot));option.value=String(lot);selector.append(option);}
+    byId("manifest-status").textContent=filename+" · "+String(info.pallets_count??"—")+" paletas · "+info.lot_ids.length+" lote(s).";
+    selector.value="";if(options.autoSelect!==false&&info.lot_ids.length===1){selector.value=String(info.lot_ids[0]);await openSelectedLot();}
+    refreshWorkflow();refreshReceptionControls();
+  }
+  async function openSelectedLot() {
+    const lot=byId("scan-lot").value;
+    if(!state.manifestCsv||!lot)throw Error("Carga el manifiesto y selecciona el lote que deseas inspeccionar.");
+    clearReceptionSelection();const revision=state.scanRevision;
+    const selection=await (await request("/api/reception/lot",{manifest_csv:state.manifestCsv,lot_id:lot})).json();
+    if(revision!==state.scanRevision)return;
+    renderSelection(selection);refreshWorkflow();status("Lote "+selection.lot_id+" listo: "+selection.pallets.length+" paletas con sus datos de recepción.");
+  }
+  async function restoreManifest() {
+    let saved;
+    try{saved=await receptionStorage("get");}
+    catch(e){showPersistence(e.message+" Puedes cargar un CSV y usarlo durante esta sesión.",true);return;}
+    if(!saved)return;state.storedManifestPresent=true;
+    if(typeof saved.manifest_csv!=="string"){showPersistence("La copia guardada del manifiesto no es válida. Carga otro CSV o borra la copia guardada.",true);refreshReceptionControls();return;}
+    try{const info=await (await request("/api/reception/manifest",{manifest_csv:saved.manifest_csv})).json();await manifestReady(saved.manifest_csv,String(saved.filename||"Manifiesto guardado"),info,{autoSelect:false});showPersistence("Manifiesto disponible. Selecciona el lote que deseas abrir.");}
+    catch(e){showPersistence("No se pudo restaurar el manifiesto guardado: "+e.message+" Puedes cargar otro CSV sin modificar los reportes guardados.",true);}
+    refreshReceptionControls();
+  }
+  function receptionTable(records) {
+    const preferred=["lot_id","pallet_id","label_brand","packing_date","size_declared","expected_count_per_box","boxes_received","qty_received_weight","data_origin","source_record"];
+    const labels={demo_case_id:"Caso de demo",shipment_id:"Envío",scan_code:"Código de etiqueta",scan_level:"Alcance de la etiqueta",lot_id:"AgroPeru Lot Number",pallet_id:"N° PALLET",label_brand:"Label",country_origin:"País de origen",packing_date:"Packing date",size_declared:"Size declarado",expected_count_per_box:"Frutos declarados por caja",boxes_received:"Cajas recibidas",qty_received_weight:"Peso recibido",data_origin:"Procedencia",source_record:"Referencia",status:"Estado"};
+    const keys=Array.from(new Set([...preferred,...records.flatMap(record=>Object.keys(record))]));const wrap=element("div",undefined,"reception-table-wrap");const table=element("table",undefined,"reception-table");const caption=element("caption","Filas originales del manifiesto para esta paleta","visually-hidden");table.append(caption);const head=element("thead");const row=element("tr");for(const key of keys){const cell=element("th",labels[key]||key.replace(/_/g," "));cell.scope="col";row.append(cell);}head.append(row);table.append(head);
+    const body=element("tbody");for(const record of records){const line=element("tr");for(const key of keys){const raw=record[key];const text=raw===null||raw===undefined||String(raw).trim()===""?"No registrado":typeof raw==="object"?JSON.stringify(raw):String(raw);line.append(element("td",text));}body.append(line);}table.append(body);wrap.append(table);return wrap;
+  }
+  function renderSelection(selection) {
+    const validRecords=records=>Array.isArray(records)&&records.length>0&&records.every(row=>row&&typeof row==="object"&&!Array.isArray(row));
+    const directLot=selection?.selection_mode==="lot"&&selection.scanned_pallet_id===null;
+    if(!selection||!selection.lot_id||(!directLot&&!selection.scanned_pallet_id)||!validRecords(selection.records)
+      ||!Array.isArray(selection.pallets)||!selection.pallets.length
+      ||selection.pallets.some(pallet=>!pallet||pallet.lot_id!==selection.lot_id||!pallet.pallet_id||!validRecords(pallet.records))
+      ||(!directLot&&!selection.pallets.some(pallet=>pallet.pallet_id===selection.scanned_pallet_id)))throw Error("No se recibieron filas de recepción válidas para esta paleta.");
+    state.receptionSelection=copy(selection);byId("selection-title").textContent="Lote "+String(selection.lot_id)+" · "+selection.pallets.length+" paletas"+(directLot?"":" · paleta consultada "+String(selection.scanned_pallet_id));
+    const values=byId("selection-values");values.replaceChildren();for(const [label,value]of [["Label",unambiguous(selection.records,"label_brand")],["Origen",selection.qc_header?.country_origin],["Vessel",selection.qc_header?.vessel],["Container",selection.qc_header?.container]])if(value)values.append(element("p",label+": "+String(value)));
+    const warning=byId("selection-origin-warning");const simulated=selection.records.some(row=>/SIM|DEMO/i.test(String(row.data_origin||"")));warning.hidden=!simulated;warning.textContent=simulated?"La procedencia indica datos de QC combinados con identificadores simulados o de demo. Verifica la etiqueta y los datos recibidos antes de continuar.":"";
+    byId("selection-pallets").replaceChildren(...selection.pallets.map(pallet=>element("span","Paleta "+pallet.pallet_id+(pallet.qc_fields?.size?" · Size "+pallet.qc_fields.size:""))));
+    const details=element("details",undefined,"bound-note");details.append(element("summary","Ver datos originales del manifiesto"),receptionTable(selection.records));byId("selection-records").replaceChildren(details);byId("reception-selection").hidden=false;refreshReceptionControls();
+  }
+  function addReceptionSample(selection) {
+    const currentLot=headerControls.lot_id.value.trim();const incomingLot=String(selection.lot_id);
+    if(state.samples.length&&currentLot!==incomingLot)throw Error("El QC actual pertenece al lote "+currentLot+". No se puede añadir una paleta del lote "+incomingLot+" sin comenzar una nueva inspección; los datos actuales se conservan.");
+    if(state.demoMode&&state.samples.length)throw Error("Hay una demo técnica abierta. Comienza una nueva inspección antes de añadir una paleta del manifiesto.");
+    const first=state.samples.length===0;headerControls.lot_id.value=incomingLot;
+    if(first||!headerControls.country_origin.value.trim())headerControls.country_origin.value=selection.qc_header?.country_origin??"";
+    state.activeReception=copy(selection);state.demoMode=false;
+    const sample=addSample({pallet_id:String(selection.pallet_id),qc_fields:selection.qc_fields||{},reception:{scan_input:String(selection.scan_input||""),records:copy(selection.records)},receptionLot:incomingLot});
+    byId("inspection-form").hidden=false;byId("demo-notice").hidden=true;refreshReceptionControls();if(!state.restoring)sample.card.scrollIntoView({behavior:"smooth",block:"start"});status("QC iniciado para la paleta "+selection.pallet_id+".");
+    return sample;
+  }
+  function resetInspection() {
+    invalidate();byId("sample-list").replaceChildren();byId("qc-editor-list").replaceChildren();state.samples=[];state.nextSample=1;state.activeReception=null;state.lotReception=null;state.workflowStep=1;state.generatedReason="";state.reasonSource="defect_summary";state.demoMode=false;byId("qc-table-body").replaceChildren();
+    for(const [key,control]of Object.entries(headerControls)){control.value=key==="inspection_date"?todayInLima():"";control.readOnly=false;}
+    for(const control of Object.values(summaryControls))control.value="";
+    state.selectedPallet="";byId("scan-input").value="";byId("scan-lot").value="";clearReceptionSelection();
+    state.finalized=false;byId("inspection-observations").value="";byId("inspector-name").value="";byId("inspection-form").hidden=true;byId("demo-notice").hidden=true;byId("draft-recovery-note").hidden=true;refreshReceptionControls();updateCapturePresentation();
+  }
+  function invalidate() {
+    state.revision++; state.payload=null; state.report=null; state.evaluatedRevision=null;
+    for(const sample of state.samples){if(sample.pendingAdditional){retainPendingAdditional(sample);sample.pendingAdditional.needsReview=true;}sample.inspectorChoice="";}
+    byId("review-refresh-needed").hidden=state.workflowStep!==4;
+    byId("review").hidden=true; byId("results").replaceChildren(); byId("saved-report").hidden=true;
+    byId("inspector-decisions").replaceChildren();
+    byId("lot-summary-values").replaceChildren(element("p","Vuelve a calcular los resultados para revisar el lote.","hint"));byId("lot-defect-summary").replaceChildren();
+    byId("download-links").replaceChildren(); byId("inspector-confirmation").checked=false;
+    byId("signing").hidden=false; byId("review-state").textContent="Pendiente de confirmación";
+    captureChanged();
+  }
+  function valueOf(control,key) {
+    const raw=control.value.trim();
+    if(raw==="")return null;
+    if(defectKeys.has(key)||key==="sample_count")return Number(raw);
+    if(["avg_count_per_box","pulp_temp"].includes(key) && /^[-+]?\d+(?:[.,]\d+)?$/.test(raw))return Number(raw.replace(",","."));
+    return raw;
+  }
+  function todayInLima() { const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"America/Lima",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()); const p=Object.fromEntries(parts.map(x=>[x.type,x.value])); return `${p.year}-${p.month}-${p.day}`; }
+  function field(key,label,id,opts={}) {
+    const wrap=element("div",undefined,"field"+(opts.wide?" wide":""));
+    const lab=element("label",label);lab.htmlFor=id;const sourceTag=element("span",undefined,"field-source");sourceTag.hidden=true;sourceTag.setAttribute("aria-hidden","true");lab.append(sourceTag);wrap.append(lab);
+    let input;
+    if(opts.textarea)input=element("textarea");
+    else if(opts.options){input=element("select");for(const [v,t]of opts.options){const option=element("option",t);option.value=v;input.append(option);}}
+    else {input=element("input");input.type=opts.type||"text";}
+    input.id=id;input.name=key;
+    if(opts.required)input.required=true;
+    if(opts.readonly)input.readOnly=true;
+    if(opts.type==="number"){input.min="0";input.step="1";input.inputMode="numeric";}
+    if(opts.placeholder)input.placeholder=opts.placeholder;
+    if(opts.suggestions){const list=element("datalist");list.id=id+"-options";for(const value of opts.suggestions){const option=element("option");option.value=value;list.append(option);}input.setAttribute("list",list.id);wrap.append(list);}
+    if(opts.help){const hint=element("small",opts.help);hint.id=id+"-help";input.setAttribute("aria-describedby",hint.id);wrap.append(input,hint);}else wrap.append(input);
+    const sourceHint=element("small",undefined,"field-state");sourceHint.id=id+"-source";sourceHint.hidden=true;wrap.append(sourceHint);input.setAttribute("aria-describedby",[input.getAttribute("aria-describedby"),sourceHint.id].filter(Boolean).join(" "));sourceNodes.set(input,{tag:sourceTag,hint:sourceHint});
+    return {wrap,input};
+  }
+  function renderHeader() {
+    const supplied=new Map((state.config.header_fields||[]).map(x=>[x.key,x]));
+    for(const base of fallbackHeaders){const meta={...base,...supplied.get(base.key)};const key=meta.key;
+      const opts={required:key==="lot_id"||key==="inspection_date",wide:key==="remarks"||key==="reason",textarea:key==="remarks"||key==="reason",readonly:key==="reason",type:key==="inspection_date"?"date":"text"};
+      if(key==="Level_Flag")opts.options=[["","Pendiente / sin registrar"],["1","1"],["2","2"],["3","3"]];
+      const f=field(key,meta.label,"header-"+key,opts);headerControls[key]=f.input;byId(key==="reason"?"reason-field":["Level_Flag","remarks","grade","color","plu_pct"].includes(key)?"final-header-fields":"header-fields").append(f.wrap);
+    }
+    headerControls.inspection_date.value=todayInLima();
+  }
+  function renderSummary() {
+    for(const [key,label]of [["label_brand","Label"],["packing_date","Packing date"],["plu_coo","PLU/Coo"],["open_rating","Open Rating"],["color_rating","Color Rating"]]){const item=field(key,label,"summary-"+key);summaryControls[key]=item.input;byId("summary-fields").append(item.wrap);}
+  }
+  function numberText(value,digits=2){return new Intl.NumberFormat("es-PE",{maximumFractionDigits:digits}).format(value);}
+  function newBoxInspection(number=1) {
+    return {sample_box_id:"BOX_"+String(number).padStart(3,"0"),status:"capturing",coverage_confirmed:false,manifest_record_index:null};
+  }
+  function boxCaptureSummary(sample,records,box) {
+    const unique=new Map(records.map(record=>[record.image_id,record]));
+    const actual=Array.from(unique.values()).reduce((sum,record)=>sum+record.total_fruits,0);
+    const rows=sample.reception?.records||[];let selected=null,selectionRequired=false;
+    if(Number.isInteger(box.manifest_record_index)&&rows[box.manifest_record_index])selected=rows[box.manifest_record_index];
+    else if(rows.length){const variants=new Set(rows.map(row=>JSON.stringify([String(row.expected_count_per_box??"").trim(),String(row.size_declared??"").trim()])));if(variants.size===1)selected=rows[0];else selectionRequired=true;}
+    const raw=String(selected?.expected_count_per_box??"").trim(),parsed=Number(raw);
+    const invalidExpected=raw!==""&&(!/^\d+(?:\.0+)?$/.test(raw)||!Number.isSafeInteger(parsed));
+    const expected=!invalidExpected&&raw!==""&&parsed>0?parsed:null;
+    const difference=expected===null?null:actual-expected;
+    return {actual_count:actual,images_processed:unique.size,expected_count_per_box:expected,count_difference:difference,count_deviation_pct:expected===null?null:100*difference/expected,selection_required:selectionRequired,invalid_expected:invalidExpected};
+  }
+  function renderBoxCapture(sample,kind,host) {
+    const additional=kind==="additional",box=additional?sample.pendingAdditional.boxInspection:sample.boxInspection;
+    const section=element("section",undefined,"box-capture rule-note");section.append(element("h4","Caja "+box.sample_box_id));
+    section.append(element("p","Fotografía todos los frutos de esta caja en grupos separados, sin repetir limones entre fotos. Puedes agregar varias tandas antes de finalizar.","hint"));
+    const rows=sample.reception?.records||[],controls={box,section,additional};
+    if(rows.length>1){const label=element("label","Caja / tamaño declarado en el manifiesto"),select=element("select");select.id="box-manifest-"+sample.serial+"-"+kind;label.htmlFor=select.id;
+      const placeholder=element("option","Selecciona la línea de esta caja");placeholder.value="";select.append(placeholder);
+      rows.forEach((row,index)=>{const option=element("option","Línea "+(index+1)+" · Size "+(row.size_declared||"—")+" · "+(row.expected_count_per_box||"sin count")+" frutos/caja"+(row.label_brand?" · "+row.label_brand:""));option.value=String(index);select.append(option);});
+      select.value=box.manifest_record_index===null?"":String(box.manifest_record_index);controls.select=select;section.append(label,select);
+      select.addEventListener("change",event=>{event.stopPropagation();if(state.busy)return;box.manifest_record_index=select.value===""?null:Number(select.value);box.status="capturing";box.coverage_confirmed=false;if(!additional)invalidate();updateBoxCapture(sample,kind);captureChanged(true);});}
+    controls.metrics=element("div",undefined,"vision-summary");controls.values=[];
+    for(const label of ["Esperados por caja","Detectados en esta caja","Diferencia detectada","Desviación"]){const metric=element("div",undefined,"metric"),value=element("strong","—");metric.append(element("span",label),value);controls.metrics.append(metric);controls.values.push(value);}section.append(controls.metrics);
+    controls.note=element("p",undefined,"notice");section.append(controls.note);controls.progress=element("p",undefined,"hint");section.append(controls.progress);
+    controls.finish=element("button","Finalizar inspección de caja","secondary");controls.finish.type="button";
+    controls.finish.addEventListener("click",()=>{if(state.busy)return;const records=additional?sample.pendingAdditional.visionRecords:sample.records,summary=boxCaptureSummary(sample,records,box);
+      if(box.status==="completed"){box.status="capturing";box.coverage_confirmed=false;}
+      else{if(!summary.actual_count||summary.selection_required||summary.invalid_expected){error(summary.invalid_expected?"El count declarado es inválido. Corrige el manifiesto antes de finalizar esta caja.":summary.selection_required?"Selecciona la línea del manifiesto de esta caja.":"Agrega las fotografías de la caja antes de finalizar.");return;}box.status="completed";box.coverage_confirmed=true;}
+      if(!additional)invalidate();updateBoxCapture(sample,kind);captureChanged(true);status(box.status==="completed"?"Caja finalizada. Revisa la diferencia entre el conteo detectado y el manifiesto.":"Caja abierta para continuar la captura.");});
+    section.append(element("p","Al finalizar confirmas que fotografiaste toda la caja y que los grupos no repiten frutos. La coincidencia con el manifiesto no cierra la caja automáticamente.","hint"),controls.finish);
+    if(additional)sample.additionalBoxControls=controls;else sample.boxControls=controls;host.append(section);updateBoxCapture(sample,kind);
+  }
+  function updateBoxCapture(sample,kind="initial") {
+    const additional=kind==="additional",controls=additional?sample.additionalBoxControls:sample.boxControls;
+    if(!controls)return;const box=controls.box,records=additional?(sample.pendingAdditional?.visionRecords||[]):sample.reviewHistory?.initial?.vision_records||sample.records,summary=boxCaptureSummary(sample,records,box),done=box.status==="completed";
+    const difference=summary.count_difference,values=[summary.expected_count_per_box??"Pendiente",summary.actual_count,difference===null?"—":(difference>0?"+":"")+difference,summary.count_deviation_pct===null?"—":numberText(summary.count_deviation_pct,2)+" %"];
+    controls.values.forEach((node,index)=>node.textContent=String(values[index]));
+    controls.note.textContent=summary.selection_required?"Esta paleta mezcla tamaños o counts. Selecciona la línea de la caja inspeccionada.":summary.invalid_expected?"El count declarado es inválido: debe ser un entero. Corrige el manifiesto antes de finalizar esta caja.":summary.expected_count_per_box===null?"El manifiesto no tiene un conteo esperado disponible; se conserva el conteo detectado.":!done?"Conteo parcial: sigue fotografiando hasta cubrir toda la caja. La diferencia todavía no acredita unidades faltantes.":difference<0?(-difference)+" unidades menos detectadas que las declaradas. Verifica el conteo físico para confirmar el faltante.":difference>0?difference+" unidades más detectadas que las declaradas.":"El conteo detectado coincide con las unidades declaradas para esta caja.";
+    controls.progress.textContent=box.sample_box_id+" · "+summary.images_processed+" JSON únicos · "+(done?"Caja finalizada":"Captura en curso");
+    controls.finish.textContent=done?"Reabrir captura de esta caja":"Finalizar inspección de caja";controls.finish.disabled=state.busy||Boolean(sample.reviewHistory&&!additional)||!summary.actual_count||summary.selection_required||summary.invalid_expected;
+    if(controls.select)controls.select.disabled=state.busy||Boolean(sample.reviewHistory&&!additional);
+    if(additional&&sample.additionalAddButton)sample.additionalAddButton.disabled=state.busy||!done;
+  }
+  function lockCaptureInputs() {
+    const controls=Array.from(document.querySelectorAll("#inspection-form input,#inspection-form select,#inspection-form textarea,#inspection-form button,#reception-card input,#reception-card select,#reception-card button,#signing input,#signing button,#inspector-decisions select")).map(control=>[control,control.disabled]);for(const [control]of controls)control.disabled=true;return ()=>{for(const [control,disabled]of controls)control.disabled=disabled;updateCapturePresentation();refreshReceptionControls();};
+  }
+  async function importVisionRecords(sample,newRecords) {
+    if(sample.reviewHistory)throw Error("Esta paleta ya tiene revisiones adicionales. Agrega otra caja desde EXTEND para conservar su historial.");
+    const lot=headerControls.lot_id.value.trim();const pallet=sample.controls.pallet_id.value.trim();const id=sample.id.value.trim();
+    if(!lot||!pallet||!id)throw Error("Completa lote, N° PALLET y Sample ID antes de importar los JSON.");
+    if(state.samples.some(other=>other!==sample&&other.id.value.trim()===id))throw Error("Sample ID debe ser distinto para cada muestra antes de asociar imágenes.");
+    const revision=state.revision;const context=JSON.stringify([lot,pallet,id]);const unlock=lockCaptureInputs();
+    try{
+      const response=await (await request("/api/vision/import",{...collectPayload(),sample_id:id,vision_records:newRecords})).json();
+      if(revision!==state.revision||context!==JSON.stringify([headerControls.lot_id.value.trim(),sample.controls.pallet_id.value.trim(),sample.id.value.trim()]))throw Error("El contexto cambió durante la importación. No se asociaron los JSON; vuelve a importarlos en la muestra correcta.");
+      if(!Array.isArray(response.vision_records)||!Array.isArray(response.image_bindings)||!response.inspection_summary)throw Error("La importación no devolvió resultados y asociaciones válidas.");
+      const images=new Set(response.vision_records.map(record=>record.image_id));const linked=new Set();for(const binding of response.image_bindings){if(String(binding.lot_id).trim()!==lot||String(binding.pallet_id).trim()!==pallet||String(binding.sample_id).trim()!==id||!images.has(binding.image_id)||linked.has(binding.image_id))throw Error("La importación devolvió una asociación distinta del contexto visible; no se modificó la captura.");linked.add(binding.image_id);}if(linked.size!==images.size)throw Error("Faltan asociaciones para las imágenes importadas; no se modificó la captura.");
+      const records=copy(response.vision_records);const bindings=copy(response.image_bindings);const summary=copy(response.inspection_summary);
+      const previousIds=new Set(sample.records.map(record=>record.image_id));if(sample.boxInspection&&records.some(record=>!previousIds.has(record.image_id))){sample.boxInspection.status="capturing";sample.boxInspection.coverage_confirmed=false;}
+      sample.records=records;sample.imageBindings=bindings;sample.visionSummary=summary;sample.validationState="validated";sample.fileNames=records.map(record=>String(record.image_id)+".json");sample.restoreIssues=[];
+      invalidate();updateVision(sample);captureChanged(true);status("JSON validados y asociados a "+id+" · N° PALLET "+pallet+".");
+    }finally{unlock();}
+  }
+  function updateVision(sample) {
+    const seen=new Set();let total=0,affected=0,duplicates=0,valid=true;const confidence=[];
+    for(const rec of sample.records){
+      if(!rec||typeof rec!=="object"||!rec.image_id){valid=false;continue;}
+      if(seen.has(rec.image_id)){duplicates++;continue;}seen.add(rec.image_id);
+      if(!Number.isInteger(rec.total_fruits)||!Number.isInteger(rec.oleocellosis_count)){valid=false;continue;}
+      total+=rec.total_fruits;affected+=rec.oleocellosis_count;
+      for(const pred of Array.isArray(rec.fruit_predictions)?rec.fruit_predictions:[])if(pred&&typeof pred.confidence==="number"&&Number.isFinite(pred.confidence))confidence.push(pred.confidence);
+    }
+    const summary=sample.visionSummary;if(summary){total=summary.total_fruits;affected=summary.oleocellosis_count;}
+    const values=[seen.size,valid?total:"—",valid?affected:"—",valid&&total>0?numberText(100*affected/total,4)+" %":"—"];
+    sample.metricValues.forEach((n,i)=>n.textContent=String(values[i]));
+    sample.fileList.replaceChildren();for(const image of seen){const binding=sample.imageBindings.find(item=>item.image_id===image);sample.fileList.append(element("li",String(image)+" → "+(binding?"Muestra "+binding.sample_id+" · N° PALLET "+binding.pallet_id:"Asociación pendiente de validar")));}
+    sample.clearFiles.hidden=sample.records.length===0;
+    sample.visionNote.textContent=sample.records.length?`${confidence.length?"Confianza media: "+numberText(100*confidence.reduce((a,b)=>a+b,0)/confidence.length,2)+" %. ":""}${sample.validationState==="validated"?"Resultados validados y asociados a la muestra visible.":"Datos del borrador recuperados. Vuelve a evaluar antes de confirmar el reporte."}`:"Procesa las fotos de esta caja y confirma sus resultados. Una fotografía repetida no aumenta los frutos.";
+    sample.duplicateNotice.textContent=duplicates?(sample.validationState==="validated"?duplicates+" fotografía(s) duplicada(s) idéntica(s) ignorada(s) en el agregado; no aumentan frutos ni afectados.":duplicates+" fotografía(s) repetida(s) en el borrador; se comprobarán al volver a evaluar."):"";sample.duplicateNotice.hidden=!duplicates;
+    sample.controls.oleocellosis.value=valid&&sample.records.length?String(affected):"";
+    sample.controls.sample_count.readOnly=true;
+    sample.controls.sample_count.value=valid&&sample.records.length?String(total):"";
+    updateSampleTotal(sample);
+    updateReviewLocks(sample);
+    if(sample.boxInspection)updateBoxCapture(sample);
+  }
+  function updateReviewLocks(sample) {
+    if(!sample.reviewHistory)return;
+    for(const key of [...defectKeys,"sample_count"])if(sample.controls[key])sample.controls[key].readOnly=true;
+    if(sample.visionUpload)sample.visionUpload.disabled=true;
+    if(sample.clearFiles)sample.clearFiles.hidden=true;
+    if(sample.zeroButton)sample.zeroButton.hidden=true;
+    if(sample.visionNote)sample.visionNote.textContent="Esta paleta acumula "+(1+sample.reviewHistory.additional.length)+" revisiones. Añade otra caja desde EXTEND en los resultados; el historial conserva cada revisión.";
+  }
+  function updateSampleTotal(sample) {
+    if(!sample.totalPct)return;
+    const denominator=Number(sample.controls.sample_count.value);
+    for(const key of defectKeys){const control=sample.controls[key];if(sample.controls.sample_count.value!==""&&Number.isInteger(denominator)&&denominator>=0)control.max=String(denominator);else control.removeAttribute("max");}
+    const values=Array.from(defectKeys,key=>sample.controls[key].value);
+    const complete=denominator>0&&values.every(v=>v!==""&&Number.isInteger(Number(v))&&Number(v)>=0);
+    sample.totalPct.value=complete?numberText(values.reduce((sum,v)=>sum+Number(v),0)/denominator*100,4)+" %":"Pendiente";
+  }
+  function receiptValue(sample,key) {
+    const rows=sample.reception?.records||[];if(!rows.length)return "";
+    const source={label_brand:"label_brand",grower:"grower",packing_date:"packing_date",size:"size_declared",avg_count_per_box:"avg_count_per_box",plu_pct:"plu_pct",plu_coo:"plu_coo"}[key];
+    if(!source)return "";
+    if(key==="size"){const values=new Set();for(const row of rows){const present=[row.size_declared,row.size].filter(value=>value!==undefined&&value!==null&&String(value).trim()!=="");if(!present.length)return "";for(const value of present)values.add(String(value).trim());}return values.size===1?[...values][0]:"";}
+    return unambiguous(rows,source);
+  }
+  function updateReceiptLocks(sample) {
+    let supplied=false;
+    for(const key of ["label_brand","grower","packing_date","size","avg_count_per_box","plu_pct","plu_coo"]){const control=sample.controls[key];if(!control)continue;const received=receiptValue(sample,key);if(received)supplied=true;control.readOnly=Boolean(received)&&!sample.editReceipt&&String(control.value).trim()===received;}
+    if(sample.receiptButton){sample.receiptButton.hidden=!supplied;sample.receiptButton.textContent=sample.editReceipt?"Terminar corrección":"Corregir datos del manifiesto";sample.receiptButton.setAttribute("aria-pressed",String(Boolean(sample.editReceipt)));}
+  }
+  function renderQCEditor(sample) {
+    if(sample.qcEditor)return sample.qcEditor;
+    const editor=element("section",undefined,"qc-editor");editor.id="qc-editor-"+sample.serial;editor.setAttribute("aria-labelledby","qc-editor-title-"+sample.serial);sample.qcEditor=editor;
+    const heading=element("div",undefined,"qc-editor-heading"),text=element("div");sample.editorTitle=element("h3","Datos de la paleta");sample.editorTitle.id="qc-editor-title-"+sample.serial;sample.editorInfo=element("p");text.append(sample.editorTitle,sample.editorInfo);
+    sample.receiptButton=element("button","Corregir datos del manifiesto","quiet");sample.receiptButton.type="button";sample.receiptButton.hidden=true;sample.receiptButton.addEventListener("click",()=>{sample.editReceipt=!sample.editReceipt;updateReceiptLocks(sample);});heading.append(text,sample.receiptButton);editor.append(heading);byId("qc-editor-list").append(editor);return editor;
+  }
+  function mountVisionCapture(sample,kind) {
+    const root=element("section");
+    if(!window.SmartFruitVisionCapture?.create){root.append(element("p","Vision integrada no está disponible. Puedes importar los JSON de Vision.","hint"));return {root,refresh(){},destroy(){}};}
+    const key=kind==="additional"?"additionalCapture":"visionCapture",memoryKey=key+"Memory";
+    sample[key]?.destroy();sample[memoryKey]??={};
+    const capture=window.SmartFruitVisionCapture.create({root,request,memory:sample[memoryKey],
+      getContext:()=>({lot_id:(headerControls.lot_id?.value||"").trim(),pallet_id:(sample.controls.pallet_id?.value||"").trim(),sample_id:(sample.id?.value||"").trim(),review_kind:kind}),
+      getUsedImageIds:()=>new Set(state.samples.flatMap(item=>[...item.records,...(item.pendingAdditional?.visionRecords||[])].flatMap(record=>{const metadata=record.inference||record.meta;return [record.image_id,...(metadata?.input_kind==="scene"&&metadata.source_filename?[metadata.source_filename.replace(/\.[^.]+$/,"")]:[])];}))),
+      getReservedPhotoIds:()=>new Set(state.samples.flatMap(item=>[...Object.entries(item.photoPools||{}).flatMap(([poolKind,pool])=>item===sample&&poolKind===kind?[]:pool?.photo_ids||[]),...["visionCaptureMemory","additionalCaptureMemory"].flatMap(key=>{const memory=item[key];return memory&&memory!==sample[memoryKey]?Array.from(memory.selected||[]):[];})])),
+      getTargetCount:()=>{const records=kind==="additional"?(sample.pendingAdditional?.visionRecords||[]):sample.reviewHistory?.initial?.vision_records||sample.records;const box=kind==="additional"?(sample.pendingAdditional?.boxInspection||{manifest_record_index:sample.boxInspection?.manifest_record_index??null}):sample.boxInspection||{};const summary=boxCaptureSummary(sample,records,box);return summary.selection_required||summary.invalid_expected||summary.expected_count_per_box===null?null:Math.max(0,summary.expected_count_per_box-summary.actual_count);},
+      getPhotoPool:()=>sample.photoPools?.[kind],
+      onPhotoPool:pool=>{sample.photoPools??={};sample.photoPools[kind]=copy(pool);scheduleDraft();},
+      getPreferredGroupIndex:()=>0,
+      getDefaultSelectionKey:()=>JSON.stringify([headerControls.lot_id?.value||"",sample.controls.pallet_id?.value||"",sample.id?.value||"",kind,kind==="additional"?(sample.reviewHistory?.additional?.length||0):0]),
+      hasExistingResults:()=>kind==="additional"?Boolean(sample.pendingAdditional?.visionRecords?.length):Boolean(sample.records.length),
+      getConfirmedRecords:()=>kind==="additional"?(sample.pendingAdditional?.visionRecords||[]):sample.records,
+      canProcess:()=>state.samples.includes(sample)&&(kind==="additional"?sample.inspectorChoice==="EXPAND":!sample.reviewHistory),
+      runAction:async action=>{if(state.busy)throw Error("Espera a que termine la operación actual.");let failure;await busy(async()=>{const unlock=lockCaptureInputs();try{await action();}catch(issue){failure=issue;throw issue;}finally{unlock();}});if(failure)throw failure;},
+      onConfirm:records=>kind==="additional"?stageAdditionalReview(sample,records):importVisionRecords(sample,records),onError:error,onStatus:status});
+    sample[key]=capture;return {root,...capture};
+  }
+  function addSample(values={}) {
+    invalidate();const serial=state.nextSample++;const sample={serial,controls:{},photoPools:values.photo_pools?copy(values.photo_pools):{},records:values.records||[],imageBindings:values.image_bindings?copy(values.image_bindings):[],visionSummary:null,validationState:values.restore?"restored":"empty",restoreIssues:[],contextIssues:[],fileNames:values.records?values.records.map(r=>r.image_id+".json"):[],reception:values.reception?copy(values.reception):null,receptionLot:values.receptionLot||null,reviewHistory:values.review_history?copy(values.review_history):null,boxInspection:values.box_inspection?copy(values.box_inspection):values.review_history?.initial?.box_inspection?copy(values.review_history.initial.box_inspection):values.restore&&values.review_history?null:newBoxInspection(),inspectorChoice:canonicalDecision(values.review_choice),pendingAdditional:null};
+    const card=element("section",undefined,"card sample-card");sample.card=card;card.setAttribute("aria-labelledby","sample-title-"+serial);
+    const heading=element("div",undefined,"card-heading");const titleWrap=element("div");titleWrap.append(element("div","Fotografías de la inspección","sample-number"));const title=element("h3","Paleta "+String(values.pallet_id||serial),"sample-title");sample.title=title;title.id="sample-title-"+serial;titleWrap.append(title);
+    const remove=element("button","Retirar muestra","quiet");sample.removeButton=remove;remove.hidden=Boolean(state.lotReception);remove.type="button";remove.setAttribute("aria-label","Retirar muestra "+serial);remove.addEventListener("click",()=>{if(state.samples.length===1){error("El reporte necesita al menos una muestra. Usa Nueva inspección para comenzar otro QC.");return;}state.samples=state.samples.filter(s=>s!==sample);card.remove();sample.qcEditor?.remove();invalidate();captureChanged(true);refreshReceptionControls();status("Muestra retirada.");});heading.append(titleWrap,remove);card.append(heading);
+    const identifiers=element("details",undefined,"rule-note");identifiers.append(element("summary","Identificación de la muestra y recepción"));const id=field("sample_id","Sample ID","sample-id-"+serial,{required:true});sample.id=id.input;id.input.value=values.sample_id!==undefined?values.sample_id:"SAMPLE_"+String(serial).padStart(3,"0");identifiers.append(id.wrap);card.append(identifiers);
+    if(sample.reception){const provenance=element("details",undefined,"bound-note");provenance.append(element("summary","Datos originales de la paleta "+String(values.pallet_id)));provenance.append(element("p","Registro de recepción: "+sample.reception.scan_input+" · Lote: "+String(sample.receptionLot)));provenance.append(receptionTable(sample.reception.records));identifiers.append(provenance);}
+    const vision=element("div",undefined,"vision-area");const vh=element("div",undefined,"vision-heading");vh.append(element("h3","Vision · Oleocellosis"),element("span","Automático","auto-tag"));vision.append(vh);
+    sample.context=element("div",undefined,"vision-context");vision.append(sample.context);sample.contextIssue=element("div",undefined,"notice context-issue");sample.contextIssue.hidden=true;vision.append(sample.contextIssue);
+    vision.append(mountVisionCapture(sample,"initial").root);
+    const importDetails=element("details",undefined,"rule-note");importDetails.append(element("summary","Importar resultados JSON existentes"));
+    const fileLabel=element("label","JSON de Vision · varias fotografías");fileLabel.htmlFor="vision-files-"+serial;const upload=element("input");sample.visionUpload=upload;upload.id=fileLabel.htmlFor;upload.className="file-input";upload.type="file";upload.multiple=true;upload.accept=".json,application/json";importDetails.append(fileLabel,upload);vision.append(importDetails);
+    upload.addEventListener("change",()=>{const files=Array.from(upload.files||[]);if(!files.length)return;busy(async()=>{const unlock=lockCaptureInputs();try{const parsed=await Promise.all(files.map(async file=>JSON.parse(await file.text())));for(const record of parsed)if(Array.isArray(record)||!record||typeof record!=="object")throw Error("Cada archivo debe contener un objeto JSON de Vision.");await importVisionRecords(sample,parsed);}catch(e){throw Error("No se importaron los JSON: "+e.message+" Los datos anteriores se conservan.");}finally{upload.value="";unlock();}});});
+    sample.fileList=element("ul",undefined,"file-list");vision.append(sample.fileList);
+    const metrics=element("div",undefined,"vision-summary");sample.metricValues=[];for(const label of ["Fotografías únicas","Frutos Vision","Con oleocelosis","Oleocelosis (%)"]){const m=element("div",undefined,"metric");const n=element("strong","—");m.append(element("span",label),n);metrics.append(m);sample.metricValues.push(n);}vision.append(metrics);
+    sample.visionNote=element("p",undefined,"hint");vision.append(sample.visionNote);sample.duplicateNotice=element("p",undefined,"notice");sample.duplicateNotice.hidden=true;vision.append(sample.duplicateNotice);sample.clearFiles=element("button","Retirar JSON de esta muestra","quiet");sample.clearFiles.type="button";sample.clearFiles.style.marginTop=".7rem";sample.clearFiles.addEventListener("click",()=>{sample.records=[];sample.imageBindings=[];sample.visionSummary=null;sample.validationState="empty";sample.restoreIssues=[];sample.fileNames=[];sample.boxInspection.status="capturing";sample.boxInspection.coverage_confirmed=false;invalidate();updateVision(sample);captureChanged(true);refreshReceptionControls();});vision.append(sample.clearFiles);
+    if(sample.boxInspection)renderBoxCapture(sample,"initial",vision);
+    vision.append(element("p","Sample se completa automáticamente con los frutos de los resultados confirmados.","hint"));card.append(vision);
+    const editor=renderQCEditor(sample);const supplied=new Map((state.config.qc_columns||[]).map(x=>[x.key,x]));
+    for(const group of ["general","condition","quality"]){
+      const section=element("fieldset",undefined,"qc-fieldset "+group+"-fields");const title=element("legend",{general:"General Information",condition:"Condition",quality:"Quality"}[group]);section.append(title);const grid=element("div",undefined,"grid");
+      for(const base of fallbackColumns.filter(c=>c.group===group)){const meta={...base,...supplied.get(base.key)};const key=meta.key;const count=defectKeys.has(key)||key==="sample_count";
+        const f=field(key,meta.label,"sample-"+serial+"-"+key,{type:count?"number":"text",required:count||key==="pallet_id",readonly:key==="oleocellosis"||key==="sample_count",placeholder:key==="oleocellosis"?"Vision":count?"—":"",help:key==="sample_count"?"Frutos calculados desde Vision":key==="oleocellosis"?"Cantidad detectada por Vision":undefined,suggestions:["open_rating","color_rating"].includes(key)?["Good","Good to Fair","Fair","Poor","N/A"]:undefined});sample.controls[key]=f.input;if(defectKeys.has(key))f.wrap.classList.add("defect-field");
+        if(!defectKeys.has(key)&&key!=="sample_count"&&values.qc_fields?.[key]!==null&&values.qc_fields?.[key]!==undefined)f.input.value=String(values.qc_fields[key]);
+        if(key==="pallet_id"&&values.pallet_id)f.input.value=values.pallet_id;
+        if(key==="pallet_id"&&sample.reception)f.input.readOnly=true;
+        if(key==="sample_count")f.input.min="1";
+        if(key==="packing_date")f.input.placeholder="Fecha o valor original (N/A)";
+        if(key==="plu_pct")f.input.setAttribute("aria-label","PLU (%) · conservar el valor registrado");
+        grid.append(f.wrap);
+      }section.append(grid);editor.append(section);
+    }
+    const totalField=field("sample_total_pct","Total de defectos (%)","sample-total-"+serial,{readonly:true,help:"Suma de incidencias / Sample. Un fruto puede presentar varios defectos."});sample.totalPct=totalField.input;totalField.wrap.classList.add("qc-editor-total");editor.append(totalField.wrap);editor.addEventListener("input",()=>updateSampleTotal(sample));
+    const tools=element("div",undefined,"qc-editor-tools");const zeros=element("button","Registrar defectos pendientes en 0","secondary");sample.zeroButton=zeros;zeros.type="button";const zeroHint=element("p","Úsalo después de revisar que los defectos que dejaste en blanco están ausentes. Conserva las cantidades ya registradas.","hint");zeros.addEventListener("click",()=>{let count=0;for(const key of defectKeys){if(key!=="oleocellosis"&&sample.controls[key].value===""){sample.controls[key].value="0";count++;}}invalidate();updateSampleTotal(sample);zeroHint.textContent=count?`Registraste ${count} defecto(s) pendiente(s) como ausente(s).`:"No hay defectos manuales pendientes.";status(zeroHint.textContent);});tools.append(zeros,zeroHint);editor.append(tools);
+    const obs=field("observations","Observaciones de esta paleta","sample-observations-"+serial,{textarea:true});sample.observations=obs.input;editor.append(obs.wrap);byId("sample-list").append(card);state.samples.push(sample);
+    if(values.demo){for(const key of defectKeys)if(key!=="oleocellosis")sample.controls[key].value="0";sample.controls.label_brand.value="DEMO";sample.controls.open_rating.value="Good";sample.controls.color_rating.value="Good";zeroHint.textContent="Solo para esta demo: defectos manuales de ejemplo registrados en cero.";}
+    if(values.restore){for(const [key,control]of Object.entries(sample.controls))control.value=values.qc_fields[key]??"";sample.observations.value=values.observations;}
+    updateReceiptLocks(sample);mountQCRow(sample);
+    updateVision(sample,{preserveQC:Boolean(values.restore)});refreshReceptionControls();captureChanged(true);return sample;
+  }
+  function collectPayload() {
+    const header={};for(const [key,control]of Object.entries(headerControls)){header[key]=valueOf(control,key);if(key==="Level_Flag"&&header[key]!==null)header[key]=Number(header[key]);}
+    const summary={};for(const [key,control]of Object.entries(summaryControls))summary[key]=valueOf(control,key);
+    const samples=state.samples.map(s=>{const fields={};for(const [key,control]of Object.entries(s.controls))fields[key]=valueOf(control,key);return {sample_id:s.id.value.trim(),pallet_id:String(fields.pallet_id||""),vision_records:s.records,...(s.imageBindings.length?{image_bindings:copy(s.imageBindings)}:{}),vision_covers_sample:s.boxInspection?s.boxInspection.status==="completed"&&s.boxInspection.coverage_confirmed===true:s.records.length>0,...(s.boxInspection?{box_inspection:copy(s.boxInspection)}:{}),qc_fields:fields,observations:s.observations.value.trim(),review_choice:s.inspectorChoice||"",...(s.reviewHistory?{review_history:copy(s.reviewHistory)}:{}),...(s.reception?{reception:copy(s.reception)}:{})};});
+    return {qc_header:header,qc_summary:summary,reason_source:state.reasonSource||"defect_summary",samples,...(state.lotReception?{lot_reception:copy(state.lotReception)}:{}),observations:byId("inspection-observations").value.trim()};
+  }
+  function reviewAssessment(payload) {
+    const assessment=copy(payload);for(const key of ["qc_summary","observations","reason_source"])delete assessment[key];
+    for(const key of ["Level_Flag","reason","remarks","grade","color","plu_pct"])delete assessment.qc_header[key];
+    for(const sample of assessment.samples||[])delete sample.review_choice;
+    return assessment;
+  }
+  function syncReviewMetadata() {
+    byId("inspector-confirmation").checked=false;byId("saved-report").hidden=true;byId("review-state").textContent="Pendiente de confirmación";
+    byId("signing").hidden=false;if(state.finalized)for(const sample of state.samples)if(sample.choiceControl)sample.choiceControl.disabled=false;
+    if(state.payload&&state.report&&state.evaluatedRevision===state.revision){
+      const payload=collectPayload();
+      if(JSON.stringify(reviewAssessment(payload))!==JSON.stringify(reviewAssessment(state.payload))){invalidate();return false;}
+      state.payload=copy(payload);state.report.qc_header=copy(payload.qc_header);state.report.qc_summary=copy(payload.qc_summary);state.report.observations=payload.observations;state.report.reason_source=payload.reason_source;
+      for(const sample of state.report.samples){const current=payload.samples.find(item=>item.sample_id===sample.sample_id);if(current)sample.review_choice=current.review_choice||"";}
+      byId("review-refresh-needed").hidden=true;
+    }
+    captureChanged();return true;
+  }
+  function handleInspectionEdit(event) {
+    if(event.target.type==="file"||event.target.closest?.(".additional-review")||event.target.closest?.(".vision-capture")||event.target.dataset?.sampleId)return;
+    const finalField=["Level_Flag","reason","remarks","grade","color","plu_pct"].some(key=>headerControls[key]===event.target);
+    if(finalField||Object.values(summaryControls).includes(event.target)||event.target===byId("inspection-observations"))syncReviewMetadata();else invalidate();
+  }
+  function validateForEvaluation() {
+    if(!state.samples.length)throw Error("Carga el manifiesto y abre un lote antes de evaluar.");
+    for(const sample of state.samples)if(sample.boxInspection&&(sample.boxInspection.status!=="completed"||sample.boxInspection.coverage_confirmed!==true)){selectQCPallet(sample.serial);setStep(2);sample.boxControls?.finish.focus();throw Error("Finaliza la inspección de "+sample.boxInspection.sample_box_id+" después de fotografiar todos sus frutos, sin repetir grupos.");}
+    updateCapturePresentation();for(const sample of state.samples){if(!state.demoMode&&!sample.reception)throw Error("Cada muestra real debe iniciarse desde una paleta resuelta en el manifiesto.");if(sample.receptionLot&&sample.receptionLot!==headerControls.lot_id.value.trim())throw Error("El lote del QC no coincide con la recepción vinculada. Los datos de origen no se pueden cambiar silenciosamente.");if(sample.contextIssues.length)throw Error(sample.id.value+": "+sample.contextIssues.join(" "));}
+    const invalid=Array.from(byId("inspection-form").querySelectorAll("input,select,textarea")).find(control=>!control.closest(".additional-review")&&!control.dataset.sampleId&&!control.checkValidity());if(invalid){const panel=invalid.closest("[data-workflow-step]");if(panel)setStep(Number(panel.dataset.workflowStep));const owner=state.samples.find(sample=>sample.card.contains(invalid)||sample.qcEditor?.contains(invalid));if(owner)selectQCPallet(owner.serial);for(let parent=invalid.parentElement;parent&&parent!==byId("inspection-form");parent=parent.parentElement)if(parent.tagName==="DETAILS")parent.open=true;invalid.reportValidity();throw Error("Completa los campos pendientes de la inspección.");}
+    const ids=new Set();
+    for(const s of state.samples){const id=s.id.value.trim();if(!id)throw Error("Cada muestra necesita Sample ID.");if(ids.has(id))throw Error("Sample ID debe ser distinto para cada muestra: "+id);ids.add(id);if(!s.records.length)throw Error("Carga al menos un JSON de Vision para "+id+".");}
+  }
+  async function request(url,payload) {
+    const res=await fetch(url,payload===undefined?{}:{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+    if(!res.ok){let detail;try{const body=await res.json();detail=body.detail||body.message;}catch(_){detail=await res.text().catch(()=>"");}if(Array.isArray(detail))detail=detail.map(x=>typeof x==="string"?x:((x.loc||[]).join(".")+": "+(x.msg||JSON.stringify(x)))).join("\n");throw Error(typeof detail==="string"?detail:"No se pudo completar la operación ("+res.status+").");}
+    return res;
+  }
+  async function busy(action) {
+    if(state.busy)return;state.busy=true;clearError();
+    const nodes=["evaluate-button","demo-button","draft-button","finalize-button","manifest-file","resolve-scan-button","open-lot-button","start-qc","forget-manifest","new-inspection-button","add-sample","save-draft-now"].map(byId);
+    nodes.push(...document.querySelectorAll("#final-header-fields input,#final-header-fields select,#final-header-fields textarea,#reason-panel textarea,#reason-panel button,#summary-fields input,#summary-fields select,#summary-fields textarea,#inspection-observations,#results select,#results .additional-review input,#results .additional-review textarea,#results .additional-review button"));
+    const controls=Array.from(new Set(nodes)).map(control=>[control,control.disabled]);for(const [control]of controls)control.disabled=true;
+    try{await action();}catch(e){error(e.message||"No se pudo completar la operación.");}finally{state.busy=false;for(const [control,disabled]of controls)control.disabled=disabled;updateCapturePresentation();refreshReceptionControls();}
+  }
+  function setInspectorChoice(sampleId,value) {
+    const sample=state.samples.find(item=>item.id.value.trim()===String(sampleId));if(!sample)throw Error("No se encontró la paleta para actualizar su estado.");
+    const choice=canonicalDecision(value);if(choice&&!decisions.includes(choice))throw Error("Selecciona STANDARD, EXTEND o ESCALATE.");
+    sample.inspectorChoice=choice;if(sample.choiceControl)sample.choiceControl.value=choice;
+    if(sample.inspectorStatus)sample.inspectorStatus.textContent="Estado inspector: "+decisionLabel(choice);
+    if(sample.additionalPanel)sample.additionalPanel.hidden=choice!=="EXPAND";
+    if(choice==="EXPAND")sample.additionalCapture?.refresh();
+    renderInspectorDecisionSummary();syncReviewMetadata();status("Paleta "+sample.controls.pallet_id.value+": estado "+decisionLabel(choice)+" pendiente de confirmación.");
+  }
+  function renderInspectorDecisionSummary() {
+    byId("inspector-decisions").replaceChildren(...state.samples.map(sample=>element("p","Paleta "+sample.controls.pallet_id.value+" · "+decisionLabel(sample.inspectorChoice))));
+  }
+  function renderReviewHistory(sample,reportSample) {
+    const history=sample.reviewHistory||reportSample.review_history;if(!history)return null;
+    const details=element("details",undefined,"rule-note");details.open=true;details.append(element("summary","Historial · "+(1+history.additional.length)+" revisiones de esta paleta"));
+    const wrap=element("div",undefined,"reception-table-wrap"),table=element("table",undefined,"summary-defects"),head=element("tr");for(const label of ["Revisión","Sample","Oleocelosis","Porcentaje","Otros defectos"])head.append(element("th",label));const thead=element("thead");thead.append(head);const body=element("tbody");
+    const entries=[{...history.initial,label:"Inicial"},...history.additional.map(item=>({...item,label:"Caja adicional · revisión "+item.review_number})),{qc_fields:reportSample.qc_fields,inspection_summary:reportSample.inspection_summary,label:"Acumulado"}];
+    for(const entry of entries){const fields=entry.qc_fields||{},summary=entry.inspection_summary||{},n=Number(fields.sample_count??summary.total_fruits??0),affected=Number(fields.oleocellosis??summary.oleocellosis_count??0);const other=fallbackColumns.filter(column=>defectKeys.has(column.key)&&column.key!=="oleocellosis"&&Number(fields[column.key])>0).map(column=>column.label+": "+fields[column.key]).join(" · ");const row=element("tr");for(const value of [entry.label,String(n),String(affected),n>0?numberText(100*affected/n,2)+" %":"—",other||"Sin otros defectos"])row.append(element("td",value));body.append(row);}table.append(thead,body);wrap.append(table);details.append(wrap);return details;
+  }
+  function renderAdditionalReview(sample) {
+    const panel=element("section",undefined,"additional-review");sample.additionalPanel=panel;panel.hidden=sample.inspectorChoice!=="EXPAND";
+    panel.append(element("h4","EXTEND · revisar otra caja"),element("p","Procesa las fotos de la caja adicional de esta paleta. Sus frutos y defectos se sumarán al acumulado, conservando la revisión inicial.","hint"));
+    panel.append(mountVisionCapture(sample,"additional").root);
+    const importDetails=element("details",undefined,"rule-note");importDetails.append(element("summary","Importar JSON existentes de la caja adicional"));
+    const label=element("label","JSON de Vision de la caja adicional");label.htmlFor="additional-files-"+sample.serial;const upload=element("input");upload.type="file";upload.multiple=true;upload.accept=".json,application/json";upload.id=label.htmlFor;upload.className="file-input";importDetails.append(label,upload);panel.append(importDetails);
+    upload.addEventListener("change",()=>{const files=Array.from(upload.files||[]);if(!files.length)return;busy(async()=>{try{const records=await Promise.all(files.map(async file=>JSON.parse(await file.text())));await stageAdditionalReview(sample,records);}finally{upload.value="";}});});
+    sample.additionalBody=element("div");panel.append(sample.additionalBody);renderAdditionalForm(sample);if(!panel.hidden)sample.additionalCapture?.refresh();return panel;
+  }
+  function renderAdditionalForm(sample) {
+    retainPendingAdditional(sample);const area=sample.additionalBody;area.replaceChildren();
+    if(!sample.pendingAdditional){sample.additionalControls=null;sample.additionalObservations=null;sample.additionalBoxControls=null;area.append(element("p","Elige fotografías nuevas: un JSON ya utilizado no se vuelve a contar.","hint"));return;}
+    const pending=sample.pendingAdditional,old=pending.manualValues||{},previousNotes=pending.observations||"";
+    const discard=element("button","Descartar caja adicional pendiente","quiet");discard.type="button";discard.addEventListener("click",()=>discardPendingAdditional(sample));area.append(discard);
+    if(!samePendingContext(pending.context,pendingAdditionalContext(sample))){sample.additionalControls=null;sample.additionalObservations=null;sample.additionalBoxControls=null;area.append(element("p","La captura adicional pertenece a otro contexto de lote, paleta o muestra. Sus datos se conservan; vuelve al contexto original o descarta expresamente esta caja antes de cargar otra.","notice"));return;}
+    if(pending.needsReview)area.append(element("p","Caja adicional recuperada o conservada. Revisa sus fotos y defectos antes de incorporarla; todavía no forma parte del acumulado de la paleta.","notice"));
+    const summary=sample.pendingAdditional.summary;area.append(element("p",summary.images_processed+" fotografía(s) · "+summary.total_fruits+" frutos · "+summary.oleocellosis_count+" con oleocelosis ("+numberText(summary.oleocellosis_pct,2)+" %)","vision-context"),element("p","Registra únicamente los defectos de esta caja adicional. Los valores anteriores se conservan.","hint"));sample.additionalControls={};
+    if(sample.pendingAdditional.boxInspection)renderBoxCapture(sample,"additional",area);
+    for(const group of ["condition","quality"]){const section=element("fieldset",undefined,"qc-fieldset "+group+"-fields");section.append(element("legend",group==="condition"?"Condition · caja adicional":"Quality · caja adicional"));const grid=element("div",undefined,"grid");for(const column of fallbackColumns.filter(item=>item.group===group&&defectKeys.has(item.key)&&item.key!=="oleocellosis")){const item=field(column.key,column.label,"additional-"+sample.serial+"-"+column.key,{type:"number",placeholder:"Pendiente"});item.input.max=String(summary.total_fruits);item.input.value=old[column.key]??"";sample.additionalControls[column.key]=item.input;item.input.addEventListener("input",()=>{pending.manualValues[column.key]=item.input.value;captureChanged();});grid.append(item.wrap);}section.append(grid);area.append(section);}
+    const zeros=element("button","Registrar pendientes de esta caja en 0","secondary");zeros.type="button";zeros.addEventListener("click",()=>{for(const control of Object.values(sample.additionalControls))if(control.value==="")control.value="0";retainPendingAdditional(sample);captureChanged(true);});area.append(zeros,element("p","Usa esta acción después de comprobar que los defectos que dejaste vacíos están ausentes en la caja adicional.","hint"));
+    const notes=field("additional_observations","Observaciones de la revisión adicional","additional-notes-"+sample.serial,{textarea:true});sample.additionalObservations=notes.input;notes.input.value=previousNotes;notes.input.addEventListener("input",()=>{pending.observations=notes.input.value;captureChanged();});area.append(notes.wrap);
+    area.append(element("p","Sample de esta caja se calcula desde sus JSON. Usa fotografías de frutos distintos de los ya revisados.","hint"));
+    const add=element("button","Agregar caja y actualizar resultados");sample.additionalAddButton=add;add.type="button";add.disabled=Boolean(sample.pendingAdditional.boxInspection&&sample.pendingAdditional.boxInspection.status!=="completed");add.addEventListener("click",()=>busy(()=>applyAdditionalReview(sample)));area.append(add);
+  }
+  function discardPendingAdditional(sample) {
+    sample.pendingAdditional=null;sample.additionalControls=null;sample.additionalObservations=null;sample.additionalBoxControls=null;sample.additionalAddButton=null;
+    if(sample.photoPools)delete sample.photoPools.additional;
+    if(sample.additionalCaptureMemory){sample.additionalCaptureMemory.job=null;sample.additionalCaptureMemory.confirmedJob=null;sample.additionalCaptureMemory.selected?.clear();}
+    renderAdditionalForm(sample);sample.additionalCapture?.refresh();captureChanged(true);status("Caja adicional pendiente descartada expresamente. La inspección inicial y el historial incorporado se conservan.");
+  }
+  async function stageAdditionalReview(sample,records) {
+    ensureCurrent();if(sample.inspectorChoice!=="EXPAND")throw Error("Selecciona EXTEND en esta paleta para añadir otra caja.");
+    if(sample.pendingAdditional?.context&&!samePendingContext(sample.pendingAdditional.context,pendingAdditionalContext(sample)))throw Error("La caja adicional pendiente pertenece a otro contexto. Conserva sus datos o descártala expresamente antes de cargar otra.");
+    if(!Array.isArray(records)||!records.length||records.some(record=>!record||typeof record!=="object"||Array.isArray(record)))throw Error("Cada archivo debe contener un objeto JSON de Vision.");
+    const used=new Set(state.samples.flatMap(item=>item.records.map(record=>record.image_id))),incoming=new Map((sample.pendingAdditional?.visionRecords||[]).map(record=>[record.image_id,record]));let added=false;
+    for(const record of records){if(used.has(record.image_id))throw Error("El JSON "+record.image_id+" ya fue utilizado. Elige otra fotografía para la caja adicional.");if(incoming.has(record.image_id)){if(!sameVisionRecord(incoming.get(record.image_id),record))throw Error("El JSON "+record.image_id+" tiene contenido distinto del ya cargado.");}else{incoming.set(record.image_id,record);added=true;}}records=Array.from(incoming.values());
+    const revision=state.revision,unlock=lockCaptureInputs();
+    try{const response=await (await request("/api/inspection/additional-review/preview",{...collectPayload(),sample_id:sample.id.value.trim(),vision_records:records})).json();if(revision!==state.revision)throw Error("La inspección cambió durante la validación. Vuelve a seleccionar los JSON.");if(!response.inspection_summary)throw Error("Vision no devolvió un resumen válido.");const total=records.reduce((sum,record)=>sum+record.total_fruits,0),affected=records.reduce((sum,record)=>sum+record.oleocellosis_count,0);if(!Number.isInteger(total)||total<=0)throw Error("La caja adicional debe contener frutos evaluados.");const box=sample.pendingAdditional?.boxInspection||{...newBoxInspection((sample.reviewHistory?.additional.length||0)+2),manifest_record_index:sample.boxInspection?.manifest_record_index??null};if(added){box.status="capturing";box.coverage_confirmed=false;}sample.pendingAdditional={...sample.pendingAdditional,visionRecords:copy(records),boxInspection:box,context:sample.pendingAdditional?.context||pendingAdditionalContext(sample),summary:{images_processed:records.length,total_fruits:total,oleocellosis_count:affected,oleocellosis_pct:100*affected/total}};renderAdditionalForm(sample);captureChanged(true);status("Tanda añadida a la caja. Continúa hasta cubrir todos sus frutos y finaliza la inspección de caja.");}finally{unlock();}
+  }
+  async function applyAdditionalReview(sample) {
+    ensureCurrent();if(sample.inspectorChoice!=="EXPAND"||!sample.pendingAdditional)throw Error("Selecciona EXTEND y carga los JSON de la caja adicional.");
+    if(sample.pendingAdditional.boxInspection?.status!==undefined&&sample.pendingAdditional.boxInspection.status!=="completed")throw Error("Finaliza la inspección de la caja adicional antes de agregarla a la paleta.");
+    const manual={};for(const key of defectKeys){if(key==="oleocellosis")continue;const control=sample.additionalControls[key],raw=control.value.trim(),value=Number(raw);if(raw===""||!Number.isInteger(value)||value<0||value>sample.pendingAdditional.summary.total_fruits){control.focus();throw Error("Registra "+(fallbackColumns.find(column=>column.key===key)?.label||key)+" como cantidad de frutos de la caja adicional; pendiente no equivale a 0.");}manual[key]=value;}
+    const revision=state.revision,unlock=lockCaptureInputs();try{const response=await (await request("/api/inspection/additional-review",{...collectPayload(),sample_id:sample.id.value.trim(),inspector_decision:"EXPAND",additional_review:{vision_records:sample.pendingAdditional.visionRecords,...(sample.pendingAdditional.boxInspection?{box_inspection:copy(sample.pendingAdditional.boxInspection)}:{}),manual_defects:manual,observations:sample.additionalObservations.value.trim()}})).json();if(revision!==state.revision)throw Error("La inspección cambió durante la revisión adicional. No se modificó la captura.");commitAdditionalReview(sample,response);}finally{unlock();}
+  }
+  function commitAdditionalReview(sample,response) {
+    const id=sample.id.value.trim(),updated=response?.capture?.samples?.find(item=>item.sample_id===id),result=response?.report?.samples?.find(item=>item.sample_id===id);
+    if(!updated||!result||updated.pallet_id!==sample.controls.pallet_id.value||response.report.lot_id!==headerControls.lot_id.value.trim()||!Array.isArray(updated.vision_records)||!Array.isArray(updated.image_bindings)||!updated.review_history?.initial||!Array.isArray(updated.review_history.additional)||updated.review_history.additional.length!==(sample.reviewHistory?.additional.length||0)+1)throw Error("La revisión adicional no devolvió el historial y los valores de la paleta esperados.");
+    for(const key of [...defectKeys,"sample_count"]){const value=updated.qc_fields?.[key];if(!Number.isInteger(value)||value<0||value!==result.qc_fields?.[key])throw Error("Las cantidades acumuladas de la revisión adicional no son válidas.");}
+    sample.records=copy(updated.vision_records);sample.imageBindings=copy(updated.image_bindings);sample.reviewHistory=copy(updated.review_history);sample.visionSummary=copy(result.inspection_summary);sample.validationState="validated";sample.restoreIssues=[];sample.fileNames=sample.records.map(record=>record.image_id+".json");sample.inspectorChoice="";sample.pendingAdditional=null;sample.additionalControls=null;
+    if(sample.photoPools)delete sample.photoPools.additional;sample.additionalCaptureMemory={};
+    for(const [key,control]of Object.entries(sample.controls))if(Object.hasOwn(updated.qc_fields,key))control.value=String(updated.qc_fields[key]??"");
+    state.revision++;state.report=copy(response.report);state.evaluatedRevision=state.revision;state.payload=collectPayload();state.finalized=false;state.draftPaused=false;updateVision(sample,{preserveQC:true});renderResults(state.report);renderLotSummary(state.report);syncReviewMetadata();captureChanged(true);setStep(4);status("Paleta "+sample.controls.pallet_id.value+": caja adicional incorporada. Revisa el acumulado y selecciona tu nuevo estado.");
+  }
+  function renderResults(report) {
+    const area=byId("results"),decisionArea=byId("inspector-decisions");area.replaceChildren();decisionArea.replaceChildren();
+    for(const sample of report.samples){const model=state.samples.find(item=>item.id.value.trim()===String(sample.sample_id));const pallet=String(sample.pallet_id||sample.qc_fields?.pallet_id||"—");const box=element("article",undefined,"review-result");const top=element("div",undefined,"result-top");top.append(element("h3","Paleta "+pallet));const rec=String(sample.final_recommendation||sample.business_severity?.recommendation||"");top.append(element("span","Sugerencia: "+decisionLabel(rec),"recommendation"+(decisions.includes(rec)?" "+rec:"")));box.append(top);
+      const body=element("div",undefined,"result-body");const sev=sample.business_severity||{};body.append(element("p","Nivel calculado: "+String(sev.business_max_level??"—")+" · Quality: "+String(sev.quality_max_level??"—")+" · Condition: "+String(sev.condition_max_level??"—")));
+      const fields=sample.qc_fields||{},count=Number(fields.sample_count||sample.inspection_summary?.total_fruits||0);const observed=fallbackColumns.filter(column=>defectKeys.has(column.key)&&Number(fields[column.key])>0);body.append(element("strong","Resultados de la paleta · "+count+" frutos inspeccionados"));if(observed.length){const list=element("ul");for(const column of observed){const amount=Number(fields[column.key]);list.append(element("li",column.label+": "+amount+" frutos"+(count>0?" ("+numberText(100*amount/count,2)+" %)":"")));}body.append(list);}else body.append(element("p","Sin defectos registrados en esta paleta.","result-detail"));
+      const reasons=sample.recommendation_reasons||sev.reasons||[];body.append(element("strong","Motivo de la recomendación"));if(reasons.length){const list=element("ul");for(const reason of reasons)list.append(element("li",String(reason)));body.append(list);}else body.append(element("p","Sin defectos que superen nivel 1 entre las reglas evaluadas."));
+      const vision=sample.inspection_summary||{};body.append(element("p",`Vision: ${vision.total_fruits??"—"} frutos · ${vision.oleocellosis_count??"—"} con oleocelosis · ${vision.oleocellosis_pct===undefined?"—":numberText(vision.oleocellosis_pct,4)+" %"}`,"result-detail"));
+      if(sample.box_inspections?.length){const counts=element("section",undefined,"rule-note");counts.append(element("h4","Conteo por caja frente al manifiesto"));for(const box of sample.box_inspections){const difference=box.count_difference;counts.append(element("p",box.sample_box_id+" · Esperados: "+(box.expected_count_per_box??"No disponible")+" · Detectados: "+box.actual_count+" · Diferencia: "+(difference===null?"—":(difference>0?"+":"")+difference)+" · Desviación: "+(box.count_deviation_pct===null?"—":numberText(box.count_deviation_pct,2)+" %")+(box.missing_count>0?" · Unidades menos detectadas: "+box.missing_count:"")));}body.append(counts);}
+      if(vision.duplicate_image_ids_ignored?.length)body.append(element("p","Fotografías duplicadas ignoradas: "+vision.duplicate_image_ids_ignored.length,"result-detail"));
+      if(sample.evidence_photos?.length){const gallery=element("section",undefined,"vision-positive-gallery");gallery.append(element("h4","Evidencia de oleocelosis"));const grid=element("div",undefined,"vision-positive-grid");for(const photo of sample.evidence_photos){if(photo.defect!=="oleocellosis"||!/^data:image\/(?:jpeg|png);base64,/.test(photo.image_data_url||""))continue;const figure=element("figure",undefined,"vision-positive-card"),image=element("img");image.src=photo.image_data_url;image.alt="Oleocelosis · "+(photo.sample_box_id||"Caja inspeccionada");image.loading="lazy";figure.append(image,element("figcaption",(photo.sample_box_id||"Caja inspeccionada")+" · Oleocelosis"+(photo.view==="scene"?" · Fotografía del grupo":"")));grid.append(figure);}gallery.append(grid);body.append(gallery);}else if(sample.evidence_summary?.positive_fruits>0)body.append(element("p","No hay fotografías disponibles para adjuntar como evidencia de los frutos con oleocelosis.","hint"));
+      const predictive=sample.predictive||{enabled:false};body.append(element("p","Predictive: "+(predictive.enabled?"ON - Experimental":"OFF"),"result-detail"));if(predictive.enabled){if(predictive.predicted_loss_pct!==null&&predictive.predicted_loss_pct!==undefined)body.append(element("p","predicted_loss_pct: "+numberText(predictive.predicted_loss_pct,4)+" %","result-detail"));else body.append(element("p","Señal predictiva no disponible; la recomendación sigue basada en las reglas.","result-detail"));}
+      const uncovered=sample.rule_coverage?.not_evaluated||state.config.rule_coverage?.not_evaluated||[];if(uncovered.length)body.append(element("div","Cobertura parcial de reglas. Registrados sin evaluación automática de severidad: "+uncovered.join(", ")+". Revisa estos defectos antes de confirmar tu decisión.","notice"));
+      if(model){model.inspectorChoice=canonicalDecision(model.inspectorChoice||sample.review_choice);const choice=element("div",undefined,"pallet-choice");model.inspectorStatus=element("p","Estado inspector: "+decisionLabel(model.inspectorChoice),"inspector-status");choice.append(model.inspectorStatus);const final=field("review_choice","Actualizar estado de esta paleta","decision-"+model.serial,{options:[["","Selecciona tu decisión"],...decisions.map(value=>[value,decisionLabel(value)])]});final.input.value=model.inspectorChoice;final.input.dataset.sampleId=String(sample.sample_id);final.input.addEventListener("change",()=>setInspectorChoice(sample.sample_id,final.input.value));model.choiceControl=final.input;choice.append(final.wrap);body.append(choice);const history=renderReviewHistory(model,sample);if(history)body.append(history);body.append(renderAdditionalReview(model));}box.append(body);area.append(box);
+    }
+    renderInspectorDecisionSummary();
+    byId("review").hidden=false;byId("signing").hidden=false;byId("saved-report").hidden=true;byId("inspector-confirmation").checked=false;byId("review-state").textContent="Pendiente de confirmación";
+  }
+  function ensureCurrent() {if(!state.payload||!state.report||state.evaluatedRevision!==state.revision||JSON.stringify(collectPayload())!==JSON.stringify(state.payload))throw Error("Los datos han cambiado. Evalúa de nuevo antes de generar o confirmar el reporte.");}
+  function safeDownloadURL(raw){const u=new URL(raw,window.location.origin);if(u.origin!==window.location.origin||!u.pathname.startsWith("/api/reports/"))throw Error("El servidor devolvió una ruta de descarga no válida.");return u.href;}
+  byId("manifest-file").addEventListener("change",event=>{
+    const file=event.target.files?.[0];if(!file)return;
+    busy(async()=>{
+      try{
+        const csv=await file.text();const info=await (await request("/api/reception/manifest",{manifest_csv:csv})).json();await manifestReady(csv,file.name,info);
+        try{await receptionStorage("put",{manifest_csv:csv,filename:file.name});state.storedManifestPresent=true;showPersistence("Manifiesto guardado en este navegador para próximas visitas. La selección de cada muestra se conserva por separado en su QC.");}
+        catch(e){showPersistence("El manifiesto activo está disponible durante esta sesión, pero no se pudo actualizar la copia guardada: "+e.message+" Al recargar podría reaparecer una copia anterior.",true);}
+        status(state.receptionSelection?"Lote listo. Revisa sus datos y continúa con Vision.":"Manifiesto cargado. Selecciona el lote que deseas inspeccionar.");byId(state.receptionSelection?"start-qc":"scan-lot").focus();
+      }finally{event.target.value="";}
+    });
+  });
+  byId("forget-manifest").addEventListener("click",()=>busy(async()=>{
+    state.manifestCsv=null;state.manifestFilename="";state.manifestInfo=null;clearReceptionSelection();byId("scan-input").value="";byId("scan-lot").replaceChildren();const all=element("option","Selecciona un lote");all.value="";byId("scan-lot").append(all);byId("manifest-status").textContent="No hay un manifiesto activo. Las muestras QC ya iniciadas y sus filas de recepción se conservan.";
+    try{await receptionStorage("delete");state.storedManifestPresent=false;showPersistence("Se borró el manifiesto guardado en este navegador. Puedes cargar otro CSV; los QC no se eliminaron.");}
+    catch(e){showPersistence("Se retiró el manifiesto de esta sesión, pero no se pudo borrar la copia guardada: "+e.message+" Podría reaparecer al recargar.",true);}
+    status("Manifiesto retirado; las muestras de la inspección permanecen intactas.");
+  }));
+  byId("scan-input").addEventListener("input",clearReceptionSelection);
+  byId("scan-lot").addEventListener("change",clearReceptionSelection);
+  byId("lot-form").addEventListener("submit",event=>{event.preventDefault();busy(openSelectedLot);});
+  byId("reception-form").addEventListener("submit",event=>{
+    event.preventDefault();busy(async()=>{
+      if(!state.manifestCsv)throw Error("Carga el manifiesto CSV antes de escanear la paleta.");
+      if(!byId("reception-form").reportValidity())return;const scan=byId("scan-input").value.trim();if(!scan)throw Error("Escanea o escribe N° PALLET.");
+      clearReceptionSelection();const revision=state.scanRevision;const lot=byId("scan-lot").value;const payload={manifest_csv:state.manifestCsv,scan_input:scan,...(lot?{lot_id:lot}:{})};status("Buscando paleta en el manifiesto…");const selection=await (await request("/api/reception/lot",payload)).json();
+      if(revision!==state.scanRevision){status("La entrada cambió durante la búsqueda. Vuelve a buscar la paleta actual.");return;}
+      renderSelection(selection);refreshWorkflow();status("Lote "+selection.lot_id+" encontrado con "+selection.pallets.length+" paletas. Revisa la recepción y continúa.");
+    });
+  });
+  byId("start-qc").addEventListener("click",()=>busy(async()=>{if(!state.receptionSelection)throw Error("Primero busca una paleta en el manifiesto.");startLot(copy(state.receptionSelection));}));
+  byId("new-inspection-button").addEventListener("click",()=>{
+    if(state.busy)return;
+    const needsDiscard=Boolean(state.samples.length||state.draftBlocked||state.pendingDraft);
+    if(needsDiscard&&!window.confirm("¿Comenzar una nueva inspección? Se descartarán el borrador QC guardado y los datos abiertos en este formulario. Los reportes ya confirmados y el manifiesto de recepción no se eliminarán."))return;
+    busy(async()=>{const unlock=lockCaptureInputs();const paused=state.draftPaused;try{if(needsDiscard&&!await clearActiveDraft("Borrador descartado. Puedes comenzar otra inspección.")){state.draftPaused=paused;return;}state.pendingDraft=null;state.restoring=true;try{resetInspection();}finally{state.restoring=false;state.draftPaused=false;}status("Formulario preparado para otra inspección. Selecciona el lote que deseas abrir.");}finally{unlock();}});
+  });
+  byId("resume-draft").addEventListener("click",()=>busy(async()=>resumeSavedDraft()));
+  byId("start-new-from-draft").addEventListener("click",()=>byId("new-inspection-button").click());
+  byId("save-draft-now").addEventListener("click",()=>busy(async()=>{await saveActiveDraft();}));
+  byId("inspection-form").addEventListener("input",handleInspectionEdit);byId("inspection-form").addEventListener("change",handleInspectionEdit);
+  byId("add-sample").addEventListener("click",()=>{if(state.busy)return;clearError();try{if(state.activeReception)addReceptionSample(copy(state.activeReception));else if(state.demoMode){addSample();state.samples[state.samples.length-1].card.scrollIntoView({behavior:"smooth",block:"start"});}else throw Error("Escanea una paleta e inicia su QC antes de añadir otra muestra.");}catch(e){error(e.message);}});
+  byId("inspection-form").addEventListener("submit",event=>{event.preventDefault();busy(async()=>{validateForEvaluation();const payload=collectPayload();const revision=state.revision;status("Evaluando muestras…");const report=await (await request("/api/evaluate",payload)).json();if(revision!==state.revision){status("Los datos cambiaron durante la evaluación. Vuelve a evaluar.");return;}state.payload=payload;state.report=report;state.evaluatedRevision=revision;renderResults(report);renderLotSummary(report);syncReviewMetadata();setStep(4);byId("final-panel").scrollIntoView({behavior:"smooth",block:"start"});status("Resultados listos. Revisa las sugerencias y el Reason; después registra tu decisión final.");});});
+  byId("draft-button").addEventListener("click",()=>busy(async()=>{ensureCurrent();const res=await request("/api/export",state.payload);const blob=await res.blob();const url=URL.createObjectURL(blob);const link=element("a");link.href=url;link.download="QC_"+String(state.payload.qc_header.lot_id||"SmartFruit").replace(/[^a-zA-Z0-9_-]/g,"_")+"_BORRADOR.xlsx";document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);status("Excel de borrador descargado. Aún falta la confirmación final.");}));
+  byId("inspector-name").addEventListener("input",()=>{byId("inspector-confirmation").checked=false;captureChanged();});
+  byId("finalize-button").addEventListener("click",()=>busy(async()=>{
+    ensureNoPendingAdditional();
+    ensureCurrent();
+    const inspector=byId("inspector-name").value.trim();
+    if(!inspector)throw Error("Registra el nombre del inspector que confirma.");
+    const finalDecisions=Object.create(null);
+    for(const sample of state.samples){const choice=canonicalDecision(sample.inspectorChoice);if(!decisions.includes(choice)){sample.choiceControl?.focus();throw Error("Selecciona el estado del inspector para la paleta "+sample.controls.pallet_id.value+".");}finalDecisions[sample.id.value.trim()]=choice;}
+    if(!byId("inspector-confirmation").checked)throw Error("Confirma explícitamente que revisaste el reporte y tus decisiones finales.");
+    const revision=state.revision;
+    const payload={...state.payload,inspector_name:inspector,confirmed:true,final_decisions:finalDecisions};
+    const unlock=lockCaptureInputs();clearTimeout(state.draftTimer);state.draftTimer=null;
+    try{
+      try{await saveActiveDraft();}catch(_){}
+      state.draftPaused=true;
+      const result=await (await request("/api/finalize",payload)).json();
+      if(revision!==state.revision){state.draftPaused=false;scheduleDraft(true);error("Se guardó el reporte confirmado, pero la captura cambió. Evalúa los datos actuales antes de emitir otra versión.");return;}
+      const links=byId("download-links");links.replaceChildren();
+      for(const [key,label]of [["xlsx","Descargar QC Report · Excel"],["json","Descargar registro · JSON"],["print","Ver reporte / imprimir PDF"]]){
+        if(result.downloads?.[key]){const a=element("a",label);a.href=safeDownloadURL(result.downloads[key]);if(key!=="print")a.setAttribute("download","");else{a.target="_blank";a.rel="noopener";a.addEventListener("click",e=>{if(!window.loadPyodide){e.preventDefault();openPrint(a.href);}});}links.append(a);}
+      }
+      state.finalized=true;state.draftPaused=true;
+      const cleared=await clearActiveDraft("QC Report confirmado y guardado; borrador activo eliminado.");
+      byId("saved-description").textContent="Inspector: "+inspector+" · Registro: "+String(result.report_id||"")+(cleared?"":" · No se pudo eliminar la copia del borrador; el reporte confirmado sí está guardado.");
+      byId("saved-report").hidden=false;byId("signing").hidden=true;byId("review-state").textContent="Confirmado por el inspector";
+      status("QC Report confirmado y guardado. Las descargas están disponibles.");
+    }catch(e){if(!state.finalized){state.draftPaused=false;scheduleDraft(true);}throw e;}
+    finally{unlock();if(state.finalized)for(const sample of state.samples)if(sample.choiceControl)sample.choiceControl.disabled=true;}
+  }));
+  byId("demo-button").addEventListener("click",()=>busy(async()=>{
+    if(state.samples.length)throw Error("Hay una inspección abierta. Usa Nueva inspección antes de cargar la demo; los datos actuales se conservan.");
+    const demo=await (await request("/api/demo")).json();
+    state.restoring=true;let sample;
+    try{
+      invalidate();byId("sample-list").replaceChildren();byId("qc-editor-list").replaceChildren();state.samples=[];state.nextSample=1;state.activeReception=null;state.lotReception=null;state.workflowStep=2;state.generatedReason="";state.reasonSource="defect_summary";state.demoMode=true;state.finalized=false;state.draftPaused=false;
+      for(const [key,control]of Object.entries(headerControls)){control.value=demo.qc_header?.[key]??(key==="inspection_date"?todayInLima():"");control.readOnly=false;}
+      for(const control of Object.values(summaryControls))control.value="";
+      sample=addSample({sample_id:demo.sample_id,pallet_id:demo.pallet_id,demo:true});
+      byId("inspection-observations").value="Demo técnica: datos manuales simulados; sin asociación a un lote comercial real.";
+      byId("demo-notice").hidden=false;byId("draft-recovery-note").hidden=true;byId("inspection-form").hidden=false;
+    }finally{state.restoring=false;}
+    try{await importVisionRecords(sample,demo.records);}catch(e){captureChanged(true);throw e;}
+    refreshReceptionControls();status("Demo técnica cargada; JSON validados y asociados. Los defectos manuales son datos de ejemplo en cero.");
+  }));
+
+  function setStep(step) {
+    if(step>1&&!state.samples.length)throw Error("Primero carga el manifiesto y abre un lote.");
+    state.workflowStep=step;refreshWorkflow();scheduleDraft();
+  }
+  function refreshWorkflow() {
+    const step=state.workflowStep||1;
+    for(const panel of document.querySelectorAll("[data-workflow-step]"))panel.hidden=Number(panel.dataset.workflowStep)!==step;
+    byId("inspection-form").hidden=!state.samples.length;
+    for(const button of byId("workflow-nav").querySelectorAll("[data-go-step]")){const n=Number(button.dataset.goStep);button.disabled=state.busy||(n>1&&!state.samples.length);if(n===step)button.setAttribute("aria-current","step");else button.removeAttribute("aria-current");}
+    const evaluated=Boolean(state.report&&state.evaluatedRevision===state.revision);
+    byId("review").hidden=step!==4||!evaluated;
+    for(const id of ["system-review","reason-panel","final-decision-panel"])byId(id).hidden=!evaluated;
+    byId("review-required").hidden=evaluated;
+    const lot=headerControls.lot_id?.value.trim()||state.receptionSelection?.lot_id||"";
+    byId("lot-banner").hidden=!lot;
+    byId("lot-banner-title").textContent="Lote "+lot;
+    byId("lot-banner-detail").textContent=state.samples.length+" paletas en QC · "+state.samples.filter(sample=>sample.boxInspection?.status==="completed").length+" con caja finalizada";
+    const selector=byId("vision-pallet-select");const signature=JSON.stringify(state.samples.map(sample=>[sample.serial,sample.controls.pallet_id.value,sample.id.value,sample.controls.label_brand.value]));
+    if(selector.dataset.signature!==signature){selector.replaceChildren(...state.samples.map(sample=>{const option=element("option","Paleta "+sample.controls.pallet_id.value+(sample.controls.label_brand.value?" · "+sample.controls.label_brand.value:""));option.value=String(sample.serial);return option;}));selector.dataset.signature=signature;}
+    if(!state.samples.some(sample=>String(sample.serial)===state.selectedPallet))state.selectedPallet=String(state.samples[0]?.serial||"");
+    selector.value=state.selectedPallet;
+    for(const sample of state.samples){const selected=String(sample.serial)===state.selectedPallet;sample.card.hidden=!selected;if(sample.qcEditor)sample.qcEditor.hidden=!selected;if(sample.title)sample.title.textContent="Paleta "+(sample.controls.pallet_id.value||"pendiente");if(sample.editorTitle)sample.editorTitle.textContent="Paleta "+(sample.controls.pallet_id.value||"pendiente");if(sample.editorInfo)sample.editorInfo.textContent=[sample.controls.label_brand.value,sample.controls.size.value?"Size "+sample.controls.size.value:"",sample.records.length?sample.records.length+" JSON de Vision":"Vision pendiente"].filter(Boolean).join(" · ");if(sample.removeButton)sample.removeButton.hidden=Boolean(state.lotReception);}
+    if(step===2)state.samples.find(sample=>String(sample.serial)===state.selectedPallet)?.visionCapture?.refresh();
+    renderQCPallets();
+    byId("vision-progress").textContent=state.samples.filter(sample=>sample.boxInspection?.status==="completed").length+" / "+state.samples.length+" paletas con caja finalizada";
+    const legacy=!state.demoMode&&state.samples.length&&!state.lotReception;
+    byId("legacy-warning").hidden=!legacy;byId("legacy-warning").textContent="Captura anterior recuperada sin padrón completo del lote. Se conservan sus muestras; para inspeccionar todas las paletas inicia una nueva inspección desde el manifiesto.";
+  }
+  function startLot(selection) {
+    if(state.pendingDraft)throw Error("Hay un borrador guardado. Elige Continuar borrador o Empezar otra inspección antes de abrir otro lote.");
+    if(state.samples.length){if(!state.lotReception||headerControls.lot_id.value.trim()!==selection.lot_id)throw Error("Hay otra inspección abierta. Usa Nueva inspección antes de cambiar el lote.");if(JSON.stringify(state.lotReception.records)!==JSON.stringify(selection.records))throw Error("El manifiesto de este lote cambió. La inspección abierta conserva sus datos originales; usa Nueva inspección para trabajar con la nueva recepción.");setStep(2);return;}
+    state.restoring=true;
+    try{
+      state.lotReception=selection.selection_mode==="lot"?{lot_id:selection.lot_id,records:copy(selection.records)}:{scan_input:selection.scan_input||selection.pallets.find(pallet=>pallet.pallet_id===selection.scanned_pallet_id)?.scan_input||byId("scan-input").value.trim(),records:copy(selection.records)};
+      state.demoMode=false;state.workflowStep=2;
+      for(const [key,value]of Object.entries(selection.qc_header))if(headerControls[key])headerControls[key].value=value;
+      for(const pallet of selection.pallets)addReceptionSample(copy(pallet));
+      for(const key of ["country_origin","vessel","container"])if(headerControls[key])headerControls[key].value=selection.qc_header[key]??"";
+      prefillSummary(selection.records);
+      byId("inspection-form").hidden=false;byId("demo-notice").hidden=true;
+    }finally{state.restoring=false;}
+    captureChanged(true);setStep(2);status("Lote "+selection.lot_id+" abierto. Selecciona cada paleta para cargar sus JSON.");
+  }
+  function prefillSummary(records) {
+    for(const key of ["label_brand","packing_date","plu_coo"]){if(summaryControls[key])summaryControls[key].value=unambiguous(records,key);}
+  }
+  function selectQCPallet(serial) {
+    if(!state.samples.some(sample=>String(sample.serial)===String(serial)))return;
+    state.selectedPallet=String(serial);refreshWorkflow();renderQCOverview();
+  }
+  function pendingDefects(sample) {
+    const n=Number(sample.controls.sample_count.value);
+    return Array.from(defectKeys).filter(key=>{const raw=sample.controls[key].value;const value=Number(raw);return raw===""||!Number.isInteger(value)||value<0||(n>0&&value>n);}).length;
+  }
+  function renderQCPallets() {
+    const list=byId("qc-pallet-list");const signature=JSON.stringify([state.busy,state.samples.map(sample=>[sample.serial,sample.controls.pallet_id.value,sample.controls.label_brand.value,pendingDefects(sample),String(sample.serial)===state.selectedPallet])]);
+    if(list.dataset.signature!==signature){list.replaceChildren(...state.samples.map(sample=>{const button=element("button",undefined,"qc-pallet-button");button.type="button";button.disabled=state.busy;button.setAttribute("aria-controls","qc-editor-"+sample.serial);button.setAttribute("aria-current",String(String(sample.serial)===state.selectedPallet));button.append(element("span","Paleta "+sample.controls.pallet_id.value));const pending=pendingDefects(sample);button.append(element("small",sample.controls.label_brand.value||"Label pendiente"),element("small",pending?pending+" defectos pendientes":"Defectos registrados"));button.addEventListener("click",()=>selectQCPallet(sample.serial));return button;}));list.dataset.signature=signature;}
+    const index=state.samples.findIndex(sample=>String(sample.serial)===state.selectedPallet);byId("qc-prev").disabled=state.busy||index<=0;byId("qc-next").disabled=state.busy||index<0||index>=state.samples.length-1;
+    byId("qc-capture-progress").textContent=state.samples.length?"Paleta "+(index+1)+" de "+state.samples.length+" · "+state.samples.filter(sample=>pendingDefects(sample)===0).length+" con todos los defectos registrados":"";
+  }
+  function renderTableHead() {
+    const labels=element("tr");for(const label of ["Paleta","Label","Size","Sample","Oleocelosis","Otros defectos / avance","Total (%)",""]){const th=element("th",label);th.scope="col";labels.append(th);}byId("qc-table-head").replaceChildren(labels);
+  }
+  function mountQCRow(sample) {
+    renderQCEditor(sample);renderQCOverview();
+  }
+  function renderQCOverview() {
+    const body=byId("qc-table-body"),foot=byId("qc-table-foot");if(!body||!foot)return;
+    const rows=state.samples.map(sample=>{const row=element("tr");row.setAttribute("aria-current",String(String(sample.serial)===state.selectedPallet));const pending=pendingDefects(sample);const positive=Array.from(defectKeys).filter(key=>key!=="oleocellosis"&&Number(sample.controls[key].value)>0).map(key=>(fallbackColumns.find(column=>column.key===key)?.label||key)+": "+sample.controls[key].value);for(const value of [sample.controls.pallet_id.value,sample.controls.label_brand.value||"—",sample.controls.size.value||"—",sample.controls.sample_count.value||"—",sample.controls.oleocellosis.value||"—",pending?pending+" pendientes":positive.join(" · ")||"Sin otros defectos",sample.totalPct.value||"Pendiente"])row.append(element("td",value));const action=element("td"),button=element("button","Completar","secondary");button.type="button";button.setAttribute("aria-label","Completar inspección de paleta "+sample.controls.pallet_id.value);button.addEventListener("click",()=>{selectQCPallet(sample.serial);if(state.workflowStep!==3)setStep(3);sample.qcEditor.scrollIntoView({behavior:"smooth",block:"start"});});action.append(button);row.append(action);return row;});body.replaceChildren(...rows);
+    if(!state.samples.length){foot.replaceChildren();return;}
+    const total=state.samples.reduce((sum,sample)=>sum+(Number(sample.controls.sample_count.value)||0),0),valid=state.samples.every(sample=>Number.isInteger(Number(sample.controls.sample_count.value))&&Number(sample.controls.sample_count.value)>0),complete=valid&&state.samples.every(sample=>pendingDefects(sample)===0);
+    const oleoKnown=state.samples.every(sample=>sample.controls.oleocellosis.value!==""&&Number.isInteger(Number(sample.controls.oleocellosis.value))&&Number(sample.controls.oleocellosis.value)>=0);
+    const incidents=complete?state.samples.reduce((sum,sample)=>sum+Array.from(defectKeys).reduce((value,key)=>value+Number(sample.controls[key].value),0),0):null;const totals=element("tr");for(const value of ["Totales",state.samples.length+" paletas","",valid?String(total):"Pendiente",oleoKnown?String(state.samples.reduce((sum,sample)=>sum+Number(sample.controls.oleocellosis.value),0)):"Pendiente",complete?incidents+" incidencias":"Captura pendiente",complete?numberText(100*incidents/total,2)+" %":"Pendiente",""])totals.append(element("td",value));foot.replaceChildren(totals);
+  }
+  function updateTableTotals() {
+    for(const sample of state.samples)updateSampleTotal(sample);renderQCOverview();
+  }
+  function renderLotSummary(report) {
+    const summary=report.lot_summary;if(!summary)return;const values=byId("lot-summary-values");values.replaceChildren();
+    for(const [label,value]of [["Paletas",summary.pallet_count],["Sample · frutos",summary.sample_count],["Incidencias",summary.total_defect_incidents],["Total Percent Combined",numberText(summary.total_combined_pct,2)+" %"]]){const box=element("div",undefined,"metric");box.append(element("span",label),element("strong",String(value)));values.append(box);}
+    const table=element("table",undefined,"summary-defects"),head=element("tr");for(const label of ["Defecto","Cantidad","Porcentaje","Paletas afectadas"])head.append(element("th",label));const thead=element("thead");thead.append(head);const body=element("tbody");for(const defect of summary.defects){const tr=element("tr");for(const value of [defect.label,defect.count,numberText(defect.pct,4)+" %",defect.affected_pallets+" / "+defect.inspected_pallets])tr.append(element("td",String(value)));body.append(tr);}table.append(thead,body);byId("lot-defect-summary").replaceChildren(table);
+    applyGeneratedReason(report);byId("review-refresh-needed").hidden=true;
+  }
+  function updateReasonSource() {
+    if(!headerControls.reason)return;
+    const manual=state.reasonSource==="inspector";headerControls.reason.readOnly=!manual;
+    byId("reason-source-note").textContent=manual?"Redacción ajustada por el inspector. El resumen calculado original se conserva debajo para contrastar.":"Reason se completa automáticamente con el resumen de defectos del lote.";
+    byId("edit-reason").hidden=manual;byId("use-generated-reason").hidden=!manual;
+    byId("edit-reason").disabled=!state.report;byId("use-generated-reason").disabled=!state.report;
+  }
+  function applyGeneratedReason(report) {
+    state.generatedReason=report.generated_reason||report.lot_summary?.generated_reason||"";
+    if(state.reasonSource!=="inspector")headerControls.reason.value=state.generatedReason;
+    byId("generated-reason").textContent=state.generatedReason;updateReasonSource();
+  }
+  async function openPrint(path,payload) {
+    const tab=window.open("about:blank","_blank");
+    try{const response=await request(path,payload);const blob=await response.blob();const url=URL.createObjectURL(blob);if(tab){tab.opener=null;tab.location.href=url;}else{const a=element("a");a.href=url;a.download="SmartFruit_QC_imprimible.html";a.click();}setTimeout(()=>URL.revokeObjectURL(url),60000);}catch(e){if(tab)tab.close();error(e.message);}
+  }
+  byId("vision-pallet-select").addEventListener("change",event=>selectQCPallet(event.target.value));
+  for(const [id,offset]of [["qc-prev",-1],["qc-next",1]])byId(id).addEventListener("click",()=>{if(state.busy)return;const index=state.samples.findIndex(sample=>String(sample.serial)===state.selectedPallet);const next=state.samples[index+offset];if(next)selectQCPallet(next.serial);});
+  for(const button of document.querySelectorAll("[data-go-step]"))button.addEventListener("click",()=>{if(state.busy)return;clearError();try{setStep(Number(button.dataset.goStep));}catch(e){error(e.message);}});
+  for(const button of document.querySelectorAll("[data-next-step]"))button.addEventListener("click",()=>{if(state.busy)return;clearError();try{const missing=state.samples.find(sample=>!sample.records.length);if(missing){state.selectedPallet=String(missing.serial);refreshWorkflow();throw Error("Procesa las fotos y confirma los resultados de Vision de la paleta "+missing.controls.pallet_id.value+".");}setStep(Number(button.dataset.nextStep));}catch(e){error(e.message);}});
+  byId("edit-reason").addEventListener("click",()=>{if(state.busy||!state.report)return;state.reasonSource="inspector";updateReasonSource();syncReviewMetadata();headerControls.reason.focus();});
+  byId("use-generated-reason").addEventListener("click",()=>{if(state.busy||!state.report)return;state.reasonSource="defect_summary";applyGeneratedReason(state.report);syncReviewMetadata();status("Reason actualizado desde el resumen de defectos. Las sugerencias se conservan.");});
+  byId("print-report").addEventListener("click",()=>{try{ensureCurrent();openPrint("/api/report/print",state.payload);}catch(e){error(e.message);}});
+
+  async function init(){
+    try{
+      state.config=await (await request("/api/config")).json();const on=Boolean(state.config.use_predictive);
+      byId("predictive-badge").textContent="Predictive: "+(on?"ON - Experimental":"OFF");if(on)byId("predictive-badge").classList.add("experimental");
+      renderHeader();renderSummary();renderTableHead();
+      const coverage=state.config.rule_coverage||{};const evaluated=coverage.evaluated||[];const missing=coverage.not_evaluated||[];
+      byId("coverage-summary").textContent="Cobertura de Business Severity: "+(evaluated.length||8)+" de 16 defectos";
+      byId("coverage-description").textContent="Las recomendaciones utilizan las reglas existentes. "+(missing.length?"Sin regla implementada: "+missing.join(", ")+". Estos defectos también se registran y requieren revisión del inspector.":"Los campos sin regla implementada requieren revisión del inspector.");
+      byId("boundary-description").textContent="Política de frontera: "+String(state.config.boundary_policy||"higher")+" (referencia actual de integración; pendiente de confirmación operativa de QC).";
+      byId("loading").textContent="Recuperando el manifiesto guardado en este navegador…";await restoreManifest();
+      byId("loading").textContent="Recuperando el borrador de inspección…";await restoreDraft();
+      byId("loading").hidden=true;byId("workflow-nav").hidden=false;byId("demo-button").disabled=false;refreshWorkflow();
+      updateCapturePresentation();refreshReceptionControls();status(state.samples.length?"Borrador recuperado. Revisa los datos y evalúa de nuevo antes de confirmar.":"Carga el manifiesto y abre tu lote, o prueba la demo técnica.");
+    }catch(e){byId("loading").textContent="No se pudo preparar el formulario.";error(e.message);}
+  }
+  init();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+{
+  "image_id": "DEMO_ADDITIONAL_BOX_001",
+  "partition": "demo_simulated",
+  "total_fruits": 12,
+  "oleocellosis_count": 2,
+  "oleocellosis_pct": 16.666666666666668,
+  "mean_confidence": 0.95,
+  "data_origin": "SIMULATED_DEMO",
+  "simulation_note": "Datos ficticios para simular una caja adicional; no provienen del modelo ni de un lote real.",
+  "fruit_predictions": [
+    {
+      "crop_id": "DEMO_ADDITIONAL_BOX_001_01",
+      "predicted_class": "con_oleocelosis",
+      "oleocellosis_probability": 0.95,
+      "confidence": 0.95
+    },
+    {
+      "crop_id": "DEMO_ADDITIONAL_BOX_001_02",
+      "predicted_class": "con_oleocelosis",
+      "oleocellosis_probability": 0.95,
+      "confidence": 0.95
+    },
+    {
+      "crop_id": "DEMO_ADDITIONAL_BOX_001_03",
+      "predicted_class": "sin_oleocelosis",
+      "oleocellosis_probability": 0.05,
+      "confidence": 0.95
+    },
+    {
+      "crop_id": "DEMO_ADDITIONAL_BOX_001_04",
+      "predicted_class": "sin_oleocelosis",
+      "oleocellosis_probability": 0.05,
+      "confidence": 0.95
+    },
+    {
+      "crop_id": "DEMO_ADDITIONAL_BOX_001_05",
+      "predicted_class": "sin_oleocelosis",
+      "oleocellosis_probability": 0.05,
+      "confidence": 0.95
+    },
+    {
+      "crop_id": "DEMO_ADDITIONAL_BOX_001_06",
+      "predicted_class": "sin_oleocelosis",
+      "oleocellosis_probability": 0.05,
+      "confidence": 0.95
+    },
+    {
+      "crop_id": "DEMO_ADDITIONAL_BOX_001_07",
+      "predicted_class": "sin_oleocelosis",
+      "oleocellosis_probability": 0.05,
+      "confidence": 0.95
+    },
+    {
+      "crop_id": "DEMO_ADDITIONAL_BOX_001_08",
+      "predicted_class": "sin_oleocelosis",
+      "oleocellosis_probability": 0.05,
+      "confidence": 0.95
+    },
+    {
+      "crop_id": "DEMO_ADDITIONAL_BOX_001_09",
+      "predicted_class": "sin_oleocelosis",
+      "oleocellosis_probability": 0.05,
+      "confidence": 0.95
+    },
+    {
+      "crop_id": "DEMO_ADDITIONAL_BOX_001_10",
+      "predicted_class": "sin_oleocelosis",
+      "oleocellosis_probability": 0.05,
+      "confidence": 0.95
+    },
+    {
+      "crop_id": "DEMO_ADDITIONAL_BOX_001_11",
+      "predicted_class": "sin_oleocelosis",
+      "oleocellosis_probability": 0.05,
+      "confidence": 0.95
+    },
+    {
+      "crop_id": "DEMO_ADDITIONAL_BOX_001_12",
+      "predicted_class": "sin_oleocelosis",
+      "oleocellosis_probability": 0.05,
+      "confidence": 0.95
+    }
+  ]
+}

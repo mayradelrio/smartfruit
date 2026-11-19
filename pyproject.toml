@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "smartfruit"
+version = "0.2.0"
+description = "Apoyo a la decisión de ampliar la inspección QC de limones"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.115,<1",
+    "uvicorn>=0.30,<1",
+    "openpyxl>=3.1,<4",
+    "Pillow>=10,<13",
+]
+
+[project.scripts]
+smartfruit = "smartfruit.app:main"
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.9", "httpx>=0.27,<1"]
+vision-crops = ["torch>=2.2,<3", "torchvision>=0.17,<1", "Pillow>=10,<13"]
+vision-scenes = [
+    "torch>=2.2,<3",
+    "torchvision>=0.17,<1",
+    "Pillow>=10,<13",
+    "ultralytics>=8.3,<9",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+smartfruit = ["web/*.html", "web/*.js", "resources/*.xlsx", "resources/vision/*.json", "resources/branding/agroperu-logo.png"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+extend-exclude = ["legacy", "notebooks", "data"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

@@ -1,0 +1,58 @@
+# Datos operativos y notebooks con resultados históricos
+/data/local/
+/notebooks/originals/
+reports/
+
+# Excel operativos: solo se publican las dos plantillas vacías saneadas
+*.xlsx
+*.xls
+*.xlsm
+*.xlsb
+!/templates/qc/smartfruit_qc_blank.xlsx
+!/src/smartfruit/resources/qc_template.xlsx
+
+# Inventarios de entrega privada y recurso de identidad anterior
+/PACKAGE_SHA256.json
+/docs/source_inventory.json
+/src/smartfruit/resources/branding/agrofruit-logo.png
+
+# Secretos y configuración local
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+
+# Pesos y artefactos de modelos
+*.pt
+*.pth
+*.pkl
+*.pickle
+*.joblib
+*.onnx
+
+# Python y herramientas
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+.coverage
+htmlcov/
+build/
+dist/
+node_modules/
+
+# Archivos locales
+/work/
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.bak
+~$*
