@@ -3,6 +3,7 @@
 from copy import deepcopy
 
 import pytest
+from review_helpers import confirm_vision_records
 
 from smartfruit.additional_review import add_additional_review
 from smartfruit.decision import confirm_inspection
@@ -45,15 +46,15 @@ def capture():
         "reason_source": "defect_summary",
         "samples": [
             {
-                "sample_id": "S1", "pallet_id": "P1", "vision_records": [record("FIRST", 10, 1)],
+                "sample_id": "S1", "pallet_id": "P1", "vision_records": confirm_vision_records([record("FIRST", 10, 1)]),
                 "vision_covers_sample": True,
                 "qc_fields": {"pallet_id": "P1", "label_brand": "TEST_LABEL", **manual(scars=2)},
-                "review_choice": "EXPAND", "observations": "First box",
+                "review_choice": "EXTEND", "observations": "First box",
             },
             {
-                "sample_id": "S2", "pallet_id": "P2", "vision_records": [record("OTHER", 5, 0)],
+                "sample_id": "S2", "pallet_id": "P2", "vision_records": confirm_vision_records([record("OTHER", 5, 0)]),
                 "vision_covers_sample": True,
-                "qc_fields": {"pallet_id": "P2", **manual()}, "review_choice": "ESCALATE",
+                "qc_fields": {"pallet_id": "P2", **manual()}, "review_choice": "STANDARD",
             },
         ],
     }
@@ -63,7 +64,7 @@ def request(capture, **changes):
     return {
         **deepcopy(capture), "sample_id": "S1", "inspector_decision": "EXTEND",
         "additional_review": {
-            "vision_records": [record()], "manual_defects": manual(scars=3),
+            "vision_records": confirm_vision_records([record()]), "manual_defects": manual(scars=3),
             "observations": "Second inspected box",
         },
         **changes,
@@ -100,28 +101,24 @@ def test_history_records_initial_normalized_values_trigger_and_changed_suggestio
     history = target["review_history"]
     assert history["initial"]["qc_fields"]["sample_count"] == 10
     assert history["initial"]["qc_fields"]["oleocellosis"] == 1
-    assert history["initial"]["system_recommendation"] == "ESCALATE"
-    assert history["additional"][0]["trigger_decision"] == "EXPAND"
-    assert history["additional"][0]["system_recommendation_before"] == "ESCALATE"
-    assert history["additional"][0]["system_recommendation_after"] == "EXPAND"
-    assert target["review_choice"] == ""
-    assert result["capture"]["samples"][1]["review_choice"] == "ESCALATE"
+    assert history["initial"]["system_recommendation"] == "EXTEND"
+    assert history["additional"][0]["trigger_decision"] == "EXTEND"
+    assert history["additional"][0]["system_recommendation_before"] == "EXTEND"
+    assert history["additional"][0]["system_recommendation_after"] == "COMPLETE"
+    assert target["review_choice"] == "COMPLETE"
+    assert result["capture"]["samples"][1]["review_choice"] == "STANDARD"
     assert result["report"]["samples"][0]["review_history"] == history
     assert len(target["image_bindings"]) == 2
 
 
-def test_another_extra_box_keeps_initial_and_each_distinct_review(capture):
+def test_third_box_is_rejected_without_changing_capture(capture):
     first = add_additional_review(request(capture))["capture"]
     second_request = request(first)
-    second_request["additional_review"]["vision_records"] = [record("THIRD", 10, 0)]
-    second_request["additional_review"]["manual_defects"] = manual()
-    result = add_additional_review(second_request)
-    history = result["capture"]["samples"][0]["review_history"]
-    assert history["initial"] == first["samples"][0]["review_history"]["initial"]
-    assert [entry["review_number"] for entry in history["additional"]] == [2, 3]
-    assert result["report"]["samples"][0]["qc_fields"]["sample_count"] == 40
-    assert result["report"]["samples"][0]["qc_fields"]["scars"] == 5
-    assert result["report"]["samples"][0]["inspection_summary"]["oleocellosis_pct"] == 5
+    second_request["additional_review"]["vision_records"] = confirm_vision_records([record("THIRD", 10, 0)])
+    before = deepcopy(second_request)
+    with pytest.raises(ValueError, match="2 cajas"):
+        add_additional_review(second_request)
+    assert second_request == before
 
 
 def test_identical_duplicates_in_original_capture_still_count_only_once(capture):
@@ -222,23 +219,23 @@ def test_derived_round_totals_and_suggestions_are_recomputed_not_trusted(capture
     history["additional"][0]["qc_fields"]["sample_count"] = 999
     history["additional"][0]["system_recommendation_after"] = "STANDARD"
     canonical = evaluate_inspection(updated)["samples"][0]["review_history"]
-    assert canonical["initial"]["system_recommendation"] == "ESCALATE"
+    assert canonical["initial"]["system_recommendation"] == "EXTEND"
     assert canonical["additional"][0]["qc_fields"]["sample_count"] == 20
     assert canonical["additional"][0]["inspection_summary"]["total_fruits"] == 20
-    assert canonical["additional"][0]["system_recommendation_after"] == "EXPAND"
+    assert canonical["additional"][0]["system_recommendation_after"] == "COMPLETE"
 
 
 def test_history_survives_confirmation_and_metadata_correction_without_assuming_approval(capture):
     updated = add_additional_review(request(capture))["capture"]
     updated["samples"][0]["qc_fields"]["label_brand"] = "Inspector corrected label"
-    updated["samples"][0]["review_choice"] = "EXTEND"
+    updated["samples"][0]["review_choice"] = "COMPLETE"
     updated["qc_header"]["Level_Flag"] = 2
     evaluated = evaluate_inspection(updated)
-    assert evaluated["samples"][0]["review_choice"] == "EXPAND"
+    assert evaluated["samples"][0]["review_choice"] == "COMPLETE"
     assert evaluated["samples"][0]["inspector_confirmed"] is False
     assert evaluated["samples"][0]["inspector_final_decision"] is None
-    confirmed = confirm_inspection(evaluated, "Inspector TEST", {"S1": "EXTEND", "S2": "STANDARD"}, True)
-    assert confirmed["samples"][0]["inspector_final_decision"] == "EXPAND"
+    confirmed = confirm_inspection(evaluated, "Inspector TEST", {"S1": "COMPLETE", "S2": "STANDARD"}, True)
+    assert confirmed["samples"][0]["inspector_final_decision"] == "COMPLETE"
     assert confirmed["samples"][0]["review_history"] == evaluated["samples"][0]["review_history"]
     assert confirmed["samples"][0]["qc_fields"]["label_brand"] == "Inspector corrected label"
     assert confirmed["samples"][0]["review_history"]["initial"]["qc_fields"]["label_brand"] == "TEST_LABEL"

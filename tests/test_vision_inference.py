@@ -97,9 +97,13 @@ def test_cli_preserves_bound_image_ids_and_updates_progress(tmp_path, monkeypatc
     summary = aggregate_vision_sample(records, "SAMPLE")["vision_summary"]
     assert summary["image_ids"] == ["INSPECTION-A", "INSPECTION-B"]
     assert summary["total_fruits"] == 2
-    assert summary["oleocellosis_count"] == 1
+    assert summary["oleocellosis_count"] == 0
+    assert summary["suspected_oleocellosis_count"] == 1
+    assert summary["pending_review_count"] == 1
     assert all(kwargs["input_kind"] == "fruit_crop" for _, kwargs in calls)
-    assert json.loads(progress_path.read_text(encoding="utf-8")) == {"completed": 2, "total": 2}
+    progress = json.loads(progress_path.read_text(encoding="utf-8"))
+    assert progress["completed"] == 2 and progress["total"] == 2
+    assert progress["detected_fruits"] == 2
 
 
 def test_cli_failure_leaves_explicit_error_and_partial_progress(tmp_path, monkeypatch):
@@ -116,7 +120,9 @@ def test_cli_failure_leaves_explicit_error_and_partial_progress(tmp_path, monkey
     }), encoding="utf-8")
     assert inference.main(["--request", str(request_path), "--output", str(output_path)]) == 1
     assert json.loads(output_path.read_text(encoding="utf-8")) == {"error": "Modelo incompatible"}
-    assert json.loads(progress_path.read_text(encoding="utf-8")) == {"completed": 0, "total": 1}
+    assert json.loads(progress_path.read_text(encoding="utf-8")) == {
+        "completed": 0, "total": 1, "phase": "LOADING_MODEL",
+    }
 
 
 def test_locked_progress_never_discards_successful_predictions(tmp_path, monkeypatch):

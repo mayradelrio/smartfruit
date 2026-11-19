@@ -4,8 +4,8 @@ import argparse
 import hashlib
 import importlib.util
 import json
-from pathlib import Path
 import shutil
+from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 
 
@@ -55,7 +55,8 @@ def build(output, runtime_assets, licenses, zoneinfo, project_archive=None):
     html = html.replace("<script>", '<script src="/bridge.js"></script>\n<script>', 1)
     (output / "index.html").write_text(html, "utf-8")
     (output / "assets").mkdir(exist_ok=True)
-    for asset in ("drafts.js", "field_sources.js", "vision_defaults.js", "vision_capture.js"):
+    for asset in ("drafts.js", "field_sources.js", "vision_defaults.js", "vision_capture.js",
+                  "vision_review.js"):
         shutil.copy2(source / "web" / asset, output / "assets" / asset)
     shutil.copy2(source / "resources/branding/agroperu-logo.png", output / "assets/agroperu-logo.png")
     shutil.copy2(here / "bridge.js", output / "bridge.js")
@@ -66,6 +67,9 @@ def build(output, runtime_assets, licenses, zoneinfo, project_archive=None):
         for name in (
             "__init__",
             "vision",
+            "vision_review",
+            "vision_validation",
+            "defect_dominance",
             "image_binding",
             "additional_review",
             "reception",

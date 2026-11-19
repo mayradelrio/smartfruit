@@ -204,7 +204,8 @@ class QCReportTests(unittest.TestCase):
         self.assertNotIn("predicted_loss_pct", text)
         self.assertIn("OFF", strings(sheet))
         self.assertIn("Sin regla implementada: Soft", text)
-        self.assertIn("confianza media: 0.95", text)
+        self.assertIn("confirmados QC: 1", text)
+        self.assertNotIn("confianza media:", text)
 
     def test_vision_counts_ending_in_zero_are_not_truncated(self):
         report = example_report()
@@ -217,7 +218,7 @@ class QCReportTests(unittest.TestCase):
         )
         sheet = load(export_qc_xlsx(report))["Report"]
         text = "\n".join(strings(sheet))
-        self.assertIn("Frutos evaluados: 100; cantidad con oleocelosis: 20;", text)
+        self.assertIn("Frutos evaluados: 100; confirmados QC: 20;", text)
 
     def test_confirmation_and_human_override_do_not_change_level_flag(self):
         report = example_report()

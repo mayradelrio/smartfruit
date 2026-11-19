@@ -59,6 +59,7 @@ class VisionCapture:
         self._runner = runner
         self._executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="smartfruit-vision")
         self._lock = threading.RLock()
+        self._submission_lock = threading.Lock()
         self._jobs = {}
         self._photos = {}
         self._fingerprints = {}
@@ -230,7 +231,18 @@ class VisionCapture:
                         for field in ("lot_id", "pallet_id", "sample_id"))
             candidates = jobs.get((key, record["image_id"]), [])
             for job_id, stored, photo in candidates:
-                if any(record.get(field) != stored.get(field) for field in (*VISION_FIELDS, "inference")):
+                # Human review adds audit fields without changing model evidence.
+                def raw(value):
+                    value = deepcopy(value)
+                    for prediction in value.get("fruit_predictions", []):
+                        for field in ("review_status", "reviewed_by", "reviewed_at",
+                                      "override_label", "override_reason", "qc_final_label"):
+                            prediction.pop(field, None)
+                    return value
+
+                original, supplied = raw(stored), raw(record)
+                if any(supplied.get(field) != original.get(field)
+                       for field in (*VISION_FIELDS, "inference")):
                     continue
                 try:
                     path = self.job_photo_path(job_id, photo["photo_id"])
@@ -340,6 +352,12 @@ class VisionCapture:
         return deepcopy(status)
 
     def submit(self, payload):
+        # Serialize selection/snapshot creation so concurrent clicks cannot queue
+        # two jobs against the same inspection while models are starting.
+        with self._submission_lock:
+            return self._submit(payload)
+
+    def _submit(self, payload):
         if self._closed:
             raise ValueError("Vision se está cerrando. Vuelve a iniciar el servidor.")
         context = {key: _identifier(payload.get(key), key)
@@ -354,6 +372,12 @@ class VisionCapture:
         if len(set(ids)) != len(ids):
             raise ValueError("Una fotografía no se puede seleccionar dos veces.")
         with self._lock:
+            for job in self._jobs.values():
+                if job.get("status") not in ("queued", "running") or job.get("context") != context:
+                    continue
+                if {photo["photo_id"] for photo in job["photos"]} == set(ids):
+                    return deepcopy(job)
+                raise ValueError("Esta caja ya se está procesando. Espera el resultado.")
             catalog = self._catalog()
             if any(photo_id not in catalog for photo_id in ids):
                 raise ValueError("Una imagen seleccionada ya no está disponible. Actualiza la lista.")
@@ -385,7 +409,7 @@ class VisionCapture:
             "images": images,
         }
         job = {
-            "job_id": job_id, "status": "queued", "context": context,
+            "job_id": job_id, "status": "queued", "phase": "QUEUED", "context": context,
             "created_at": _now(), "progress": {"completed": 0, "total": len(photos)},
             "photos": [{**{k: v for k, v in photo.items() if k != "_path"},
                         "evidence_url": f"/api/vision/jobs/{job_id}/photos/{photo['photo_id']}/image"}
@@ -409,7 +433,7 @@ class VisionCapture:
 
     def _run(self, job_id, request, folder):
         try:
-            self._update(job_id, folder, status="running", started_at=_now())
+            self._update(job_id, folder, status="running", phase="LOADING_MODEL", started_at=_now())
             if self._runner is not None:
                 result = self._runner(request)
             else:
@@ -424,11 +448,15 @@ class VisionCapture:
                         for record in records]
             for record in records:
                 _write_json(folder / f"{record['image_id']}.json", record)
-            self._update(job_id, folder, status="ready", records=records, image_bindings=bindings,
+            self._update(job_id, folder, status="ready", phase="REVIEW_READY",
+                         records=records, image_bindings=bindings,
                          pipeline=result.get("pipeline"), finished_at=_now(),
                          progress={"completed": len(records), "total": len(records)})
         except Exception as exc:
-            self._update(job_id, folder, status="failed", error=str(exc), finished_at=_now())
+            timeout = isinstance(exc, TimeoutError)
+            self._update(job_id, folder, status="failed", phase="TIMEOUT" if timeout else "ERROR",
+                         error_type="timeout" if timeout else "error", error=str(exc),
+                         finished_at=_now())
 
     def get(self, job_id):
         try:
@@ -445,7 +473,8 @@ class VisionCapture:
                 except (OSError, ValueError) as exc:
                     raise KeyError("Trabajo de Vision no encontrado.") from exc
                 if job["status"] in ("queued", "running"):
-                    job.update(status="failed", error="El servidor se reinició durante el proceso. "
+                    job.update(status="failed", phase="ERROR", error_type="interrupted",
+                               error="El servidor se reinició durante el proceso. "
                                "Vuelve a procesar las imágenes.")
                     _write_json(folder / "job.json", job)
                 self._jobs[job_id] = job
@@ -456,6 +485,11 @@ class VisionCapture:
                 if (isinstance(progress.get("completed"), int)
                         and 0 <= progress["completed"] <= snapshot["progress"]["total"]):
                     snapshot["progress"]["completed"] = progress["completed"]
+                    if progress.get("phase") in ("LOADING_MODEL", "DETECTING", "CLASSIFYING"):
+                        snapshot["phase"] = progress["phase"]
+                    detected = progress.get("detected_fruits")
+                    if type(detected) is int and detected >= 0:
+                        snapshot["progress"]["detected_fruits"] = detected
             except (OSError, ValueError, TypeError, AttributeError):
                 pass
         return snapshot

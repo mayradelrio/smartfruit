@@ -68,6 +68,7 @@ def _sample_model(
     sample.pop("image_bindings", None)
     sample.pop("box_inspection", None)
     sample.pop("box_inspections", None)
+    sample.pop("review_choice", None)
     sample["vision_records"] = deepcopy(records)
     sample["qc_fields"] = deepcopy(fields)
     sample["vision_covers_sample"] = True
@@ -91,6 +92,8 @@ def validate_review_history(
     additions = history.get("additional")
     if not isinstance(additions, list) or not additions:
         raise ValueError("El historial debe contener al menos una revisión adicional.")
+    if len(additions) > 1:
+        raise ValueError("La inspección permite como máximo 2 cajas por paleta.")
     initial = history["initial"]
     records = _records(initial.get("vision_records"), "Inspección inicial")
     initial_fields = initial.get("qc_fields")
@@ -166,14 +169,14 @@ def validate_review_history(
         recommendation = model["business_severity"]["recommendation"]
         canonical["additional"].append({
             "review_number": index,
-            "trigger_decision": "EXPAND",
+            "trigger_decision": "EXTEND",
             "vision_records": deepcopy(incoming),
             "manual_defects": manual,
             "qc_fields": fields,
             "inspection_summary": deepcopy(summary),
             "observations": observations,
             "system_recommendation_before": before,
-            "system_recommendation_after": recommendation,
+            "system_recommendation_after": "COMPLETE",
         })
         if additional_box is not None:
             canonical["additional"][-1]["box_inspection"] = additional_box
@@ -221,6 +224,8 @@ def add_additional_review(
     current = next((sample for sample in current_report["samples"] if sample["sample_id"] == target_id), None)
     if current is None:
         raise ValueError(f"La muestra '{target_id}' no existe en esta inspección.")
+    if current.get("review_history", {}).get("additional"):
+        raise ValueError("La inspección permite como máximo 2 cajas por paleta; ya está completa.")
     target = next(sample for sample in capture["samples"] if sample["sample_id"].strip() == target_id)
     incoming, summary, manual, fields = _additional_fields(
         supplied, target_id, current["pallet_id"], current_report["lot_id"]
@@ -252,7 +257,7 @@ def add_additional_review(
             history["initial"]["box_inspection"] = deepcopy(current["box_inspection"])
     history["additional"].append({
         "review_number": len(history["additional"]) + 2,
-        "trigger_decision": "EXPAND",
+        "trigger_decision": "EXTEND",
         "vision_records": incoming,
         "manual_defects": manual,
         "qc_fields": fields,
@@ -273,7 +278,7 @@ def add_additional_review(
     for key in ("sample_count", "oleocellosis", *_manual_keys()):
         target["qc_fields"][key] += fields[key]
     target["review_history"] = history
-    target["review_choice"] = ""
+    target["review_choice"] = "COMPLETE"
     for sample in capture["samples"]:
         for key in ("inspector_confirmed", "inspector_final_decision", "confirmed_at", "confirmed"):
             sample.pop(key, None)

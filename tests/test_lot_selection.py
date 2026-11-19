@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
+from review_helpers import confirm_vision_records
 
 from smartfruit.app import create_app
 from smartfruit.image_binding import validate_vision_import
@@ -42,7 +43,7 @@ def capture():
             {
                 "sample_id": f"TEST-{index}",
                 "pallet_id": pallet["pallet_id"],
-                "vision_records": [record],
+                "vision_records": confirm_vision_records([record]),
                 "vision_covers_sample": True,
                 "qc_fields": {
                     **pallet["qc_fields"],
@@ -77,7 +78,7 @@ def test_lot_endpoint_accepts_explicit_lot_without_scan_in_both_transports(tmp_p
 
 def test_direct_lot_provenance_survives_vision_import_and_evaluation(capture, tmp_path):
     original = deepcopy(capture)
-    payload = {**capture, "sample_id": "TEST-0", "vision_records": []}
+    payload = {**capture, "sample_id": "TEST-0", "vision_records": confirm_vision_records([])}
     imported = validate_vision_import(payload)
     assert imported["vision_records"] == capture["samples"][0]["vision_records"]
     report = evaluate_inspection(capture)
@@ -131,7 +132,7 @@ def test_direct_lot_selection_still_protects_complete_roster(capture, problem):
     with pytest.raises(ValueError):
         evaluate_inspection(capture)
     with pytest.raises(ValueError):
-        validate_vision_import({**capture, "sample_id": "TEST-0", "vision_records": []})
+        validate_vision_import({**capture, "sample_id": "TEST-0", "vision_records": confirm_vision_records([])})
     assert capture == original
 
 

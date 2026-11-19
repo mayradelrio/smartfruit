@@ -70,10 +70,10 @@
     while (true) {
       if (job.job_id !== jobId || !sameContext(job.context, context)) throw Error("El procesamiento devolvió una asociación distinta de la seleccionada.");
       onProgress(job);
-      if (job.status === "failed") throw Error(job.error || "No se pudieron procesar las imágenes.");
+      if (job.status === "failed") {const error=Error(job.error || "No se pudieron procesar las imágenes.");error.code=job.error_type==="timeout"||job.phase==="TIMEOUT"?"TIMEOUT":"ERROR";throw error;}
       if (job.status === "ready") { checkReady(job, context); return job; }
       if (!["queued", "running"].includes(job.status)) throw Error("Estado de Vision desconocido.");
-      if (Date.now() - started > 15 * 60 * 1000) throw Error("Vision sigue procesando. Vuelve a comprobar su estado antes de iniciar otro trabajo.");
+      if (Date.now() - started > 15 * 60 * 1000) {const error=Error("Vision no respondió a tiempo. Reintenta para recuperar el trabajo de esta caja.");error.code="TIMEOUT";throw error;}
       await wait(900);
       job = await (await request("/api/vision/jobs/" + encodeURIComponent(jobId))).json();
     }
@@ -96,7 +96,7 @@
     root.addEventListener("change", event => event.stopPropagation());
     const header = make("div", undefined, "vision-heading");
     header.append(make("h4", "Fotos disponibles"), make("span", "Vision integrada", "auto-tag"));
-    const description = make("p", "Completa la caja con varias tomas de grupos físicos distintos. Selecciona solo sus fotos: un mismo limón no debe aparecer en dos grupos. Puedes procesar y confirmar fotos por tandas.", "hint");
+    const description = make("p", "Añade la foto general y las fotos grupales por defecto. No repitas frutos entre las fotos que se suman al conteo.", "hint");
     const catalogueStatus = make("p", "Consultando las fotos disponibles…", "hint");
     const controls = make("div", undefined, "vision-photo-controls");
     const searchInput = make("input");searchInput.type="search";searchInput.placeholder="Buscar toma o fotografía";searchInput.setAttribute("aria-label", "Buscar fotos disponibles");
@@ -119,10 +119,10 @@
       const context={...getContext()};
       if (!contextKeys.every(key=>String(context[key]||"").trim())) throw Error("Completa la identificación de la paleta antes de procesar sus fotos.");
       if (options.canProcess && !options.canProcess()) throw Error("Esta paleta ya tiene revisiones adicionales. Procesa la siguiente caja desde EXTEND.");
-      memory.job=null;
+      memory.job={status:"queued",phase:"QUEUED",context,progress:{completed:0,total:memory.selected.size},records:[]};drawResult();
       memory.job=await processPhotos(request,context,Array.from(memory.selected),job=>{memory.job=job;drawResult();});
       if (!sameContext(context,getContext())) throw Error("La inspección cambió durante el procesamiento. No se incorporaron los resultados.");
-      options.onStatus?.("Vision terminó. Revisa los conteos y confirma las fotos de esta paleta.");
+      options.onStatus?.("Vision terminó. Revisa cada sospecha de oleocelosis.");
     }));
     actions.append(selectBox,process,clear);
     const result=make("div",undefined,"vision-capture-result");result.setAttribute("aria-live","polite");
@@ -147,7 +147,7 @@
       if (busy || destroyed) return;
       busy=true;issue="";draw();
       try { await (options.runAction || (fn=>fn()))(action); }
-      catch (error) {issue=error.message || "No se pudo completar Vision.";options.onError?.(issue);}
+      catch (error) {memory.failureState=error.code==="TIMEOUT"?"TIMEOUT":"ERROR";issue=error.message || "No se pudo completar Vision.";options.onError?.(issue);}
       finally {busy=false;if (!destroyed) draw();}
     }
 
@@ -178,6 +178,7 @@
       let visible=available;poolText.textContent="";
       const enabled=options.canProcess?.()!==false;
       if(!enabled){visible=[];poolText.textContent="La selección de fotos está inactiva para esta revisión.";}
+      else if(available.some(photo=>photo.input_kind==="scene")){visible=available.filter(photo=>photo.input_kind==="scene");poolText.textContent="Fotos grupales de la caja. Los recortes históricos siguen disponibles al importar JSON.";}
       else if(options.getTargetCount){
         const target=options.getTargetCount(),key=defaultSelectionKey();
         const assigned=options.getPhotoPool?.();
@@ -223,13 +224,16 @@
       const selectedGroups=allGroups.filter(group=>group.photos.some(photo=>memory.selected.has(photo.photo_id))).length;
       selectedText.textContent=memory.selected.size?selectedGroups+" grupo(s) / toma(s) · "+memory.selected.size+" foto(s) seleccionada(s) en esta tanda.":"Selecciona los grupos o fotos de esta caja. No hay imágenes preseleccionadas.";
       process.disabled=busy||!memory.selected.size||catalogue?.runtime?.available===false||options.canProcess?.()===false;
+      process.textContent=issue?"Reintentar procesamiento":"Procesar fotos de esta caja";
+      process.hidden=Boolean(memory.job?.status==="ready");
+      clear.hidden=!memory.selected.size;selectBox.hidden=memory.selected.size>0||!offeredPhotos.length;
       clear.disabled=busy||!memory.selected.size;reload.disabled=busy;searchInput.disabled=busy;
       selectBox.disabled=busy||!offeredPhotos.length||options.canProcess?.()===false;
     }
 
     function drawResult() {
       result.replaceChildren();
-      if(issue){result.append(make("p",issue,"notice"));return;}
+      if(issue){result.setAttribute("data-job-state",memory.failureState||"ERROR");result.append(make("strong",memory.failureState==="TIMEOUT"?"Tiempo de espera agotado":"Error de procesamiento"),make("p",issue,"notice"));return;}
       const confirmed=!memory.job;
       const savedRecords=options.getConfirmedRecords?.()||[];
       const restored=!memory.job&&!memory.confirmedJob&&savedRecords.length>0;
@@ -237,18 +241,21 @@
       if(!job || !sameContext(job.context,getContext()))return;
       if(job.status==="queued"||job.status==="running"){
         const progress=job.progress||{},done=progress.completed??progress.processed??0,total=progress.total??memory.selected.size;
-        const message=job.status==="queued"?"Esperando el procesamiento…":"Analizando fotos · "+done+" / "+total;
+        result.setAttribute("data-job-state",job.phase||job.status.toUpperCase());const phases={QUEUED:"En cola",LOADING_MODEL:"Cargando modelo",DETECTING:"Detectando frutos",CLASSIFYING:"Clasificando"};
+        const message=(phases[job.phase]||(job.status==="queued"?"En cola":"Procesando"))+" · "+done+" / "+total+" fotos"+(progress.detected_fruits===undefined?"":" · "+progress.detected_fruits+" frutos detectados");
         result.append(make("p",message,"vision-processing"));return;
       }
       if(job.status==="failed"){result.append(make("p",job.error||"No se pudieron procesar las fotos.","notice"));return;}
       if(job.status!=="ready")return;
+      result.setAttribute("data-job-state",confirmed?"COMPLETED":"REVIEW_READY");
       const context=job.context,records=job.records||[],total=records.reduce((sum,record)=>sum+record.total_fruits,0),affected=records.reduce((sum,record)=>sum+record.oleocellosis_count,0);
-      result.append(make("strong",restored?"Resultados confirmados de la paleta":confirmed?"Resultados confirmados de esta revisión":"Resultados listos · pendientes de confirmar"),make("p","Paleta "+context.pallet_id+" · "+total+" frutos · "+affected+" con oleocelosis ("+(total?100*affected/total:0).toLocaleString("es-PE",{maximumFractionDigits:2})+" %)","vision-context"));
-      result.append(make("p","Confirmar fotos suma esta tanda a la caja. Continúa con los grupos restantes antes de finalizar la inspección de la caja.","hint"));
+      const reviewed=scope.SmartFruitVisionReview?.summary(records);
+      result.append(make("strong",restored?"Fotos incorporadas a la paleta":confirmed?"Fotos incorporadas a la caja":"Resultados listos para revisión"),make("p","Paleta "+context.pallet_id+" · "+total+" frutos · "+affected+" sospechas"+(reviewed?" · "+reviewed.confirmed+" confirmadas por QC":""),"vision-context"));
       drawPositiveGallery(job);
       const details=make("details");details.append(make("summary","Ver resultados generados por fotografía"));const list=make("ul",undefined,"file-list");for(const record of records)list.append(make("li",record.image_id+": "+record.oleocellosis_count+" / "+record.total_fruits+" con oleocelosis"));details.append(list);result.append(details);
       if(confirmed)return;
-      const confirm=make("button",context.review_kind==="additional"?"Confirmar fotos de la caja adicional":"Confirmar resultados para esta paleta");confirm.type="button";confirm.disabled=busy;
+      const confirm=make("button",context.review_kind==="additional"?"Incorporar fotos de la segunda caja":"Incorporar fotos a la caja");confirm.type="button";confirm.disabled=busy||Boolean(reviewed?.pending);
+      if(scope.SmartFruitVisionReview){const reviewHost=make("section");result.append(reviewHost);scope.SmartFruitVisionReview.render(reviewHost,records,{reviewer:options.getReviewer?.()||memory.reviewer||"",photos:job.photos||catalogue?.photos||[],onReviewer:name=>{memory.reviewer=name;options.onReviewer?.(name);},onChange:()=>{const counts=scope.SmartFruitVisionReview.summary(records);confirm.disabled=busy||counts.pending>0;}});}
       confirm.addEventListener("click",()=>run(async()=>{
         const current=getContext();const records=checkReady(memory.job,current);
         await onConfirm(records,memory.job);
@@ -260,7 +267,7 @@
 
     function drawPositiveGallery(job) {
       const photos=positivePhotos(job,catalogue?.photos||[]);
-      const gallery=make("section",undefined,"vision-positive-gallery");gallery.append(make("h4","Imágenes clasificadas con oleocelosis"));
+      const gallery=make("section",undefined,"vision-positive-gallery");gallery.append(make("h4","Fotos con sospechas de oleocelosis"));
       if(!photos.length){
         const affected=(job.records||[]).some(record=>record.oleocellosis_count>0);
         gallery.append(make("p",affected?"Las imágenes de los frutos clasificados no están disponibles en la carpeta actual.":"No se clasificaron frutos con oleocelosis en esta revisión.","hint"));result.append(gallery);return;
@@ -287,6 +294,7 @@
     }
     draw();
     return {
+      getPhotos(){return [...(memory.confirmedJob?.photos||[]),...(catalogue?.photos||[])];},
       refresh(){if(destroyed)return;if(!loaded&&!catalogueRequest)load();else if(!loaded&&catalogueRequest)catalogueRequest.then(()=>{loaded=true;if(!destroyed)draw();}).catch(()=>{});else draw();},
       destroy(){destroyed=true;closeImage();},
     };

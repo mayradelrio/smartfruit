@@ -47,6 +47,9 @@
       return item(meta, headerValues[meta.key], origin);
     });
     const groups = samples.map(sample => {
+      if (["PENDING", "SELECTED", "SKIPPED"].includes(sample.inspection_status)) {
+        return {sample_id: sample.sample_id, inspection_status: sample.inspection_status, fields: []};
+      }
       const rows = Array.isArray(sample.reception?.records) ? sample.reception.records : [];
       const fields = (config.qc_columns || []).map(meta => {
         const value = (sample.qc_fields || {})[meta.key];

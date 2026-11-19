@@ -65,27 +65,27 @@ function reviewHistory(){return {
   initial:{
     vision_records:[{image_id:"INITIAL",total_fruits:12,oleocellosis_count:1,confirmed:"raw model metadata"}],
     qc_fields:{sample_count:12,oleocellosis:1,scars:2},
-    inspection_summary:{total_fruits:12,oleocellosis_count:1},system_recommendation:"EXPAND"
+    inspection_summary:{total_fruits:12,oleocellosis_count:1},system_recommendation:"EXTEND"
   },
   additional:[{
-    review_number:2,trigger_decision:"EXPAND",
+    review_number:2,trigger_decision:"EXTEND",
     vision_records:[{image_id:"ADDITIONAL",total_fruits:12,oleocellosis_count:2,unknown:{confirmed:true}}],
     manual_defects:{scars:1},qc_fields:{sample_count:12,oleocellosis:2,scars:1},
     inspection_summary:{total_fruits:12,oleocellosis_count:2},observations:"Second box",
-    system_recommendation_before:"EXPAND",system_recommendation_after:"ESCALATE"
+    system_recommendation_before:"EXTEND",system_recommendation_after:"COMPLETE"
   }]
 };}
 
 test("draft preparation preserves additional-review evidence and provisional choice without approving it",()=>{
   const input=snapshot({lot_id:"LOT",records:[]});
   input.saved_at="2026-11-15T12:00:00.000Z";
-  const sample=input.samples[0];sample.review_choice="EXPAND";sample.review_history=reviewHistory();
-  input.confirmed=true;input.final_decisions={S1:"EXPAND"};
-  sample.inspector_confirmed=true;sample.inspector_final_decision="EXPAND";sample.confirmed_at="old approval";
+  const sample=input.samples[0];sample.review_choice="EXTEND";sample.review_history=reviewHistory();
+  input.confirmed=true;input.final_decisions={S1:"EXTEND"};
+  sample.inspector_confirmed=true;sample.inspector_final_decision="EXTEND";sample.confirmed_at="old approval";
   const before=structuredClone(input),output=prepare(input,true);
-  assert.equal(output.samples[0].review_choice,"EXPAND");
+  assert.equal(output.samples[0].review_choice,"EXTEND");
   assert.deepEqual(output.samples[0].review_history,before.samples[0].review_history);
-  assert.equal(output.samples[0].review_history.additional[0].trigger_decision,"EXPAND");
+  assert.equal(output.samples[0].review_history.additional[0].trigger_decision,"EXTEND");
   for(const value of [output,output.samples[0]])for(const key of ["confirmed","final_decisions","inspector_confirmed","inspector_final_decision","confirmed_at"]){
     assert.equal(Object.hasOwn(value,key),false);
   }
@@ -97,14 +97,14 @@ test("old drafts do not acquire additional-review history or a provisional inspe
   const input=snapshot({lot_id:"LOT",records:[]}),output=prepare(input,false);
   assert.equal(Object.hasOwn(output.samples[0],"review_history"),false);
   assert.equal(Object.hasOwn(output.samples[0],"review_choice"),false);
-  for(const review_choice of ["","STANDARD","EXPAND","ESCALATE"]){
+  for(const review_choice of ["","STANDARD","EXTEND","COMPLETE"]){
     input.samples[0].review_choice=review_choice;
     assert.equal(prepare(input,false).samples[0].review_choice,review_choice);
   }
 });
 
 test("malformed provisional choices and additional-review wrappers cannot replace a draft",()=>{
-  for(const review_choice of [null,"EXTEND","expand","APPROVED",true,1,[],{}]){
+  for(const review_choice of [null,"APPROVED","expand","APPROVED",true,1,[],{}]){
     const input=snapshot({lot_id:"LOT",records:[]});input.samples[0].review_choice=review_choice;
     assert.throws(()=>prepare(input,false),{code:"invalid_snapshot"});
   }

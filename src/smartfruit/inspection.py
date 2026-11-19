@@ -141,6 +141,8 @@ def build_sample(payload, lot_id, boundary_policy="higher"):
     summary = sample["vision_summary"]
     if not summary["total_fruits"]:
         raise ValueError(f"{sample_id}: no se puede evaluar una muestra sin frutos.")
+    if summary.get("pending_review_count", 0):
+        raise ValueError(f"{sample_id}: revisar los positivos pendientes de Vision antes de evaluar.")
     if payload.get("vision_covers_sample") is not True:
         raise ValueError(
             f"{sample_id}: confirmar que las fotografías cubren los frutos de Sample, "
@@ -202,9 +204,9 @@ def build_sample(payload, lot_id, boundary_policy="higher"):
     sample["observations"] = observations
     if "review_choice" in payload:
         choice = payload["review_choice"]
-        if choice not in ("", "STANDARD", "EXPAND", "EXTEND", "ESCALATE"):
+        if choice not in ("", "STANDARD", "EXPAND", "EXTEND", "COMPLETE"):
             raise ValueError(f"{sample_id}: elegir una decisión de revisión válida.")
-        sample["review_choice"] = "EXPAND" if choice == "EXTEND" else choice
+        sample["review_choice"] = "EXTEND" if choice == "EXPAND" else choice
     if "image_bindings" in payload:
         sample["image_bindings"] = validate_image_bindings(
             payload["image_bindings"], records, sample_id, pallet_id, lot_id
@@ -241,4 +243,6 @@ def build_sample(payload, lot_id, boundary_policy="higher"):
         )
         sample["box_inspection"] = box
         sample["box_inspections"] = [deepcopy(box)]
+    if sample.get("review_choice") == "COMPLETE" and not sample.get("review_history"):
+        raise ValueError("COMPLETE requiere haber completado la segunda caja.")
     return sample

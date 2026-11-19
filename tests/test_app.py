@@ -9,6 +9,7 @@ from uuid import UUID
 import openpyxl
 import pytest
 from fastapi.testclient import TestClient
+from review_helpers import confirm_vision_records
 
 from smartfruit.app import create_app
 
@@ -43,10 +44,10 @@ def capture():
             {
                 "sample_id": "SAMPLE_DEMO_001",
                 "pallet_id": "PALLET_DEMO_01",
-                "vision_records": [
+                "vision_records": confirm_vision_records([
                     json.loads((examples / f"IMG_{image}.json").read_text("utf-8"))
                     for image in (6426, 6427, 6428)
-                ],
+                ]),
                 "vision_covers_sample": True,
                 "qc_fields": {**dict.fromkeys(manual_keys, 0), "sample_count": 36},
                 "observations": "Inspección manual demo.",
@@ -96,7 +97,7 @@ def test_evaluate_is_off_by_default_and_does_not_persist(client, capture, tmp_pa
     assert response.status_code == 200
     report = response.json()
     sample = report["samples"][0]
-    assert sample["final_recommendation"] == "EXPAND"
+    assert sample["final_recommendation"] == "EXTEND"
     assert sample["inspection_summary"]["oleocellosis_count"] == 3
     assert "predicted_loss_pct" not in sample["predictive"]
     assert report["inspector_confirmed"] is False
@@ -116,7 +117,7 @@ def test_export_draft_preserves_qc_layout_without_finalizing(client, capture, tm
     text = " ".join(str(cell.value) for row in sheet for cell in row if cell.value is not None)
     assert "SmartFruit" in text
     assert "BORRADOR" in text
-    assert "EXPAND" in text
+    assert "EXTEND" in text
     assert "predicted_loss_pct" not in text
     assert list(tmp_path.iterdir()) == []
 
@@ -143,7 +144,7 @@ def test_finalize_persists_source_and_report_with_inspector_authority(client, ca
     assert report["confirmed_at"]
     assert report["qc_header"]["Level_Flag"] == 1
     assert report["observations"] == "Conservar observaciones."
-    assert sample["final_recommendation"] == "EXPAND"
+    assert sample["final_recommendation"] == "EXTEND"
     assert sample["inspector_final_decision"] == "STANDARD"
     assert sample["inspector_confirmed"] is True
 
@@ -159,7 +160,7 @@ def test_finalize_persists_source_and_report_with_inspector_authority(client, ca
     values = " ".join(str(cell.value) for row in sheet for cell in row if cell.value is not None)
     assert "CONFIRMADO" in values
     assert "Inspector Demo" in values
-    assert "EXPAND" in values
+    assert "EXTEND" in values
     assert "STANDARD" in values
     assert "predicted_loss_pct" not in values
 
@@ -276,6 +277,6 @@ def test_on_without_an_artifact_continues_to_return_rule_recommendation(capture,
         response = on_client.post("/api/evaluate", json=capture)
     assert response.status_code == 200
     sample = response.json()["samples"][0]
-    assert sample["final_recommendation"] == "EXPAND"
+    assert sample["final_recommendation"] == "EXTEND"
     assert sample["predictive"]["enabled"] is True
     assert sample["predictive"]["predicted_loss_pct"] is None

@@ -124,7 +124,7 @@ test("retains imported Vision and reception verbatim while stripping only approv
 
 test("load strips old approval metadata without changing the stored copy",async()=>{
   const config=options();const old=snapshot();old.inspector_confirmed=true;
-  old.samples[0].inspector_final_decision="ESCALATE";
+  old.samples[0].inspector_final_decision="COMPLETE";
   await rawPut(config,old);
   const restored=await createStore(config).load();
   assert.equal(Object.hasOwn(restored,"inspector_confirmed"),false);
@@ -301,14 +301,14 @@ test("an invalid Reason source cannot replace the saved draft",async()=>{
 
 test("additional-review history and working choice survive recovery without final approval",async()=>{
  const config=options(),input=snapshot(),sample=input.samples[0];
- sample.review_choice="EXPAND";
+ sample.review_choice="EXTEND";
  sample.review_history={
   initial:{vision_records:[{image_id:"INITIAL",confirmed:"raw"}],qc_fields:{sample_count:12}},
-  additional:[{review_number:2,trigger_decision:"EXPAND",vision_records:[{image_id:"EXTRA"}],manual_defects:{scars:1}}]
+  additional:[{review_number:2,trigger_decision:"EXTEND",vision_records:[{image_id:"EXTRA"}],manual_defects:{scars:1}}]
  };
- sample.inspector_confirmed=true;sample.inspector_final_decision="EXPAND";input.confirmed=true;
+ sample.inspector_confirmed=true;sample.inspector_final_decision="EXTEND";input.confirmed=true;
  const store=createStore(config);await store.save(input);const restored=await createStore(config).load();
- assert.equal(restored.samples[0].review_choice,"EXPAND");
+ assert.equal(restored.samples[0].review_choice,"EXTEND");
  assert.deepEqual(restored.samples[0].review_history,sample.review_history);
  assert.equal(Object.hasOwn(restored.samples[0],"inspector_confirmed"),false);
  assert.equal(Object.hasOwn(restored.samples[0],"inspector_final_decision"),false);
@@ -317,7 +317,7 @@ test("additional-review history and working choice survive recovery without fina
 
 test("invalid additional-review draft fields preserve the previous saved inspection",async()=>{
  const store=createStore(options()),saved=await store.save(snapshot());
- for(const update of [{review_choice:"EXTEND"},{review_choice:true},{review_history:{}},
+ for(const update of [{review_choice:"APPROVED"},{review_choice:true},{review_history:{}},
   {review_history:{initial:{},additional:[null]}}]){
   const input=snapshot();Object.assign(input.samples[0],update);
   await assert.rejects(store.save(input),{code:"invalid_snapshot"});

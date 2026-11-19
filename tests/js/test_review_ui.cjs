@@ -70,11 +70,11 @@ function setup(names) {
   for(const [key,control]of Object.entries(headerControls))byId(key==="reason"?"reason-field":["Level_Flag","remarks","grade","color","plu_pct"].includes(key)?"final-header-fields":"header-fields").append(control);
   const summaryControls={};
   const context=vm.createContext({
-    state,byId,element,headerControls,summaryControls,defectKeys:new Set(keys),decisions:["STANDARD","EXPAND","ESCALATE"],
+    state,byId,element,headerControls,summaryControls,defectKeys:new Set(keys),decisions:["STANDARD","EXTEND","COMPLETE"],
     sourceNodes:new WeakMap(),copy:structuredClone,captureChanged(){},scheduleDraft(){},status(){},
     document:{querySelectorAll(){return [];}},window:{confirm(){return true;}},
     renderReviewHistory(){return null;},
-    renderAdditionalReview(sample){const panel=element("section");panel.hidden=sample.inspectorChoice!=="EXPAND";sample.additionalPanel=panel;return panel;},
+    renderAdditionalReview(sample){const panel=element("section");panel.hidden=sample.inspectorChoice!=="EXTEND";sample.additionalPanel=panel;return panel;},
   });
   const columns=html.slice(html.indexOf("  const fallbackColumns ="),html.indexOf("  const fallbackHeaders ="));
   vm.runInContext(columns+"\n"+names.map(source).join("\n"),context);
@@ -87,7 +87,7 @@ function reportFor(state) {
     qc_fields:Object.fromEntries(Object.entries(sample.controls).map(([key,control])=>[key,key==="pallet_id"?control.value:Number(control.value)])),
     inspection_summary:{total_fruits:12,oleocellosis_count:0,oleocellosis_pct:0},
     business_severity:{business_max_level:index+1,quality_max_level:index+1,condition_max_level:1,reasons:["Scars"]},
-    final_recommendation:index?"EXPAND":"STANDARD",recommendation_reasons:["Scars"],predictive:{enabled:false},
+    final_recommendation:index?"EXTEND":"STANDARD",recommendation_reasons:["Scars"],predictive:{enabled:false},
   }));
   return {qc_header:{lot_id:"LOT",Level_Flag:"",reason:""},samples,generated_reason:"Scars: 3 fruits in 2 of 2 pallets (12.5%).",
     lot_summary:{pallet_count:2,sample_count:24,total_defect_incidents:3,total_combined_pct:12.5,
@@ -127,7 +127,7 @@ test("Reason starts from the defect summary without replacing Remarks or assigni
   assert.equal(state.report.qc_header.reason,report.generated_reason);
   assert.equal(headerControls.remarks.value,"Original remarks");
   assert.equal(headerControls.Level_Flag.value,"");
-  assert.equal(state.report.samples[1].final_recommendation,"EXPAND");
+  assert.equal(state.report.samples[1].final_recommendation,"EXTEND");
   context.ensureCurrent();
 });
 
@@ -137,7 +137,7 @@ test("the inspector can decide after the suggestions while QC edits require reev
   context.applyGeneratedReason(report);state.payload=context.collectPayload();context.renderResults(report);
   const results=byId("results").children[0];
   const decisions=byId("results").querySelectorAll("select[data-sample-id]");
-  context.setInspectorChoice("S1","STANDARD");context.setInspectorChoice("S2","EXPAND");
+  context.setInspectorChoice("S1","STANDARD");context.setInspectorChoice("S2","EXTEND");
   byId("inspector-confirmation").checked=true;
   headerControls.Level_Flag.value="2";
   context.handleInspectionEdit({target:headerControls.Level_Flag});
@@ -145,7 +145,7 @@ test("the inspector can decide after the suggestions while QC edits require reev
   assert.equal(byId("results").children[0],results);
   assert.equal(state.payload.qc_header.Level_Flag,2);
   assert.equal(state.report.qc_header.Level_Flag,2);
-  assert.equal(decisions[1].value,"EXPAND");assert.equal(byId("inspector-confirmation").checked,false);
+  assert.equal(decisions[1].value,"EXTEND");assert.equal(byId("inspector-confirmation").checked,false);
   context.ensureCurrent();
   state.reasonSource="inspector";headerControls.reason.readOnly=false;
   headerControls.reason.value="Scars summary reviewed by QC.";

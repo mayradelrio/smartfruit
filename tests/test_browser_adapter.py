@@ -8,6 +8,7 @@ from pathlib import Path
 from uuid import uuid4
 
 import openpyxl
+from review_helpers import confirm_vision_records
 
 from smartfruit.workflow import evaluate_inspection
 
@@ -38,7 +39,7 @@ def capture():
             {
                 "sample_id": demo["sample_id"],
                 "pallet_id": demo["pallet_id"],
-                "vision_records": demo["records"],
+                "vision_records": confirm_vision_records(demo["records"]),
                 "vision_covers_sample": True,
                 "qc_fields": {field["key"]: 0 for field in config["manual_defects"]},
             }
@@ -51,7 +52,7 @@ def test_browser_transport_preserves_the_python_workflow():
     result = call("/api/evaluate", payload)
     assert result["status"] == 200
     assert result["body"] == evaluate_inspection(payload, use_predictive=False)
-    assert result["body"]["samples"][0]["final_recommendation"] == "EXPAND"
+    assert result["body"]["samples"][0]["final_recommendation"] == "EXTEND"
 
 
 def test_browser_draft_uses_the_same_qc_format():
@@ -79,7 +80,7 @@ def test_browser_confirmation_preserves_inspector_authority_and_capture():
     assert result["storage"]["source"] == payload
     assert result["storage"]["id"] == report_id
     report = result["storage"]["report"]
-    assert report["samples"][0]["final_recommendation"] == "EXPAND"
+    assert report["samples"][0]["final_recommendation"] == "EXTEND"
     assert report["samples"][0]["inspector_final_decision"] == "STANDARD"
     assert report["inspector_confirmed"] is True
     assert "predicted_loss_pct" not in report["samples"][0]["predictive"]

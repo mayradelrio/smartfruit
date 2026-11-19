@@ -78,6 +78,26 @@ function reception(pallet,label) {
     reception:{scan_input:pallet,records:[row]},receptionLot:"LOT"};
 }
 
+test("an inspector selects any pallet and skips another without inventing measurements",()=>{
+  const {context,state,byId}=setup(["valueOf","collectPayload"]);
+  const first=context.addSample(reception("P1","First")),second=context.addSample(reception("P2","Second"));
+  assert.equal(first.inspectionStatus,"PENDING");
+  context.selectQCPallet(second.serial);assert.equal(second.inspectionStatus,"SELECTED");assert.ok(second.selectedAt);
+  second.startButton.click();assert.equal(second.inspectionStatus,"IN_PROGRESS");
+  first.skipReasonControl.value="Muestreo QC";first.skipButton.click();
+  assert.equal(first.inspectionStatus,"SKIPPED");assert.equal(first.skipReason,"Muestreo QC");
+  const payload=context.collectPayload(),skipped=payload.samples[0];
+  assert.equal(skipped.inspection_status,"SKIPPED");assert.equal(skipped.qc_fields,undefined);
+  assert.equal(skipped.vision_records,undefined);assert.equal(skipped.box_inspection,undefined);
+  assert.equal(payload.lot_reception.pallets[0].skip_reason,"Muestreo QC");
+  context.renderQCOverview();
+  const row=byId("qc-table-body").children[0];
+  assert.equal(row.children[5].textContent,"No inspeccionada");
+  assert.equal(row.children[3].textContent,"—");
+  first.startButton.click();assert.equal(first.inspectionStatus,"IN_PROGRESS");assert.equal(first.skipReason,"");
+  assert.equal(state.samples.length,2);
+});
+
 test("QUALITY INSPECTION keeps receipt fields in grouped forms and its overview contains no inputs",()=>{
   assert.match(html,/<h1>QUALITY INSPECTION<\/h1>/);
   const {context,state,byId}=setup();

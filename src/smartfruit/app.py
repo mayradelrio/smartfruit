@@ -30,6 +30,7 @@ from .reception import (
 )
 from .report_evidence import attach_report_evidence
 from .vision_capture import VisionCapture
+from .vision_validation import build_adjudicated_dataset, calculate_vision_metrics
 from .workflow import evaluate_inspection
 
 
@@ -97,7 +98,8 @@ def create_app(reports_dir=None, use_predictive=None, vision_capture=None):
                 files("smartfruit").joinpath("resources/branding/agroperu-logo.png").read_bytes(),
                 media_type="image/png",
             )
-        if name not in ("drafts.js", "field_sources.js", "vision_defaults.js", "vision_capture.js"):
+        if name not in ("drafts.js", "field_sources.js", "vision_defaults.js", "vision_capture.js",
+                        "vision_review.js"):
             raise HTTPException(404, "Recurso no encontrado.")
         return Response(
             files("smartfruit").joinpath("web", name).read_text("utf-8"),
@@ -140,6 +142,19 @@ def create_app(reports_dir=None, use_predictive=None, vision_capture=None):
     async def import_vision(request: Request):
         try:
             return validate_vision_import(await payload_from(request))
+        except (ValueError, TypeError, OverflowError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @app.post("/api/vision/validation")
+    async def vision_validation(request: Request):
+        payload = await payload_from(request)
+        try:
+            records = payload.get("vision_records")
+            adjudications = payload.get("adjudications", [])
+            if not isinstance(records, list) or not isinstance(adjudications, list):
+                raise ValueError("Proporcionar vision_records y adjudications como listas.")
+            dataset = build_adjudicated_dataset(records, adjudications)
+            return {"dataset": dataset, "metrics": calculate_vision_metrics(dataset)}
         except (ValueError, TypeError, OverflowError) as exc:
             raise HTTPException(422, str(exc)) from exc
 

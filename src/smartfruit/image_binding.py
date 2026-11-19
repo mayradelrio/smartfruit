@@ -156,6 +156,11 @@ def validate_vision_import(payload: Any, *, additional_review: bool = False) -> 
                 )
             ownership[image_id] = (sample_id, record)
         if sample_id == target_id:
+            history = sample.get("review_history")
+            if additional_review and history is not None and not isinstance(history, dict):
+                raise ValueError("El historial de revisión debe ser un objeto.")
+            if additional_review and history and history.get("additional"):
+                raise ValueError("La inspección permite como máximo 2 cajas por paleta; ya está completa.")
             if incoming and "review_history" in sample and not additional_review:
                 raise ValueError(
                     "Esta paleta ya tiene revisiones adicionales; añade la caja desde EXTEND "

@@ -133,7 +133,10 @@
       && Array.isArray(sample.image_bindings)
       && ["", "true", "false"].includes(sample.coverage_choice)
       && typeof sample.observations === "string"
-      && (sample.review_choice === undefined || ["", "STANDARD", "EXPAND", "ESCALATE"].includes(sample.review_choice))
+      && (sample.review_choice === undefined || ["", "STANDARD", "EXPAND", "EXTEND", "COMPLETE", "ESCALATE"].includes(sample.review_choice))
+      && (sample.inspection_status === undefined || ["PENDING","SELECTED","IN_PROGRESS","COMPLETED","SKIPPED"].includes(sample.inspection_status))
+      && (sample.skip_reason === undefined || typeof sample.skip_reason === "string")
+      && ["selected_at","completed_at"].every(key => sample[key] == null || isoDate(sample[key]))
       && (sample.review_history === undefined || reviewHistory(sample.review_history))
       && (sample.box_inspection === undefined || boxInspection(sample.box_inspection))
       && (sample.pending_additional === undefined || pendingAdditional(sample.pending_additional,sample,snapshot.qc_header))

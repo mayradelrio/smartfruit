@@ -17,26 +17,26 @@ function source(name){
 
 test("inspector choice updates alongside the suggestion and EXTEND exposes only that pallet's extra review",()=>{
   const first={id:{value:"S1"},controls:{pallet_id:{value:"P1"}},inspectorChoice:"",choiceControl:{value:""},inspectorStatus:{textContent:""},additionalPanel:{hidden:true}};
-  const other={id:{value:"S2"},controls:{pallet_id:{value:"P2"}},inspectorChoice:"ESCALATE",additionalPanel:{hidden:true}};
-  const state={samples:[first,other],report:{samples:[{sample_id:"S1",final_recommendation:"ESCALATE"}]}},confirmation={checked:true};let summaries=0,syncs=0;
-  const context=vm.createContext({state,decisions:["STANDARD","EXPAND","ESCALATE"],
+  const other={id:{value:"S2"},controls:{pallet_id:{value:"P2"}},inspectorChoice:"COMPLETE",additionalPanel:{hidden:true}};
+  const state={samples:[first,other],report:{samples:[{sample_id:"S1",final_recommendation:"COMPLETE"}]}},confirmation={checked:true};let summaries=0,syncs=0;
+  const context=vm.createContext({state,decisions:["STANDARD","EXTEND","COMPLETE"],
     renderInspectorDecisionSummary(){summaries++;},syncReviewMetadata(){syncs++;confirmation.checked=false;},status(){}});
   vm.runInContext(["canonicalDecision","decisionLabel","setInspectorChoice"].map(source).join("\n"),context);
   context.setInspectorChoice("S1","EXTEND");
-  assert.equal(first.inspectorChoice,"EXPAND");assert.equal(first.choiceControl.value,"EXPAND");
+  assert.equal(first.inspectorChoice,"EXTEND");assert.equal(first.choiceControl.value,"EXTEND");
   assert.equal(first.additionalPanel.hidden,false);assert.equal(other.additionalPanel.hidden,true);
   assert.match(first.inspectorStatus.textContent,/EXTEND/);assert.equal(confirmation.checked,false);
-  assert.equal(state.report.samples[0].final_recommendation,"ESCALATE");
+  assert.equal(state.report.samples[0].final_recommendation,"COMPLETE");
   context.setInspectorChoice("S1","STANDARD");assert.equal(first.additionalPanel.hidden,true);
-  assert.equal(other.inspectorChoice,"ESCALATE");assert.equal(summaries,2);assert.equal(syncs,2);
-  assert.throws(()=>context.setInspectorChoice("S1","APPROVED"),/STANDARD, EXTEND o ESCALATE/);
+  assert.equal(other.inspectorChoice,"COMPLETE");assert.equal(summaries,2);assert.equal(syncs,2);
+  assert.throws(()=>context.setInspectorChoice("S1","APPROVED"),/STANDARD o EXTEND/);
   assert.equal(first.inspectorChoice,"STANDARD");
 });
 
 function setupCommit(){
   const counts={...Object.fromEntries(keys.map(key=>[key,0])),sample_count:12,oleocellosis:1,scars:2};
-  const sample=(id,pallet)=>({id:{value:id},controls:Object.fromEntries(Object.entries({pallet_id:pallet,label_brand:"Original",...counts}).map(([key,value])=>[key,{value:String(value)}])),records:[{image_id:"IMAGE-"+id,total_fruits:12,oleocellosis_count:1,original:{keep:true}}],imageBindings:[],inspectorChoice:"EXPAND",pendingAdditional:{visionRecords:[{image_id:"EXTRA"}]}});
-  const target=sample("S1","P1"),other=sample("S2","P2");other.inspectorChoice="ESCALATE";
+  const sample=(id,pallet)=>({id:{value:id},controls:Object.fromEntries(Object.entries({pallet_id:pallet,label_brand:"Original",...counts}).map(([key,value])=>[key,{value:String(value)}])),records:[{image_id:"IMAGE-"+id,total_fruits:12,oleocellosis_count:1,original:{keep:true}}],imageBindings:[],inspectorChoice:"EXTEND",pendingAdditional:{visionRecords:[{image_id:"EXTRA"}]}});
+  const target=sample("S1","P1"),other=sample("S2","P2");other.inspectorChoice="COMPLETE";
   const state={samples:[target,other],revision:3,evaluatedRevision:3,report:{lot_id:"LOT",samples:[]},finalized:false};
   const calls={vision:0,render:0,summary:0,sync:0,capture:0,steps:[]};
   const collectPayload=()=>({qc_header:{lot_id:"LOT"},samples:state.samples.map(item=>({sample_id:item.id.value,pallet_id:item.controls.pallet_id.value,vision_records:structuredClone(item.records),review_choice:item.inspectorChoice,review_history:item.reviewHistory}))});
@@ -45,9 +45,9 @@ function setupCommit(){
     renderResults(){calls.render++;},renderLotSummary(){calls.summary++;},syncReviewMetadata(){calls.sync++;},captureChanged(){calls.capture++;},setStep(step){calls.steps.push(step);},status(){}});
   vm.runInContext(source("commitAdditionalReview"),context);
   const total={pallet_id:"P1",label_brand:"Original",...counts,sample_count:24,oleocellosis:2,scars:5};
-  const history={initial:{vision_records:structuredClone(target.records),qc_fields:{...counts},system_recommendation:"EXPAND"},additional:[{review_number:2,trigger_decision:"EXPAND",vision_records:[{image_id:"EXTRA",total_fruits:12,oleocellosis_count:1}],manual_defects:{scars:3}}]};
+  const history={initial:{vision_records:structuredClone(target.records),qc_fields:{...counts},system_recommendation:"EXTEND"},additional:[{review_number:2,trigger_decision:"EXTEND",vision_records:[{image_id:"EXTRA",total_fruits:12,oleocellosis_count:1}],manual_defects:{scars:3}}]};
   const response={capture:{samples:[{sample_id:"S1",pallet_id:"P1",vision_records:[...structuredClone(target.records),{image_id:"EXTRA",total_fruits:12,oleocellosis_count:1}],image_bindings:[{image_id:"EXTRA",sample_id:"S1",pallet_id:"P1",lot_id:"LOT"}],qc_fields:total,review_history:history}]},
-    report:{lot_id:"LOT",samples:[{sample_id:"S1",pallet_id:"P1",qc_fields:structuredClone(total),inspection_summary:{total_fruits:24,oleocellosis_count:2,oleocellosis_pct:100*2/24},review_history:structuredClone(history),final_recommendation:"EXPAND"}]}};
+    report:{lot_id:"LOT",samples:[{sample_id:"S1",pallet_id:"P1",qc_fields:structuredClone(total),inspection_summary:{total_fruits:24,oleocellosis_count:2,oleocellosis_pct:100*2/24},review_history:structuredClone(history),final_recommendation:"EXTEND"}]}};
   return {context,state,target,other,calls,response};
 }
 
@@ -57,10 +57,10 @@ test("committing an additional box replaces only its pallet's accumulated captur
   assert.equal(target.controls.sample_count.value,"24");assert.equal(target.controls.oleocellosis.value,"2");assert.equal(target.controls.scars.value,"5");
   assert.deepEqual(target.records.map(record=>record.image_id),["IMAGE-S1","EXTRA"]);
   assert.deepEqual(target.reviewHistory,response.capture.samples[0].review_history);assert.equal(target.reviewHistory.initial.qc_fields.sample_count,12);
-  assert.equal(target.inspectorChoice,"");assert.equal(target.pendingAdditional,null);assert.equal(Object.hasOwn(target,"coverage"),false);
+  assert.equal(target.inspectorChoice,"COMPLETE");assert.equal(target.pendingAdditional,null);assert.equal(Object.hasOwn(target,"coverage"),false);
   assert.equal(target.visionSummary.oleocellosis_pct,100*2/24);assert.deepEqual(other,beforeOther);
   assert.equal(state.revision,4);assert.equal(state.evaluatedRevision,4);assert.deepEqual(state.payload.samples[0].review_history,target.reviewHistory);
-  assert.equal(state.payload.samples[1].review_choice,"ESCALATE");assert.deepEqual(calls,{vision:1,render:1,summary:1,sync:1,capture:1,steps:[4]});
+  assert.equal(state.payload.samples[1].review_choice,"COMPLETE");assert.deepEqual(calls,{vision:1,render:1,summary:1,sync:1,capture:1,steps:[4]});
   target.reviewHistory.additional[0].manual_defects.scars=99;assert.deepEqual(response,beforeResponse);
 });
 
@@ -80,7 +80,7 @@ test("malformed extra-review responses leave the current capture and other palle
 
 test("an additional box can be applied without another coverage confirmation",async()=>{
   const record={image_id:"EXTRA",total_fruits:12,oleocellosis_count:1};
-  const sample={id:{value:"S1"},inspectorChoice:"EXPAND",
+  const sample={id:{value:"S1"},inspectorChoice:"EXTEND",
     pendingAdditional:{visionRecords:[record],summary:{total_fruits:12}},
     additionalControls:Object.fromEntries(keys.filter(key=>key!=="oleocellosis").map(key=>[key,{value:"0",focus(){}}])),
     additionalObservations:{value:" Second box "}};
@@ -95,7 +95,7 @@ test("an additional box can be applied without another coverage confirmation",as
   assert.equal(Object.hasOwn(sample,"additionalCoverage"),false);
   assert.equal(calls.requests.length,1);
   assert.equal(calls.requests[0].url,"/api/inspection/additional-review");
-  assert.equal(calls.requests[0].payload.inspector_decision,"EXPAND");
+  assert.equal(calls.requests[0].payload.inspector_decision,"EXTEND");
   assert.equal(calls.requests[0].payload.additional_review.observations,"Second box");
   assert.deepEqual(calls.requests[0].payload.additional_review.vision_records,[record]);
   assert.equal(Object.keys(calls.requests[0].payload.additional_review.manual_defects).length,15);

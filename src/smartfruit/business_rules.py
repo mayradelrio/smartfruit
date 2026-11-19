@@ -8,6 +8,8 @@ import math
 from collections.abc import Mapping
 from copy import deepcopy
 
+RULES_ENGINE_VERSION = "2.0.0"
+
 BUSINESS_DEFECT_MAP = {
     "scars_pct": {
         "business_name": "Cicatrices / defectos de piel",
@@ -110,7 +112,7 @@ def business_level(value, rule, boundary_policy="higher"):
 def evaluate_business_severity(record, boundary_policy="higher"):
     """Evaluate all eight mapped defects without altering the source record.
 
-    The recommendation and maximum-level reasons retain the existing mapping.
+    Existing thresholds and maximum-level reasons are retained.
     STANDARD gains a textual explanation of that same outcome.  Other QC
     columns remain outside this module's explicitly limited rule coverage.
     """
@@ -147,11 +149,12 @@ def evaluate_business_severity(record, boundary_policy="higher"):
     out = deepcopy(dict(record))
     out["defects"] = defects_out
     out["business_severity"] = {
+        "rules_engine_version": RULES_ENGINE_VERSION,
         "boundary_policy": boundary_policy,
         "quality_max_level": max(quality_levels),
         "condition_max_level": max(condition_levels),
         "business_max_level": max_level,
-        "recommendation": {1: "STANDARD", 2: "EXPAND", 3: "ESCALATE"}[max_level],
+        "recommendation": {1: "STANDARD", 2: "EXTEND", 3: "EXTEND"}[max_level],
         "reasons": reasons,
     }
     return out

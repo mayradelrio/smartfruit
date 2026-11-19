@@ -16,6 +16,7 @@ from unittest.mock import Mock
 import openpyxl
 import pytest
 from fastapi.testclient import TestClient
+from review_helpers import confirm_vision_records
 
 from smartfruit.app import create_app
 from smartfruit.reception import load_reception_manifest, manifest_summary, resolve_reception
@@ -136,7 +137,7 @@ def _capture(selection):
             {
                 "sample_id": "RECEPTION_FLOW_SAMPLE",
                 "pallet_id": selection["pallet_id"],
-                "vision_records": records,
+                "vision_records": confirm_vision_records(records),
                 "vision_covers_sample": True,
                 "qc_fields": {
                     **selection["qc_fields"],
@@ -208,7 +209,7 @@ def test_scan_prepopulates_metadata_without_treating_declared_count_as_measured_
     assert sample["qc_fields"]["avg_count_per_box"] == ""
     assert sample["inspection_summary"]["oleocellosis_pct"] == pytest.approx(100 * 3 / 36)
     assert sample["business_severity"]["business_max_level"] == 2
-    assert sample["final_recommendation"] == "EXPAND"
+    assert sample["final_recommendation"] == "EXTEND"
     assert sample["reception"]["records"][0]["expected_count_per_box"] == "110"
     assert sample["reception"]["records"][0]["boxes_received"] == ""
     assert sample["reception"] == capture["samples"][0]["reception"]
@@ -229,7 +230,7 @@ def test_mixed_size_pallet_keeps_both_rows_and_does_not_choose_a_size(client, so
     assert sample["qc_fields"]["size"] == ""
     assert sample["inspection_summary"]["total_fruits"] == 36
     assert [row["size_declared"] for row in sample["reception"]["records"]] == ["110", "175"]
-    assert sample["final_recommendation"] == "EXPAND"
+    assert sample["final_recommendation"] == "EXTEND"
 
 
 @pytest.mark.parametrize("case", ["wrong-lot", "wrong-pallet", "extra-entity"])
@@ -321,7 +322,7 @@ def test_finalize_preserves_only_selected_provenance_and_inspector_decision(
         }
         assert "UNRELATED_RECORD_MUST_NOT_BE_PERSISTED" not in json.dumps(document)
     sample = saved_report["samples"][0]
-    assert sample["final_recommendation"] == "EXPAND"
+    assert sample["final_recommendation"] == "EXTEND"
     assert sample["inspector_final_decision"] == "STANDARD"
     assert saved_report["qc_header"]["Level_Flag"] == 1
     assert sample["reception"]["records"][0]["boxes_received"] == ""
@@ -361,5 +362,5 @@ def test_finalize_preserves_only_selected_provenance_and_inspector_decision(
     assert browser_result["storage"]["source"] == capture
     browser_sample = browser_result["storage"]["report"]["samples"][0]
     assert browser_sample["reception"] == sample["reception"]
-    assert browser_sample["final_recommendation"] == "EXPAND"
+    assert browser_sample["final_recommendation"] == "EXTEND"
     assert browser_sample["inspector_final_decision"] == "STANDARD"

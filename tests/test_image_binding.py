@@ -3,12 +3,13 @@
 from copy import deepcopy
 
 import pytest
+from review_helpers import confirm_vision_record
 
 from smartfruit.image_binding import validate_image_bindings, validate_vision_import
 
 
 def record(image_id="IMG-1", total=3, affected=1):
-    return {
+    return confirm_vision_record({
         "image_id": image_id,
         "partition": "test",
         "total_fruits": total,
@@ -24,7 +25,7 @@ def record(image_id="IMG-1", total=3, affected=1):
             }
             for i in range(total)
         ],
-    }
+    })
 
 
 def sample(sample_id="S-1", pallet_id="005824", records=None):

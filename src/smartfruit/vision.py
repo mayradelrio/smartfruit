@@ -10,6 +10,8 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
+from .vision_review import review_status, validate_prediction_review
+
 VISION_FIELDS = frozenset(
     {
         "image_id",
@@ -124,6 +126,7 @@ def validate_vision_record(data: Any) -> None:
             0,
             1,
         )
+        validate_prediction_review(prediction, f"{image_id}/{crop_id}")
     if affected != count:
         raise ValueError(f"{image_id}: las clases por fruto no coinciden con oleocellosis_count")
 
@@ -212,7 +215,24 @@ def aggregate_vision_sample(
     validate_vision_source_overlap(records.values())
 
     total = sum(record["total_fruits"] for record in records.values())
-    affected = sum(record["oleocellosis_count"] for record in records.values())
+    raw_affected = sum(record["oleocellosis_count"] for record in records.values())
+    positives = [
+        prediction
+        for record in records.values()
+        for prediction in record["fruit_predictions"]
+        if prediction["predicted_class"] == "con_oleocelosis"
+    ]
+    affected = sum(review_status(prediction) == "confirmed" for prediction in positives)
+    pending = sum(review_status(prediction) == "pending" for prediction in positives)
+    rejected = sum(review_status(prediction) == "rejected" for prediction in positives)
+    reviews = []
+    for record in records.values():
+        for prediction in record["fruit_predictions"]:
+            review = {"image_id": record["image_id"], **deepcopy(prediction)}
+            review.setdefault("review_status", "pending")
+            for field in ("reviewed_by", "reviewed_at", "override_reason", "override_label"):
+                review.setdefault(field, None)
+            reviews.append(review)
     confidences: list[float] = []
     low_confidence_items: list[dict[str, Any]] = []
     for record in records.values():
@@ -240,9 +260,17 @@ def aggregate_vision_sample(
             "image_ids": list(records),
             "total_fruits": total,
             "oleocellosis_count": affected,
+            "confirmed_oleocellosis_count": affected,
+            "raw_oleocellosis_count": raw_affected,
+            "suspected_oleocellosis_count": raw_affected,
+            "pending_review_count": pending,
+            "rejected_oleocellosis_count": rejected,
+            "review_completed": pending == 0,
+            "vision_review": reviews,
             # Conservar precisión hasta aplicar las reglas. Solo la interfaz y
             # el reporte deben redondear para presentación.
             "oleocellosis_pct": 100.0 * affected / total if total else 0.0,
+            "raw_oleocellosis_pct": 100.0 * raw_affected / total if total else 0.0,
             "mean_confidence": math.fsum(confidences) / len(confidences) if confidences else None,
             "low_confidence_threshold": threshold,
             "low_confidence_count": len(low_confidence_items),

@@ -5,10 +5,10 @@ La persistencia de la captura y del reporte corresponde a IndexedDB en bridge.js
 """
 
 import base64
+import json
 from copy import deepcopy
 from datetime import datetime
 from importlib.resources import files
-import json
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
@@ -22,16 +22,16 @@ from smartfruit.inspection import (
     QC_SUMMARY_FIELDS,
     RULE_COVERAGE,
 )
-from smartfruit.qc_report import export_qc_xlsx
 from smartfruit.print_report import render_qc_print
+from smartfruit.qc_report import export_qc_xlsx
 from smartfruit.reception import (
     load_reception_manifest,
     manifest_summary,
     resolve_reception,
     resolve_reception_lot,
 )
+from smartfruit.vision_validation import build_adjudicated_dataset, calculate_vision_metrics
 from smartfruit.workflow import evaluate_inspection
-
 
 JSON_TYPE = "application/json"
 XLSX_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -56,6 +56,15 @@ def _payload(body_json):
 
 
 def _dispatch(method, path, body_json, report_id):
+    if path == "/api/vision/validation":
+        if method != "POST":
+            return _envelope({"detail": "Método no permitido."}, status=405)
+        payload = _payload(body_json)
+        records, adjudications = payload.get("vision_records"), payload.get("adjudications", [])
+        if not isinstance(records, list) or not isinstance(adjudications, list):
+            raise ValueError("Proporcionar vision_records y adjudications como listas.")
+        dataset = build_adjudicated_dataset(records, adjudications)
+        return _envelope({"dataset": dataset, "metrics": calculate_vision_metrics(dataset)})
     if path == "/api/inspection/additional-review/preview":
         if method != "POST":
             return _envelope({"detail": "Método no permitido."}, status=405)

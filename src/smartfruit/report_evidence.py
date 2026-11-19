@@ -109,6 +109,10 @@ def attach_report_evidence(report, payload, resolver: ImageResolver | None = Non
                 positive_fruits += len(positives)
                 scene_photos = {}
                 for index in positives:
+                    prediction = record["fruit_predictions"][index]
+                    audit = {"detection_index": index + 1,
+                             "review_status": prediction.get("review_status", "pending"),
+                             "override_label": prediction.get("override_label")}
                     source = resolver(record, index, context) if resolver is not None else None
                     attachment = _image_attachment(source, record, index)
                     if attachment is None:
@@ -118,6 +122,7 @@ def attach_report_evidence(report, payload, resolver: ImageResolver | None = Non
                         existing = scene_photos.get(digest)
                         if existing is not None:
                             existing["affected_fruits"] += 1
+                            existing["vision_reviews"].append(audit)
                             attached_fruits += 1
                             continue
                     opaque_id = hashlib.sha256(
@@ -129,10 +134,11 @@ def attach_report_evidence(report, payload, resolver: ImageResolver | None = Non
                         "sample_box_id": box_id,
                         "defect": "oleocellosis",
                         "affected_fruits": 1,
+                        "vision_reviews": [audit],
                         "caption": (
-                            "Fruto con oleocelosis detectada por Vision."
+                            "Sospecha de oleocelosis de Vision; ver revisión QC."
                             if attachment["view"] == "fruit_crop" else
-                            "Foto de grupo con oleocelosis detectada; puede incluir frutos sanos."
+                            "Foto grupal con sospechas de Vision; ver revisión QC."
                         ),
                         **attachment,
                     }
@@ -151,11 +157,11 @@ def attach_report_evidence(report, payload, resolver: ImageResolver | None = Non
             "attached_fruits": attached_fruits, "attached_photos": len(photos),
             "unavailable_fruits": unavailable,
             "message": (
-                "No se detectó oleocelosis en esta muestra." if status == "no_defects" else
-                "No hay fotografías disponibles para adjuntar de los frutos con oleocelosis."
+                "Vision no indicó sospechas de oleocelosis." if status == "no_defects" else
+                "No hay fotografías disponibles de las sospechas de Vision."
                 if status == "unavailable" else
                 "Parte de la evidencia fotográfica no está disponible."
-                if status == "partial" else "Evidencia fotográfica de oleocelosis adjunta."
+                if status == "partial" else "Evidencia de Vision adjunta con revisión QC."
             ),
         }
     return result

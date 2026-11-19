@@ -165,6 +165,6 @@ test("finishing and reopening the additional box controls whether it can be adde
 test("an unfinished additional box cannot be sent for pallet accumulation",async()=>{
   const context=vm.createContext({ensureCurrent(){}});
   vm.runInContext(source("applyAdditionalReview"),context);
-  const sample={inspectorChoice:"EXPAND",pendingAdditional:{boxInspection:{status:"capturing",coverage_confirmed:false}}};
+  const sample={inspectorChoice:"EXTEND",pendingAdditional:{boxInspection:{status:"capturing",coverage_confirmed:false}}};
   await assert.rejects(context.applyAdditionalReview(sample),/Finaliza la inspección de la caja adicional/);
 });

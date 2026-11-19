@@ -6,6 +6,7 @@ from copy import deepcopy
 from pathlib import Path
 
 import pytest
+from review_helpers import confirm_vision_record, confirm_vision_records
 
 from smartfruit.vision import aggregate_vision_sample, load_vision_json, validate_vision_record
 
@@ -13,7 +14,7 @@ EXAMPLES = Path(__file__).resolve().parents[1] / "examples" / "vision"
 
 
 def record(image_id="IMG_A", total=2, affected=1, confidence=0.9):
-    return {
+    return confirm_vision_record({
         "image_id": image_id,
         "partition": "test",
         "total_fruits": total,
@@ -29,12 +30,12 @@ def record(image_id="IMG_A", total=2, affected=1, confidence=0.9):
             }
             for i in range(total)
         ],
-    }
+    })
 
 
 def test_real_demo_and_duplicate_do_not_inflate_counts():
     paths = [EXAMPLES / f"IMG_{i}.json" for i in (6426, 6427, 6428)]
-    result = aggregate_vision_sample(paths + [paths[0]], "SAMPLE_DEMO_001")
+    result = aggregate_vision_sample(confirm_vision_records(paths + [paths[0]]), "SAMPLE_DEMO_001")
     summary = result["vision_summary"]
     assert summary["images_processed"] == 3
     assert summary["image_ids"] == ["IMG_6426", "IMG_6427", "IMG_6428"]

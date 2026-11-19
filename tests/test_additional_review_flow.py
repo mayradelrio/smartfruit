@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
+from review_helpers import confirm_vision_records
 
 from smartfruit.app import create_app
 from smartfruit.inspection import MANUAL_DEFECTS
@@ -30,6 +31,7 @@ def browser(path, payload):
 def capture():
     records = [json.loads((ROOT / f"examples/vision/IMG_{number}.json").read_text())
                for number in (6426, 6427, 6428)]
+    records = confirm_vision_records(records)
     return {
         "qc_header": {"lot_id": "TEST-LOT", "inspection_date": "2026-11-15", "Level_Flag": 2},
         "reason_source": "defect_summary",
@@ -37,7 +39,7 @@ def capture():
             "sample_id": f"S{index + 1}", "pallet_id": f"P{index + 1}",
             "vision_records": [record], "vision_covers_sample": True,
             "qc_fields": {"pallet_id": f"P{index + 1}", **manual(scars=index + 1)},
-            "review_choice": "EXPAND" if index == 0 else "ESCALATE",
+            "review_choice": "EXTEND" if index == 0 else "STANDARD",
         } for index, record in enumerate(records[:2])],
     }, records[2]
 
@@ -67,39 +69,32 @@ def test_preview_apply_repeat_and_confirm_keep_one_pallet_with_review_history(ca
         total = original["samples"][0]["vision_records"][0]["total_fruits"] + extra["total_fruits"]
         assert target["qc_fields"]["sample_count"] == total
         assert target["qc_fields"]["scars"] == 4
-        assert target["review_choice"] == ""
+        assert target["review_choice"] == "COMPLETE"
         assert current["samples"][1] == original["samples"][1]
         assert len(target["review_history"]["additional"]) == 1
 
-        # The preview accepts another box through the dedicated route after history exists.
+        # A third physical box is refused without modifying the existing capture.
         third = deepcopy(extra)
         third["image_id"] = "TEST-THIRD-BOX"
         again = {**current, "sample_id": "S1", "vision_records": [third]}
         assert client.post("/api/vision/import", json=again).status_code == 422
-        assert client.post("/api/inspection/additional-review/preview", json=again).status_code == 200
-        current["samples"][0]["review_choice"] = "EXPAND"
-        request = {
-            **current, "sample_id": "S1", "inspector_decision": "EXPAND",
+        rejected = client.post("/api/inspection/additional-review", json={
+            **current, "sample_id": "S1", "inspector_decision": "EXTEND",
             "additional_review": {"vision_records": [third], "manual_defects": manual()},
-        }
-        applied = client.post("/api/inspection/additional-review", json=request)
-        assert applied.status_code == 200, applied.text
-        current = applied.json()["capture"]
-        assert len(current["samples"][0]["review_history"]["additional"]) == 2
-        assert current["samples"][0]["qc_fields"]["sample_count"] == total + third["total_fruits"]
-        report = applied.json()["report"]
-        assert report["qc_header"]["reason"] == report["generated_reason"]
+        })
+        assert rejected.status_code == 422
+        assert "2 cajas" in rejected.json()["detail"]
 
         saved = client.post("/api/finalize", json={
             **current, "confirmed": True, "inspector_name": "Inspector TEST",
-            "final_decisions": {"S1": "STANDARD", "S2": "ESCALATE"},
+            "final_decisions": {"S1": "COMPLETE", "S2": "STANDARD"},
         })
         assert saved.status_code == 200, saved.text
         downloads = saved.json()["downloads"]
         record = client.get(downloads["json"]).json()
         assert record["samples"][0]["review_history"] == current["samples"][0]["review_history"]
-        assert record["samples"][0]["inspector_final_decision"] == "STANDARD"
-        assert record["samples"][1]["inspector_final_decision"] == "ESCALATE"
+        assert record["samples"][0]["inspector_final_decision"] == "COMPLETE"
+        assert record["samples"][1]["inspector_final_decision"] == "STANDARD"
         assert client.get(downloads["print"]).status_code == 200
         assert client.get(downloads["xlsx"]).status_code == 200
 

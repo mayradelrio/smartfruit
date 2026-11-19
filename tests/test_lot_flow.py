@@ -12,6 +12,7 @@ from pathlib import Path
 import openpyxl
 import pytest
 from fastapi.testclient import TestClient
+from review_helpers import confirm_vision_records
 
 from smartfruit.app import create_app
 from smartfruit.image_binding import validate_vision_import
@@ -40,7 +41,7 @@ def capture():
             {
                 "sample_id": f"TEST-SAMPLE-{index}",
                 "pallet_id": pallet["pallet_id"],
-                "vision_records": [record],
+                "vision_records": confirm_vision_records([record]),
                 "vision_covers_sample": True,
                 "qc_fields": {
                     **pallet["qc_fields"],
@@ -116,7 +117,7 @@ def test_import_assigns_different_original_images_to_different_pallets(capture):
     original = deepcopy(capture)
     for sample in capture["samples"]:
         result = validate_vision_import(
-            {**capture, "sample_id": sample["sample_id"], "vision_records": []}
+            {**capture, "sample_id": sample["sample_id"], "vision_records": confirm_vision_records([])}
         )
         sample["image_bindings"] = result["image_bindings"]
     report = evaluate_inspection(capture)
@@ -151,7 +152,7 @@ def test_lot_roster_cannot_lose_or_mix_pallets_at_import_or_evaluation(capture, 
         evaluate_inspection(capture)
     with pytest.raises(ValueError):
         validate_vision_import(
-            {**capture, "sample_id": capture["samples"][0]["sample_id"], "vision_records": []}
+            {**capture, "sample_id": capture["samples"][0]["sample_id"], "vision_records": confirm_vision_records([])}
         )
     assert capture == before
 

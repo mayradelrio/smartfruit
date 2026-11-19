@@ -40,7 +40,12 @@ def evidence_caption(sample, photo, number):
     parts = [f"Paleta {pallet}" if pallet else "Paleta sin identificar"]
     if photo.get("sample_box_id"):
         parts.append(f"Caja {photo['sample_box_id']}")
-    parts.append("Oleocelosis")
+    reviews = photo.get("vision_reviews") or []
+    parts.append("Oleocelosis · sospecha Vision" if reviews else "Oleocelosis")
+    if reviews:
+        confirmed = sum(review.get("review_status") == "confirmed" for review in reviews)
+        rejected = sum(review.get("review_status") == "rejected" for review in reviews)
+        parts.append(f"QC: {confirmed} confirmadas, {rejected} rechazadas")
     parts.append("Fruto observado" if photo.get("view") == "fruit_crop" else "Grupo con detección")
     parts.append(f"Fotografía {number}")
     return " · ".join(parts)

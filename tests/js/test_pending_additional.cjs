@@ -28,7 +28,7 @@ function setup(extra=[]){
   const byName=new Map(),byId=name=>{if(!byName.has(name))byName.set(name,new Node());return byName.get(name);};
   const state={samples:[],revision:1,report:{approved:false},payload:{},evaluatedRevision:1,workflowStep:4,demoMode:true,reasonSource:"defect_summary"};
   const calls={capture:0,status:[]},headerControls={lot_id:{value:"LOT"}},summaryControls={};
-  const sample={serial:1,id:{value:"S1"},controls:{pallet_id:{value:"P1"}},records:[{image_id:"INITIAL",total_fruits:150,oleocellosis_count:0}],imageBindings:[],observations:{value:"Initial notes"},inspectorChoice:"EXPAND",
+  const sample={serial:1,id:{value:"S1"},controls:{pallet_id:{value:"P1"}},records:[{image_id:"INITIAL",total_fruits:150,oleocellosis_count:0}],imageBindings:[],observations:{value:"Initial notes"},inspectorChoice:"EXTEND",
     boxInspection:{sample_box_id:"BOX_001",status:"completed",coverage_confirmed:true,manifest_record_index:null},
     pendingAdditional:{visionRecords:[{image_id:"EXTRA_1",total_fruits:12,oleocellosis_count:1,confirmed:"raw Vision metadata"},{image_id:"EXTRA_2",total_fruits:11,oleocellosis_count:2}],boxInspection:{sample_box_id:"BOX_002",status:"completed",coverage_confirmed:true,manifest_record_index:null},summary:{images_processed:2,total_fruits:23,oleocellosis_count:3,oleocellosis_pct:300/23},context:{lot_id:"LOT",pallet_id:"P1",sample_id:"S1"}},
     additionalControls:Object.fromEntries(keys.map(key=>[key,{value:key==="decay"?"1":""}])),additionalObservations:{value:"Second box still pending"},additionalBody:new Node(),

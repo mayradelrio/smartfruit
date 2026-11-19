@@ -111,11 +111,11 @@ def test_unknown_rule_is_rejected():
     "values,expected,level,reasons",
     [
         ({}, "STANDARD", 1, ["Los ocho defectos con regla disponible se encuentran en Nivel 1."]),
-        ({"oleocellosis_pct": 8.3333}, "EXPAND", 2, ["Oleocelosis"]),
-        ({"oleocellosis_pct": 8, "mold_pct": 1.5}, "ESCALATE", 3, ["Moho"]),
+        ({"oleocellosis_pct": 8.3333}, "EXTEND", 2, ["Oleocelosis"]),
+        ({"oleocellosis_pct": 8, "mold_pct": 1.5}, "EXTEND", 3, ["Moho"]),
         (
             {"scars_pct": 21, "decay_pct": 2},
-            "ESCALATE",
+            "EXTEND",
             3,
             ["Cicatrices / defectos de piel", "Pudrición"],
         ),
@@ -203,4 +203,6 @@ def test_evaluation_matches_legacy_except_standard_explanation(legacy_rules, pol
         actual = evaluate_business_severity(record, policy)
         if expected["business_severity"]["business_max_level"] == 1:
             expected["business_severity"]["reasons"] = actual["business_severity"]["reasons"]
+        expected["business_severity"]["recommendation"] = "STANDARD" if expected["business_severity"]["business_max_level"] == 1 else "EXTEND"
+        expected["business_severity"]["rules_engine_version"] = "2.0.0"
         assert actual == expected

@@ -13,6 +13,7 @@ from pathlib import Path
 import openpyxl
 import pytest
 from fastapi.testclient import TestClient
+from review_helpers import confirm_vision_records
 
 from smartfruit.app import create_app
 from smartfruit.image_binding import validate_vision_import
@@ -48,10 +49,10 @@ HUMAN_SUMMARY = {
 
 @pytest.fixture
 def original_records():
-    return [
+    return confirm_vision_records([
         json.loads((ROOT / "examples" / "vision" / f"IMG_{image}.json").read_text("utf-8"))
         for image in (6426, 6427, 6428)
-    ]
+    ])
 
 
 @pytest.fixture
@@ -63,11 +64,11 @@ def import_payload(original_records):
             {
                 "sample_id": "SAMPLE_DEMO_001",
                 "pallet_id": "PALLET_DEMO_01",
-                "vision_records": [],
+                "vision_records": confirm_vision_records([]),
             }
         ],
         "sample_id": "SAMPLE_DEMO_001",
-        "vision_records": original_records,
+        "vision_records": confirm_vision_records(original_records),
     }
 
 
@@ -105,7 +106,7 @@ def _capture(import_result):
             {
                 "sample_id": "SAMPLE_DEMO_001",
                 "pallet_id": "PALLET_DEMO_01",
-                "vision_records": import_result["vision_records"],
+                "vision_records": confirm_vision_records(import_result["vision_records"]),
                 "image_bindings": import_result["image_bindings"],
                 "vision_covers_sample": True,
                 "qc_fields": {
@@ -208,7 +209,7 @@ def test_same_photo_cannot_be_imported_to_another_sample_even_on_same_pallet(
         {
             "sample_id": "OTHER_SAMPLE",
             "pallet_id": "PALLET_DEMO_01" if same_pallet else "OTHER_PALLET",
-            "vision_records": [deepcopy(original_records[0])],
+            "vision_records": confirm_vision_records([deepcopy(original_records[0])]),
         }
     )
     before = deepcopy(import_payload)
@@ -301,7 +302,7 @@ def test_bindings_and_human_qc_summary_survive_final_json_and_excel_totals(
     report = body["report"]
     sample = report["samples"][0]
     assert sample["image_bindings"] == imported["image_bindings"]
-    assert sample["final_recommendation"] == "EXPAND"
+    assert sample["final_recommendation"] == "EXTEND"
     assert sample["inspector_final_decision"] == "STANDARD"
     assert report["qc_summary"] == HUMAN_SUMMARY
     assert report["qc_header"]["Level_Flag"] == 1
@@ -326,14 +327,14 @@ def test_bindings_and_human_qc_summary_survive_final_json_and_excel_totals(
 
 
 def test_optional_fields_do_not_change_legacy_capture_when_absent(client, original_records):
-    capture = _capture({"vision_records": original_records, "image_bindings": []})
+    capture = _capture({"vision_records": confirm_vision_records(original_records), "image_bindings": []})
     del capture["samples"][0]["image_bindings"]
     response = client.post("/api/evaluate", json=capture)
     assert response.status_code == 200
     report = response.json()
     assert "qc_summary" not in report
     assert "image_bindings" not in report["samples"][0]
-    assert report["samples"][0]["final_recommendation"] == "EXPAND"
+    assert report["samples"][0]["final_recommendation"] == "EXTEND"
 
 
 @pytest.mark.parametrize("invalid", [None, True, [], "not a summary", 10])

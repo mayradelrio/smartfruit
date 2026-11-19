@@ -54,7 +54,7 @@ function source(name){
 
 test("mounting Vision uses the box's remaining fruit count and reserves pools from every other box",()=>{
   const configs=[],calls={draft:0};
-  const sample={id:{value:"S1"},controls:{pallet_id:{value:"P1"}},records:[{image_id:"INITIAL_USED",total_fruits:50}],inspectorChoice:"EXPAND",
+  const sample={id:{value:"S1"},controls:{pallet_id:{value:"P1"}},records:[{image_id:"INITIAL_USED",total_fruits:50}],inspectorChoice:"EXTEND",
     reception:{records:[{expected_count_per_box:"150",size_declared:"150"}]},boxInspection:{manifest_record_index:null},
     photoPools:{initial:{context_key:"INITIAL",target_count:100,photo_ids:["INITIAL_RESERVED"]},additional:{context_key:"ADDITIONAL",target_count:130,photo_ids:["ADDITIONAL_RESERVED"]}},
     pendingAdditional:{visionRecords:[{image_id:"EXTRA_USED",total_fruits:20}],boxInspection:{manifest_record_index:null}},additionalCaptureMemory:{selected:new Set(["OTHER_SELECTION"])},

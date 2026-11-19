@@ -3,7 +3,10 @@
 from copy import deepcopy
 from datetime import datetime, timezone
 
-RECOMMENDATIONS = ("STANDARD", "EXPAND", "ESCALATE")
+from .business_rules import RULES_ENGINE_VERSION
+from .defect_dominance import DEFECT_DOMINANCE, DOMINANCE_METADATA
+
+RECOMMENDATIONS = ("STANDARD", "EXTEND", "COMPLETE")
 
 
 def build_final_report(record):
@@ -18,13 +21,15 @@ def build_final_report(record):
         "defects": deepcopy(record["defects"]),
         "business_severity": deepcopy(severity),
         "predictive": deepcopy(record["predictive"]),
-        "final_recommendation": severity["recommendation"],
+        "final_recommendation": "COMPLETE" if record.get("review_history") else severity["recommendation"],
         "recommendation_reasons": list(severity["reasons"]),
         "human_confirmation_required": True,
         "inspector_final_decision": None,
         "inspector_confirmed": False,
         "observations": record.get("observations", ""),
         "rule_coverage": deepcopy(record["rule_coverage"]),
+        "rules_engine_version": RULES_ENGINE_VERSION,
+        "defect_dominance": {**deepcopy(DOMINANCE_METADATA), "priority": list(DEFECT_DOMINANCE)},
     }
     if "reception" in record:
         report["reception"] = deepcopy(record["reception"])
@@ -34,7 +39,7 @@ def build_final_report(record):
         report["review_history"] = deepcopy(record["review_history"])
     if "review_choice" in record:
         report["review_choice"] = record["review_choice"]
-    for key in ("box_inspection", "box_inspections"):
+    for key in ("box_inspection", "box_inspections", "inspection_status", "skip_reason", "selected_at", "completed_at"):
         if key in record:
             report[key] = deepcopy(record[key])
     return report
@@ -50,9 +55,21 @@ def confirm_inspection(report, inspector_name, decisions, confirmed=False):
     ids = {sample["sample_id"] for sample in report["samples"]}
     if not isinstance(decisions, dict) or set(decisions) != ids:
         raise ValueError("Registrar la decisión final del inspector para cada muestra.")
-    decisions = {key: "EXPAND" if value == "EXTEND" else value for key, value in decisions.items()}
+    decisions = {key: "EXTEND" if value == "EXPAND" else value for key, value in decisions.items()}
     if any(value not in RECOMMENDATIONS for value in decisions.values()):
-        raise ValueError("La decisión final debe ser STANDARD, EXPAND o ESCALATE.")
+        raise ValueError("La decisión debe ser STANDARD o EXTEND; la segunda caja queda COMPLETE.")
+    for pallet in report.get("lot_reception", {}).get("pallets", []):
+        if pallet["inspection_status"] not in ("COMPLETED", "SKIPPED"):
+            raise ValueError("Completar u omitir las paletas pendientes antes de confirmar el reporte.")
+    for sample in report["samples"]:
+        choice = decisions[sample["sample_id"]]
+        second_box = bool(sample.get("review_history", {}).get("additional"))
+        if second_box and choice != "COMPLETE":
+            raise ValueError("La segunda caja cierra la inspección con COMPLETE.")
+        if not second_box and choice == "COMPLETE":
+            raise ValueError("COMPLETE requiere haber completado la segunda caja.")
+        if choice == "EXTEND":
+            raise ValueError("Completar la segunda caja antes de confirmar una ampliación EXTEND.")
     result = deepcopy(report)
     result["inspector_name"] = inspector_name.strip()
     result["inspector_confirmed"] = True

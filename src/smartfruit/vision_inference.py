@@ -31,6 +31,7 @@ PIPELINE = "resnet18_individual_fruit_or_yolo_boxes_resnet18"
 DEFAULT_BATCH_SIZE = 32
 MAX_BATCH_SIZE = 128
 _INFERENCE_LOCK = threading.RLock()
+_PROGRESS_STATE = threading.local()
 
 
 def _model_dir(models_dir: str | Path | None) -> Path:
@@ -253,6 +254,7 @@ def _infer_crop_batch(
 
     models = _model_dir(models_dir)
     with _INFERENCE_LOCK:
+        _publish_phase("LOADING_MODEL")
         model, transform, class_to_idx = _load_classifier(
             _signature(models / CLASSIFIER_FILENAME)
         )
@@ -264,6 +266,7 @@ def _infer_crop_batch(
                 sizes.append((image.width, image.height))
             finally:
                 image.close()
+        _publish_phase("CLASSIFYING")
         with torch.inference_mode():
             probabilities = torch.softmax(model(torch.stack(tensors)), dim=1).cpu().tolist()
         if len(probabilities) != len(prepared):
@@ -303,6 +306,7 @@ def infer_image(
 
     models = _model_dir(models_dir)
     with _INFERENCE_LOCK:
+        _publish_phase("LOADING_MODEL")
         model, transform, class_to_idx = _load_classifier(
             _signature(models / CLASSIFIER_FILENAME)
         )
@@ -312,6 +316,7 @@ def infer_image(
             regions.append((0, 0, image.width, image.height))
         else:
             detector = _load_detector(_signature(models / DETECTOR_FILENAME))
+            _publish_phase("DETECTING")
             detected = detector.predict(
                 source=image, imgsz=640, conf=0.25, agnostic_nms=True,
                 device="cpu", verbose=False, save=False,
@@ -326,6 +331,7 @@ def infer_image(
                     if region[2] > region[0] and region[3] > region[1]:
                         regions.append(region)
                         detector_confidences.append(float(box.conf.item()))
+        _publish_phase("CLASSIFYING", len(regions))
         probabilities: list[list[float]] = []
         with torch.inference_mode():
             for start in range(0, len(regions), 32):
@@ -350,10 +356,31 @@ def _atomic_json(path: Path, content: Any) -> None:
     write_json_atomic(path, content)
 
 
-def _write_progress(path: Path | None, completed: int, total: int) -> None:
+def _publish_phase(phase: str, detected_fruits: int | None = None) -> None:
+    state = getattr(_PROGRESS_STATE, "value", None)
+    if state is None:
+        return
+    state["phase"] = phase
+    if detected_fruits is not None:
+        state["detected_fruits"] = state.get("previous_fruits", 0) + detected_fruits
+    path = state.get("path")
     if path is not None:
         try:
-            _atomic_json(path, {"completed": completed, "total": total})
+            _atomic_json(path, {k: v for k, v in state.items()
+                                if k not in ("path", "previous_fruits")})
+        except OSError:
+            pass
+
+
+def _write_progress(path: Path | None, completed: int, total: int) -> None:
+    state = getattr(_PROGRESS_STATE, "value", None)
+    values = {"completed": completed, "total": total}
+    if state is not None:
+        state.update(values)
+        values.update({key: state[key] for key in ("phase", "detected_fruits") if key in state})
+    if path is not None:
+        try:
+            _atomic_json(path, values)
         except OSError:
             # El progreso es telemetría: un bloqueo del lector/sincronizador no
             # debe descartar las predicciones ni impedir guardar el resultado.
@@ -361,6 +388,18 @@ def _write_progress(path: Path | None, completed: int, total: int) -> None:
 
 
 def run_request(request: Mapping[str, Any]) -> dict[str, Any]:
+    previous = getattr(_PROGRESS_STATE, "value", None)
+    _PROGRESS_STATE.value = {
+        "path": Path(request["progress_path"]) if request.get("progress_path") else None,
+        "phase": "LOADING_MODEL", "completed": 0, "total": len(request.get("images") or []),
+    }
+    try:
+        return _run_request(request)
+    finally:
+        _PROGRESS_STATE.value = previous
+
+
+def _run_request(request: Mapping[str, Any]) -> dict[str, Any]:
     images = request.get("images")
     if not isinstance(images, list) or not images:
         raise ValueError("La solicitud debe incluir una lista de imágenes")
@@ -381,6 +420,8 @@ def run_request(request: Mapping[str, Any]) -> dict[str, Any]:
     _write_progress(progress_path, 0, len(images))
     index = 0
     while index < len(normalized):
+        state = _PROGRESS_STATE.value
+        state["previous_fruits"] = sum(record["total_fruits"] for record in records)
         item = normalized[index]
         if item["input_kind"] == "fruit_crop":
             end = index + 1
@@ -395,6 +436,7 @@ def run_request(request: Mapping[str, Any]) -> dict[str, Any]:
                 input_kind=item["input_kind"], models_dir=request.get("models_dir"),
             ))
             index += 1
+        state["detected_fruits"] = sum(record["total_fruits"] for record in records)
         _write_progress(progress_path, len(records), len(images))
     return {"records": records, "pipeline": PIPELINE}
 

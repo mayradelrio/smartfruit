@@ -102,3 +102,11 @@ test('Reason identifies the defect summary only when it has a computed value and
   assert.equal(item.source,source);assert.equal(item.state,state);assert.deepEqual(value,before);
  }
 });
+
+test('skipped pallets have no QC measurement requirements or fabricated registered defects',()=>{
+ const value=capture();
+ value.samples.push({sample_id:'SKIPPED',pallet_id:'P2',inspection_status:'SKIPPED',skip_reason:'Muestreo QC'});
+ const result=describe(value,config),baseline=describe(capture(),config);
+ assert.equal(result.pending_count,baseline.pending_count);
+ assert.deepEqual(result.samples.find(sample=>sample.sample_id==='SKIPPED').fields,[]);
+});

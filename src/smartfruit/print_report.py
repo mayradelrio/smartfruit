@@ -17,7 +17,7 @@ from .evidence_display import evidence_caption, evidence_notice, evidence_photos
 from .inspection import QC_COLUMNS
 
 _NS = {"s": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
-_DECISIONS = {"STANDARD", "EXPAND", "ESCALATE"}
+_DECISIONS = {"STANDARD", "EXTEND", "COMPLETE", "EXPAND", "ESCALATE"}
 _SUMMARY_COLUMNS = {
     0: "label_brand",
     3: "packing_date",
@@ -340,6 +340,12 @@ def _smartfruit(report, totals, confirmed):
             pass
     result.append(_entry("Confirmación del reporte", timestamp))
     result.append(_entry("Observaciones", report.get("observations")))
+    for pallet in (report.get("lot_reception") or {}).get("pallets", []):
+        state = pallet.get("inspection_status", "PENDING")
+        value = "No inspeccionada · SKIPPED" if state == "SKIPPED" else state
+        if pallet.get("skip_reason"):
+            value += " · " + pallet["skip_reason"]
+        result.append(_entry(f"Paleta {pallet.get('pallet_id', '')}", value))
     result.append("</dl>")
     if report.get("lot_summary"):
         result.append('<section class="lot-summary"><h3>Resumen del lote</h3><dl>')
@@ -362,6 +368,9 @@ def _smartfruit(report, totals, confirmed):
         if sample.get("review_history") or sample.get("review_choice"):
             recommendation = _review_action(recommendation)
         result.append(_entry("Recomendación SmartFruit", recommendation))
+        result.append(_entry("Versión de reglas", sample.get("rules_engine_version")))
+        if sample.get("defect_dominance"):
+            result.append(_entry("Dominancia · procedencia", sample["defect_dominance"]))
         reasons = sample.get("recommendation_reasons", severity.get("reasons", []))
         result.append(_entry("Motivo", "; ".join(str(reason) for reason in reasons)))
         predictive = sample.get("predictive") or {}
@@ -388,9 +397,9 @@ def _smartfruit(report, totals, confirmed):
         result.append(_entry("Observaciones", sample.get("observations")))
         vision = sample.get("inspection_summary") or {}
         result.append(_entry("Frutos evaluados por Vision", _amount(vision.get("total_fruits"))))
-        result.append(_entry("Cantidad con oleocelosis", _amount(vision.get("oleocellosis_count"))))
+        result.append(_entry("Oleocelosis confirmada QC", _amount(vision.get("oleocellosis_count"))))
+        result.append(_entry("Sospechosos del modelo", _amount(vision.get("suspected_oleocellosis_count"))))
         result.append(_entry("Porcentaje de oleocelosis", _pct(vision.get("oleocellosis_pct"))))
-        result.append(_entry("Confianza media Vision", _amount(vision.get("mean_confidence"))))
         result.append(_entry(
             "Fotografías procesadas", vision.get("images_processed", len(vision.get("image_ids") or [])),
         ))
@@ -408,6 +417,23 @@ def _smartfruit(report, totals, confirmed):
             )
         )
         result.append("</dl>")
+        reviews = vision.get("vision_review") or []
+        if reviews:
+            result.append("<details><summary>Revisión QC de Vision</summary><table><thead><tr>"
+                          "<th>Imagen / fruto</th><th>Predicción original</th><th>Probabilidad</th>"
+                          "<th>Revisión</th><th>Corrección</th><th>Inspector / fecha</th>"
+                          "</tr></thead><tbody>")
+            for prediction in reviews:
+                result.append("<tr>" + "".join(f"<td>{_text(value)}</td>" for value in (
+                    f"{prediction.get('image_id', '')} / {prediction.get('crop_id', '')}",
+                    prediction.get("predicted_class"), prediction.get("oleocellosis_probability"),
+                    prediction.get("review_status"),
+                    " · ".join(str(prediction.get(key) or "")
+                               for key in ("override_label", "override_reason")),
+                    " · ".join(str(prediction.get(key) or "")
+                               for key in ("reviewed_by", "reviewed_at")),
+                )) + "</tr>")
+            result.append("</tbody></table></details>")
         result.append(_box_inspections(sample))
         result.append(_review_history(sample))
         result.append(_photo_evidence(sample))

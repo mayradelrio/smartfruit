@@ -6,6 +6,7 @@ from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
+from review_helpers import confirm_vision_records
 
 from smartfruit.decision import confirm_inspection
 from smartfruit.workflow import evaluate_inspection
@@ -46,7 +47,7 @@ def capture():
             {
                 "sample_id": "SAMPLE_DEMO_001",
                 "pallet_id": "PALLET_DEMO_01",
-                "vision_records": records,
+                "vision_records": confirm_vision_records(records),
                 "vision_covers_sample": True,
                 "qc_fields": {
                     **dict.fromkeys(MANUAL_COUNTS, 0),
@@ -72,7 +73,7 @@ def test_off_evaluates_real_vision_and_preserves_capture(capture):
     assert sample["inspection_summary"]["oleocellosis_pct"] == pytest.approx(100 * 3 / 36)
     assert sample["qc_fields"]["oleocellosis"] == 3
     assert sample["business_severity"]["business_max_level"] == 2
-    assert sample["final_recommendation"] == "EXPAND"
+    assert sample["final_recommendation"] == "EXTEND"
     assert "Oleocelosis" in sample["recommendation_reasons"]
     assert sample["predictive"]["enabled"] is False
     assert "predicted_loss_pct" not in sample["predictive"]
@@ -125,7 +126,7 @@ def test_repeated_photo_does_not_inflate_a_sample(capture):
     assert summary["oleocellosis_count"] == 3
     assert summary["images_processed"] == 3
     assert summary["duplicate_image_ids_ignored"] == ["IMG_6426"]
-    assert sample["final_recommendation"] == "EXPAND"
+    assert sample["final_recommendation"] == "EXTEND"
 
 
 def test_same_photo_cannot_be_assigned_to_two_samples(capture):
@@ -139,7 +140,7 @@ def test_same_photo_cannot_be_assigned_to_two_samples(capture):
 def test_manual_mold_overrides_lower_vision_severity_by_existing_rule(capture):
     capture["samples"][0]["qc_fields"]["mold"] = 1  # 2.78%, above the existing 1% rule.
     sample = evaluate_inspection(capture)["samples"][0]
-    assert sample["final_recommendation"] == "ESCALATE"
+    assert sample["final_recommendation"] == "EXTEND"
     assert sample["business_severity"]["business_max_level"] == 3
     assert sample["recommendation_reasons"] == ["Moho"]
 
@@ -189,8 +190,8 @@ def test_inspector_can_choose_standard_without_rewriting_recommendation(capture)
     sample = confirmed["samples"][0]
     assert sample["inspector_final_decision"] == "STANDARD"
     assert sample["inspector_confirmed"] is True
-    assert sample["final_recommendation"] == "EXPAND"
-    assert sample["business_severity"]["recommendation"] == "EXPAND"
+    assert sample["final_recommendation"] == "EXTEND"
+    assert sample["business_severity"]["recommendation"] == "EXTEND"
     assert draft["samples"][0]["inspector_final_decision"] is None
 
 
@@ -210,7 +211,7 @@ def test_every_distinct_sample_requires_its_own_final_decision(capture):
     report = confirm_inspection(
         draft,
         "Inspector",
-        {"SAMPLE_DEMO_001": "STANDARD", "SECOND_SAMPLE": "EXPAND"},
+        {"SAMPLE_DEMO_001": "STANDARD", "SECOND_SAMPLE": "STANDARD"},
         True,
     )
     assert all(sample["inspector_confirmed"] for sample in report["samples"])
@@ -219,7 +220,7 @@ def test_every_distinct_sample_requires_its_own_final_decision(capture):
 @pytest.mark.parametrize("provider", [None, Mock(side_effect=RuntimeError("provider failed"))])
 def test_predictive_on_missing_or_failing_never_blocks_rules(capture, provider):
     sample = evaluate_inspection(capture, use_predictive=True, provider=provider)["samples"][0]
-    assert sample["final_recommendation"] == "EXPAND"
+    assert sample["final_recommendation"] == "EXTEND"
     assert sample["predictive"]["enabled"] is True
     assert sample["predictive"]["experimental"] is True
     assert sample["predictive"]["status"] == "unavailable"
@@ -231,5 +232,5 @@ def test_predictive_signal_is_additional_and_does_not_change_recommendation(capt
     sample = evaluate_inspection(capture, use_predictive=True, provider=provider)["samples"][0]
     provider.assert_called_once()
     assert sample["predictive"]["predicted_loss_pct"] == 90.0
-    assert sample["final_recommendation"] == "EXPAND"
+    assert sample["final_recommendation"] == "EXTEND"
     assert sample["business_severity"]["business_max_level"] == 2

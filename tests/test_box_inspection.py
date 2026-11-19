@@ -10,6 +10,7 @@ from pathlib import Path
 import openpyxl
 import pytest
 from fastapi.testclient import TestClient
+from review_helpers import confirm_vision_record
 
 from smartfruit.additional_review import add_additional_review
 from smartfruit.app import create_app
@@ -20,7 +21,7 @@ from smartfruit.workflow import evaluate_inspection
 
 
 def vision(image_id, total=12, affected=0):
-    return {
+    return confirm_vision_record({
         "image_id": image_id,
         "partition": "test",
         "total_fruits": total,
@@ -36,7 +37,7 @@ def vision(image_id, total=12, affected=0):
             }
             for index in range(total)
         ],
-    }
+    })
 
 
 def manual():
@@ -206,11 +207,12 @@ def test_additional_boxes_compare_individually_and_preserve_pallet_accumulation(
     assert sample["box_inspection"] == first
     assert sample["review_history"]["initial"]["box_inspection"] == first
     assert sample["review_history"]["additional"][0]["box_inspection"] == second
-    again = add_additional_review(additional_request(
-        result["capture"], box_id="BOX_003", total=150, suffix="THIRD"
-    ))
-    assert again["report"]["samples"][0]["box_inspections"][-1]["count_difference"] == 0
-    assert again["report"]["samples"][0]["inspection_summary"]["total_fruits"] == 447
+    before = deepcopy(result["capture"])
+    with pytest.raises(ValueError, match="2 cajas"):
+        add_additional_review(additional_request(
+            result["capture"], box_id="BOX_003", total=150, suffix="THIRD"
+        ))
+    assert result["capture"] == before
 
 
 @pytest.mark.parametrize("change", ["duplicate_id", "unclosed", "missing_metadata"])
@@ -363,7 +365,7 @@ def test_second_box_count_metrics_survive_transport_finalization_and_saved_repor
     expanded = applied.json()["capture"]
     expanded.update(
         confirmed=True, inspector_name="Inspector TEST",
-        final_decisions={"SAMPLE_001": "EXPAND"},
+        final_decisions={"SAMPLE_001": "COMPLETE"},
     )
     finalized = client.post("/api/finalize", json=expanded)
     assert finalized.status_code == 200, finalized.text

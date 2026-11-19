@@ -57,7 +57,7 @@ QC_FIELDS = (
     "undersize",
 )
 
-_VALID_DECISIONS = {"STANDARD", "EXPAND", "ESCALATE"}
+_VALID_DECISIONS = {"STANDARD", "EXTEND", "COMPLETE", "EXPAND", "ESCALATE"}
 _XML_NS = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
 
 
@@ -518,6 +518,12 @@ def _render_smartfruit(sheet, row, report, confirmed):
         confirmed_at if confirmed else "Pendiente",
     )
     row = _line(sheet, row, "Observaciones", report.get("observations") or "")
+    for pallet in (report.get("lot_reception") or {}).get("pallets", []):
+        state = pallet.get("inspection_status", "PENDING")
+        value = "No inspeccionada · SKIPPED" if state == "SKIPPED" else state
+        if pallet.get("skip_reason"):
+            value += " · " + pallet["skip_reason"]
+        row = _line(sheet, row, f"Paleta {pallet.get('pallet_id', '')}", value)
     summary = report.get("lot_summary")
     if summary:
         row = _banner(sheet, row + 1, "Resumen del lote · cantidades registradas")
@@ -555,6 +561,11 @@ def _render_smartfruit(sheet, row, report, confirmed):
             f"· Condition: {severity.get('condition_max_level', 'Pendiente')}",
         )
         row = _line(sheet, row, "Recomendación SmartFruit", recommendation or "Pendiente")
+        if sample.get("rules_engine_version"):
+            row = _line(sheet, row, "Versión de reglas", sample["rules_engine_version"])
+        dominance = sample.get("defect_dominance") or {}
+        if dominance:
+            row = _line(sheet, row, "Dominancia · procedencia", str(dominance), height=42)
         reasons = sample.get("recommendation_reasons", severity.get("reasons", []))
         row = _line(sheet, row, "Motivo", "; ".join(str(x) for x in reasons), height=38)
         predictive = sample.get("predictive") or {}
@@ -596,9 +607,9 @@ def _render_smartfruit(sheet, row, report, confirmed):
             row,
             "Vision AI · Oleocellosis",
             f"Frutos evaluados: {_format_number(vision.get('total_fruits'), 0)}; "
-            f"cantidad con oleocelosis: {_format_number(vision.get('oleocellosis_count'), 0)}; "
-            f"porcentaje: {_format_number(vision.get('oleocellosis_pct'))} %; "
-            f"confianza media: {_format_number(vision.get('mean_confidence'), 6)}",
+            f"confirmados QC: {_format_number(vision.get('oleocellosis_count'), 0)}; "
+            f"sospechosos del modelo: {_format_number(vision.get('suspected_oleocellosis_count'), 0)}; "
+            f"porcentaje: {_format_number(vision.get('oleocellosis_pct'))} %",
             height=38,
         )
         row = _line(
@@ -635,6 +646,54 @@ def _render_smartfruit(sheet, row, report, confirmed):
         if sample.get("reception"):
             row = _render_reception(sheet, row, sample["reception"])
     return row
+
+
+def _render_vision_review(workbook, samples):
+    entries = [(sample, prediction) for sample in samples
+               for prediction in (sample.get("inspection_summary") or {}).get("vision_review", [])]
+    if not entries:
+        return
+    sheet = workbook.create_sheet("Vision QC")
+    columns = ("pallet_id", "sample_id", "image_id", "crop_id", "predicted_class",
+               "oleocellosis_probability", "confidence", "review_status", "reviewed_by",
+               "reviewed_at", "override_label", "override_reason")
+    sheet.append(columns)
+    for sample, prediction in entries:
+        values = {**prediction, "pallet_id": sample.get("pallet_id"),
+                  "sample_id": sample.get("sample_id")}
+        sheet.append([None] * len(columns))
+        for index, name in enumerate(columns, 1):
+            _write_value(sheet.cell(sheet.max_row, index), values.get(name))
+    sheet.freeze_panes = "A2"
+    sheet.auto_filter.ref = sheet.dimensions
+    for column in sheet.columns:
+        sheet.column_dimensions[column[0].column_letter].width = 24
+
+
+def _render_vision_validation(workbook, report):
+    validation = report.get("vision_validation") or {}
+    dataset = validation.get("dataset") or []
+    if not dataset:
+        return
+    sheet = workbook.create_sheet("Vision validation")
+    columns = ("image_id", "crop_id", "model_prediction", "model_probability", "qc_final_label",
+               "error_type", "notes", "reviewed_by", "reviewed_at")
+    sheet.append(columns)
+    for row in dataset:
+        sheet.append([None] * len(columns))
+        for index, key in enumerate(columns, 1):
+            _write_value(sheet.cell(sheet.max_row, index), row.get(key))
+    sheet.freeze_panes = "A2"
+    sheet.auto_filter.ref = sheet.dimensions
+    for column in sheet.columns:
+        sheet.column_dimensions[column[0].column_letter].width = 24
+    metrics = workbook.create_sheet("Vision metrics")
+    metrics.append(["Métrica", "Valor (solo detecciones adjudicadas)"])
+    for key, value in (validation.get("metrics") or {}).items():
+        metrics.append([key, None])
+        _write_value(metrics.cell(metrics.max_row, 2), str(value) if isinstance(value, dict) else value)
+    metrics.column_dimensions["A"].width = 32
+    metrics.column_dimensions["B"].width = 85
 
 
 def _render_evidence_sheet(workbook, samples):
@@ -766,6 +825,8 @@ def export_qc_xlsx(report: dict) -> bytes:
         raise ValueError("El resumen QC debe contener los campos del renglón de totales.")
     row = _render_qc_table(sheet, samples, cache, summary)
     final_row = _render_smartfruit(sheet, row, report, confirmed)
+    _render_vision_review(workbook, samples)
+    _render_vision_validation(workbook, report)
     _render_evidence_sheet(workbook, samples)
     sheet.freeze_panes = "J16"
     sheet.sheet_view.showGridLines = False

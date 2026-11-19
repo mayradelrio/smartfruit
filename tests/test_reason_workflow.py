@@ -10,6 +10,7 @@ from pathlib import Path
 import openpyxl
 import pytest
 from fastapi.testclient import TestClient
+from review_helpers import confirm_vision_records
 
 from smartfruit.app import create_app
 from smartfruit.decision import confirm_inspection
@@ -38,7 +39,7 @@ def capture():
         "samples": [{
             "sample_id": "SAMPLE_TEST",
             "pallet_id": "PALLET_TEST",
-            "vision_records": records,
+            "vision_records": confirm_vision_records(records),
             "vision_covers_sample": True,
             "qc_fields": {
                 **{field["key"]: 0 for field in MANUAL_DEFECTS},
@@ -68,7 +69,7 @@ def test_summary_reason_is_recomputed_from_counts_without_assigning_inspector_le
     assert first["qc_header"]["Level_Flag"] == ""
     assert first["qc_header"]["remarks"] == original["qc_header"]["remarks"]
     assert first["samples"][0]["inspector_final_decision"] is None
-    assert first["samples"][0]["final_recommendation"] == "EXPAND"
+    assert first["samples"][0]["final_recommendation"] == "EXTEND"
     capture["samples"][0]["qc_fields"]["scars"] = 4
     second = evaluate_inspection(capture)
     assert second["qc_header"]["reason"] == second["generated_reason"]
@@ -105,12 +106,12 @@ def test_invalid_reason_source_is_rejected_without_mutating_capture(capture, sou
 
 def test_inspector_can_decide_after_suggestion_without_overwriting_system_result(capture):
     evaluated = evaluate_inspection(capture)
-    assert evaluated["samples"][0]["final_recommendation"] == "EXPAND"
+    assert evaluated["samples"][0]["final_recommendation"] == "EXTEND"
     capture["qc_header"]["Level_Flag"] = 1
     reviewed = evaluate_inspection(capture)
     confirmed = confirm_inspection(reviewed, "Inspector TEST", {"SAMPLE_TEST": "STANDARD"}, True)
     assert confirmed["qc_header"]["Level_Flag"] == 1
-    assert confirmed["samples"][0]["final_recommendation"] == "EXPAND"
+    assert confirmed["samples"][0]["final_recommendation"] == "EXTEND"
     assert confirmed["samples"][0]["inspector_final_decision"] == "STANDARD"
     assert confirmed["qc_header"]["reason"] == confirmed["generated_reason"]
     assert evaluated["qc_header"]["Level_Flag"] == ""
@@ -155,7 +156,7 @@ def test_both_transports_export_and_confirm_the_current_summary_reason(capture, 
             assert report["reason_source"] == "defect_summary"
             assert report["qc_header"]["Level_Flag"] == 1
             assert report["samples"][0]["inspector_final_decision"] == "STANDARD"
-            assert report["samples"][0]["final_recommendation"] == "EXPAND"
+            assert report["samples"][0]["final_recommendation"] == "EXTEND"
         downloads = confirmed.json()["downloads"]
         saved = client.get(downloads["json"]).json()
         assert saved["qc_header"]["reason"] == expected

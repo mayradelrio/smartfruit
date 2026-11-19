@@ -63,7 +63,7 @@ test("polling rejects a ready result whose manifest identity changed",async()=>{
 test("initial and EXTEND confirmations use their existing import and additional-review validators",async()=>{
   const html=fs.readFileSync(path.join(__dirname,"../../src/smartfruit/web/index.html"),"utf8");
   const start=html.indexOf("  function mountVisionCapture("),end=html.indexOf("\n  function addSample(",start);
-  const sample={id:{value:"S1"},controls:{pallet_id:{value:"P1"}},records:[],inspectorChoice:"EXPAND"};
+  const sample={id:{value:"S1"},controls:{pallet_id:{value:"P1"}},records:[],inspectorChoice:"EXTEND"};
   const configs=[],calls=[];
   const sandbox=vm.createContext({state:{samples:[sample]},headerControls:{lot_id:{value:"LOT"}},request(){},
     element(){return {append(){}};},window:{SmartFruitVisionCapture:{create(options){configs.push(options);return {destroy(){},refresh(){}};}}},
@@ -101,7 +101,7 @@ test("the photo interface requires a separate confirmation after producing real 
     assert.equal(process.disabled,false);await process.listeners.click();
     assert.equal(confirmed.length,0);assert.equal(memory.job.status,"ready");
     assert.deepEqual(calls.find(call=>call.url==="/api/vision/jobs").payload.photo_ids,["1"]);
-    nodes=descendants(root);const confirm=nodes.find(node=>node.tagName==="BUTTON"&&node.textContent==="Confirmar resultados para esta paleta");
+    nodes=descendants(root);const confirm=nodes.find(node=>node.tagName==="BUTTON"&&node.textContent==="Incorporar fotos a la caja");
     assert.equal(confirm.disabled,false);await confirm.listeners.click();
     assert.deepEqual(confirmed,[[record]]);assert.equal(memory.job,null);assert.equal(memory.selected.size,0);
     widget.destroy();
@@ -138,7 +138,7 @@ test("whole-photo results label their affected fruits while showing the source p
 
 function componentFixture(options={}){
   class Node {
-    constructor(tag){this.tagName=tag.toUpperCase();this.children=[];this.listeners={};this.attributes={};this.className="";this.classList={add:name=>{this.className+=" "+name;}};}
+    constructor(tag){this.tagName=tag.toUpperCase();this.children=[];this.listeners={};this.attributes={};this.style={};this.className="";this.classList={add:name=>{this.className+=" "+name;}};}
     append(...nodes){this.children.push(...nodes);}
     replaceChildren(...nodes){this.children=[...nodes];}
     setAttribute(name,value){this.attributes[name]=value;}
@@ -169,6 +169,56 @@ function selectGroup(fixture,index=0){
   checkbox.checked=true;checkbox.listeners.change();
 }
 
+test("a submit shows queued feedback immediately and a double click starts only one request",async()=>{
+  let release,submissions=0;
+  const response=new Promise(resolve=>{release=resolve;});
+  const photos=[localPhoto("A","group.jpg")];
+  const fixture=componentFixture({photos,request:async url=>{
+    if(url==="/api/vision/photos")return {json:async()=>({photos,runtime:{available:true}})};
+    submissions++;await response;return {json:async()=>({job_id:"J",status:"ready",context,photos,records:[classified("A","group.jpg")]})};
+  }});
+  try{
+    await fixture.load();selectGroup(fixture);
+    const button=fixture.nodes().find(node=>node.textContent==="Procesar fotos de esta caja");
+    const processing=button.listeners.click();await button.listeners.click();
+    assert.equal(submissions,1);assert.equal(button.disabled,true);
+    assert.equal(fixture.nodes().some(node=>String(node.textContent).includes("En cola · 0 / 1 fotos")),true);
+    release();await processing;assert.equal(fixture.memory.job.status,"ready");
+  }finally{release();fixture.cleanup();}
+});
+
+test("a timeout is visible and an explicit retry can finish the same photo selection",async()=>{
+  const photos=[localPhoto("A","group.jpg")];let submissions=0;
+  const fixture=componentFixture({photos,request:async url=>({json:async()=>{
+    if(url==="/api/vision/photos")return {photos,runtime:{available:true}};
+    submissions++;return submissions===1?{job_id:"J",status:"failed",phase:"TIMEOUT",error_type:"timeout",error:"El worker no responde",context}:{job_id:"RETRY",status:"ready",context,photos,records:[classified("A","group.jpg")]};
+  }})});
+  try{
+    await fixture.load();selectGroup(fixture);
+    await fixture.nodes().find(node=>node.textContent==="Procesar fotos de esta caja").listeners.click();
+    assert.equal(fixture.nodes().some(node=>node.attributes?.["data-job-state"]==="TIMEOUT"),true);
+    assert.equal(fixture.nodes().some(node=>node.textContent==="Tiempo de espera agotado"),true);
+    const retry=fixture.nodes().find(node=>node.textContent==="Reintentar procesamiento");assert.equal(retry.disabled,false);
+    await retry.listeners.click();assert.equal(submissions,2);assert.equal(fixture.memory.job.status,"ready");
+  }finally{fixture.cleanup();}
+});
+
+test("the photo widget requires human adjudication before incorporating raw positives",async()=>{
+  const previous=global.SmartFruitVisionReview;global.SmartFruitVisionReview=require("../../src/smartfruit/web/vision_review.js");
+  const fixture=componentFixture();
+  try{
+    await fixture.load();selectGroup(fixture);
+    await fixture.nodes().find(node=>node.textContent==="Procesar fotos de esta caja").listeners.click();
+    const incorporate=fixture.nodes().find(node=>node.textContent==="Incorporar fotos a la caja");assert.equal(incorporate.disabled,true);
+    fixture.nodes().find(node=>node.placeholder==="Nombre del inspector").value="QC Test";
+    fixture.nodes().find(node=>node.textContent==="Confirmar oleocelosis").listeners.click();
+    assert.equal(incorporate.disabled,false);await incorporate.listeners.click();
+    assert.equal(fixture.confirmed.length,1);
+    assert.equal(fixture.confirmed[0][0].fruit_predictions[0].review_status,"confirmed");
+    assert.equal(fixture.confirmed[0][0].oleocellosis_count,1);
+  }finally{fixture.cleanup();global.SmartFruitVisionReview=previous;}
+});
+
 test("affected photos can be enlarged and remain visible after explicit confirmation",async()=>{
   const fixture=componentFixture();
   try{
@@ -182,10 +232,10 @@ test("affected photos can be enlarged and remain visible after explicit confirma
     const dialog=fixture.nodes().find(node=>node.className==="vision-image-dialog"),large=fixture.nodes().find(node=>node.className==="vision-image-large");
     assert.equal(dialog.open,true);assert.equal(dialog.hidden,false);assert.equal(large.src,"/api/vision/jobs/J/photos/A/image");
     fixture.nodes().find(node=>node.className==="quiet vision-image-close").listeners.click();assert.equal(dialog.hidden,true);assert.equal(enlarge.focused,true);
-    await fixture.nodes().find(node=>node.textContent==="Confirmar resultados para esta paleta").listeners.click();
+    await fixture.nodes().find(node=>node.textContent==="Incorporar fotos a la caja").listeners.click();
     assert.equal(fixture.confirmed.length,1);assert.equal(fixture.memory.job,null);assert.equal(fixture.memory.confirmedJob.status,"ready");
     assert.equal(fixture.nodes().filter(node=>node.className==="vision-positive-card").length,1);
-    assert.equal(fixture.nodes().some(node=>node.textContent==="Confirmar resultados para esta paleta"),false);
+    assert.equal(fixture.nodes().some(node=>node.textContent==="Incorporar fotos a la caja"),false);
     assert.equal(fixture.memory.selected.size,0);fixture.widget.refresh();assert.equal(fixture.memory.selected.size,0);
   }finally{fixture.cleanup();}
 });
@@ -244,10 +294,10 @@ test("several physical groups can be selected together without selecting the res
     selectGroup(fixture,0);selectGroup(fixture,1);
     assert.deepEqual([...fixture.memory.selected],["A","B","C"]);
     assert.equal(fixture.nodes().some(node=>node.textContent==="2 grupo(s) / toma(s) · 3 foto(s) seleccionada(s) en esta tanda."),true);
-    assert.equal(fixture.nodes().some(node=>String(node.textContent).includes("un mismo limón no debe aparecer en dos grupos")),true);
+    assert.equal(fixture.nodes().some(node=>String(node.textContent).includes("No repitas frutos entre las fotos")),true);
     await fixture.nodes().find(node=>node.textContent==="Procesar fotos de esta caja").listeners.click();
     assert.equal(fixture.confirmed.length,0);
-    assert.equal(fixture.nodes().some(node=>String(node.textContent).includes("Continúa con los grupos restantes")),true);
+    assert.equal(fixture.nodes().some(node=>String(node.textContent).includes("Resultados listos para revisión")),true);
   }finally{fixture.cleanup();}
 });
 
@@ -268,7 +318,7 @@ test("confirmed batches leave unused groups available for explicit continued cap
     for(const name of ["IMG_1","IMG_2"]){
       selectGroup(fixture,name);
       await fixture.nodes().find(node=>node.textContent==="Procesar fotos de esta caja").listeners.click();
-      await fixture.nodes().find(node=>node.textContent==="Confirmar resultados para esta paleta").listeners.click();
+      await fixture.nodes().find(node=>node.textContent==="Incorporar fotos a la caja").listeners.click();
       assert.equal(fixture.memory.selected.size,0);
       assert.equal(fixture.nodes().some(node=>node.className==="vision-group-label"&&node.children[1]?.children[0]?.textContent==="Grupo / toma "+name),false);
     }
@@ -358,7 +408,7 @@ test("confirming the prepared demo photos empties the selector when the box targ
     await fixture.load();fixture.nodes().find(node=>node.textContent==="Seleccionar fotos de esta caja").listeners.click();
     await fixture.nodes().find(node=>node.textContent==="Procesar fotos de esta caja").listeners.click();
     assert.equal(requests[0].length,3);assert.equal(records.length,0);
-    await fixture.nodes().find(node=>node.textContent==="Confirmar resultados para esta paleta").listeners.click();
+    await fixture.nodes().find(node=>node.textContent==="Incorporar fotos a la caja").listeners.click();
     assert.equal(records.length,3);assert.deepEqual(pool.photo_ids,[]);
     assert.equal(fixture.nodes().filter(node=>node.className==="vision-individual-photo").length,0);
     assert.equal(fixture.nodes().find(node=>node.textContent==="Seleccionar fotos de esta caja").disabled,true);

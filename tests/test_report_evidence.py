@@ -11,6 +11,7 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 from PIL import Image
+from review_helpers import confirm_vision_records
 
 from smartfruit.app import create_app
 from smartfruit.inspection import MANUAL_DEFECTS
@@ -39,7 +40,7 @@ def capture(records):
     return {
         "qc_header": {"lot_id": "LOT", "inspection_date": "2026-11-16"},
         "samples": [{
-            "sample_id": "S1", "pallet_id": "PAL", "vision_records": records,
+            "sample_id": "S1", "pallet_id": "PAL", "vision_records": confirm_vision_records(records),
             "vision_covers_sample": True,
             "qc_fields": {column["key"]: 0 for column in MANUAL_DEFECTS},
             "box_inspection": {
@@ -116,7 +117,7 @@ def test_ready_scene_attaches_only_positive_aligned_crops_without_source_names(l
     assert sample["evidence_summary"] == {
         "status": "available", "positive_fruits": 2, "attached_fruits": 2,
         "attached_photos": 2, "unavailable_fruits": 0,
-        "message": "Evidencia fotográfica de oleocelosis adjunta.",
+        "message": "Evidencia de Vision adjunta con revisión QC.",
     }
     first, second = sample["evidence_photos"]
     for photo in (first, second):
@@ -142,7 +143,7 @@ def test_scene_without_aligned_boxes_is_honestly_labeled_and_attached_once(local
     evidence = sample["evidence_photos"][0]
     assert evidence["view"] == "scene" and evidence["affected_fruits"] == 2
     assert evidence["width"] == 90 and evidence["height"] == 30
-    assert "grupo" in evidence["caption"] and "sanos" in evidence["caption"]
+    assert "grupal" in evidence["caption"] and "revisión QC" in evidence["caption"]
     assert sample["evidence_summary"]["attached_fruits"] == 2
 
 

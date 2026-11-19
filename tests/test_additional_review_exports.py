@@ -6,6 +6,7 @@ from io import BytesIO
 
 import openpyxl
 import pytest
+from review_helpers import confirm_vision_records
 
 from smartfruit.inspection import MANUAL_DEFECTS
 from smartfruit.lot_summary import build_lot_summary
@@ -44,8 +45,8 @@ def fields(total, affected, scars):
 
 @pytest.fixture
 def report():
-    initial_vision = vision("INITIAL-BOX", 12, 1)
-    extra_vision = vision("EXTRA-BOX", 24, 6)
+    initial_vision = confirm_vision_records([vision("INITIAL-BOX", 12, 1)])[0]
+    extra_vision = confirm_vision_records([vision("EXTRA-BOX", 24, 6)])[0]
     initial_fields = fields(12, 1, 2)
     extra_fields = fields(24, 6, 1)
     payload = {
@@ -128,7 +129,7 @@ def test_print_exposes_initial_extra_and_weighted_total_without_duplicate_pallet
     assert "Sample · frutos acumulados</dt><dd>36" in html
     assert "Estado inspector (pendiente de confirmación)</dt><dd>EXTEND" in html
     assert "Fotografías acumuladas</dt><dd>2" in html
-    assert "INITIAL-BOX" not in html and "EXTRA-BOX" not in html
+    assert "INITIAL-BOX" in html and "EXTRA-BOX" in html  # Auditable Vision source IDs.
     assert report == original
 
 
