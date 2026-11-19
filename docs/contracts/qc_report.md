@@ -62,3 +62,11 @@ No se crea `final_recommendation` de lote: cada muestra conserva su recomendaci�
 Cuando una muestra se inicia desde el manifiesto, conserva `reception: {scan_input, records}` como procedencia opcional. Los nombres/celdas originales de esas filas se preservan y deben corresponder al lote/paleta de la muestra. El footer SmartFruit muestra la lectura, cantidades declaradas/recibidas y origen del registro; no sustituye las mediciones QC. El campo `reception` no cambia ningún output de Vision o Predictive ni crea reglas de recepción.
 
 El flujo por lote añade opcionalmente `lot_reception` (padrón de recepción), `lot_summary` (cantidades y porcentajes de los dieciséis defectos) y `generated_reason` (descripción calculada, revisable). Mantiene una fila por paleta y exige Level Flag del inspector al confirmar un lote nuevo. No deduce ese Flag de la severidad por muestra. La vista imprimible conserva los campos del reporte y usa el diálogo del navegador para guardar PDF. Ver [flujo por lote](../lot_workflow.md).
+
+## Extensiones post validación QC · 18/11/2026
+
+`samples` contiene únicamente paletas inspeccionadas. El padrón `lot_reception.pallets` conserva todas las recibidas con `pallet_id`, `inspection_status`, `skip_reason`, `selected_at` y `completed_at`. SKIPPED se muestra como no inspeccionada y no aporta conteos al resumen. Los estados pendientes impiden confirmar el lote.
+
+Las recomendaciones operativas nuevas son STANDARD y EXTEND para la primera caja, y COMPLETE después de la segunda. EXTEND pendiente no permite cerrar el reporte. La severidad calculada y el Level Flag humano permanecen independientes.
+
+`inspection_summary.vision_review` conserva las predicciones originales y su revisión QC por detección. Los campos operativos de oleocelosis usan solo confirmados; `raw_oleocellosis_count` y `suspected_oleocellosis_count` conservan los positivos del modelo. El reporte incluye `rules_engine_version`, `defect_dominance` con procedencia y `vision_validation` con dataset/métricas y cobertura de adjudicación. Las hojas Excel adicionales preservan esta auditoría sin alterar la tabla QC principal. Ver [guía de la segunda prueba](../user_feedback_v2.md).

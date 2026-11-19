@@ -1,5 +1,7 @@
 # Verificación del MVP OFF
 
+La iteración post validación QC y sus pruebas se describen en [user_feedback_v2.md](user_feedback_v2.md). Los resultados históricos siguientes corresponden al MVP preservado.
+
 Entrega de guardado de borradores, asociaciones de imágenes y fidelidad del QC Report. No se ejecutaron entrenamientos, inferencia de modelos ni nuevas evaluaciones estadísticas del histórico.
 
 ## Pruebas automatizadas

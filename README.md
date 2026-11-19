@@ -2,7 +2,7 @@
 
 MVP de apoyo a la inspección de calidad de limones para AgroPeru. Integra recepción por manifiesto CSV, resultados de Vision, captura manual QC, recomendaciones por paleta y reportes Excel/JSON con revisión del inspector.
 
-Esta versión conserva el estado actual del MVP antes de implementar feedback de usuarios. La decisión final corresponde al inspector. **Predictive está OFF por defecto**; el recorrido principal funciona con reglas y no necesita un modelo predictivo.
+Esta versión incorpora la revisión QC de Vision, selección u omisión de paletas y un máximo de dos cajas por paleta. La decisión final y el Level Flag corresponden al inspector. **Predictive está OFF por defecto**. El MVP anterior se conserva en el tag `pre-user-feedback-2026-11-18`.
 
 ## Requisitos
 
@@ -42,9 +42,9 @@ Abre **http://127.0.0.1:3000** en el mismo equipo. Mantén el servidor encendido
 ## Primera prueba: demo técnica
 
 1. Pulsa **Cargar demo técnica**. Se cargan tres JSON de Vision existentes y datos manuales simulados.
-2. Revisa los resultados y completa los campos pendientes de la inspección.
-3. Evalúa la captura y revisa la sugerencia de cada paleta. La demo inicial contiene 36 frutos y 3 con oleocelosis.
-4. Para ensayar una ampliación, elige **EXTEND** y carga `examples/vision/DEMO_ADDITIONAL_BOX_001.json`. Contiene 12 frutos ficticios, 2 con oleocelosis.
+2. Registra el revisor y confirma o rechaza cada sospecha de Vision. Completa los campos pendientes.
+3. Evalúa la captura y revisa la sugerencia de cada paleta. La demo contiene 36 frutos y 3 sospechas; solo las confirmadas cuentan como oleocelosis.
+4. Para ensayar una ampliación, elige **EXTEND** y carga `examples/vision/DEMO_ADDITIONAL_BOX_001.json`. Contiene 12 frutos ficticios y 2 sospechas. Revísalas y completa los defectos de esta segunda caja; la paleta queda **COMPLETE**, sin tercera caja.
 5. Revisa el reporte, registra el inspector y sus decisiones y confirma expresamente cuando corresponda. Puedes descargar Excel/JSON y abrir la vista imprimible.
 
 Esta demo usa JSON incluidos en el paquete: **no necesita fotografías, datasets completos, pesos, PyTorch ni acceso a sistemas de AgroPeru**. Los JSON de Vision de evaluación no acreditan su asociación a un lote comercial; el contexto y los defectos manuales de la demo son simulados.
@@ -54,12 +54,13 @@ Para ensayar la recepción, carga manualmente `examples/reception/SmartFruit_rec
 ## Flujo de inspección
 
 ```text
-Manifiesto CSV → lote y paletas → Vision JSON o inferencia local opcional
-              → captura manual QC → reglas → revisión del inspector
+Manifiesto CSV → seleccionar u omitir paleta → fotos grupales o JSON históricos
+              → revisar sospechas Vision → defectos manuales QC → reglas
+              → STANDARD o EXTEND → segunda caja: COMPLETE
               → reporte Excel/JSON y vista imprimible
 ```
 
-Al cargar un manifiesto, selecciona el lote, revisa sus paletas y vincula los resultados de Vision a la caja correspondiente. `Sample` y oleocelosis proceden de los JSON únicos; los otros quince defectos se registran manualmente. Confirma que la caja está completamente inspeccionada antes de evaluarla. Una ampliación conserva el detalle de las cajas y recalcula el acumulado de la paleta.
+Al cargar un manifiesto, selecciona libremente las paletas que inspeccionarás y omite las restantes con un motivo opcional. El reporte diferencia una paleta omitida de una inspeccionada sin defectos. `Sample` procede de las imágenes únicas y oleocelosis de los positivos confirmados por QC; los otros quince defectos se registran manualmente. Confirma que la caja está completamente inspeccionada antes de evaluarla. Una ampliación conserva ambas cajas y recalcula el acumulado.
 
 El navegador conserva el borrador en IndexedDB. Recuperarlo exige evaluar de nuevo y volver a confirmar las decisiones. El guardado automático no confirma reportes ni sustituye una copia de seguridad.
 
@@ -144,9 +145,12 @@ Las pruebas JavaScript usan Node.js y `fake-indexeddb`. Algunas comparaciones co
 ## Límites del MVP
 
 - Vision automatiza oleocelosis; el resto de defectos requiere inspección manual.
+- Sus positivos son sospechas hasta que QC los revise. La confianza del modelo no acredita exactitud.
 - Se capturan dieciséis defectos y las reglas actuales evalúan ocho. La interfaz informa los que todavía no tienen regla.
 - Las sugerencias se calculan por muestra/paleta. El `Level Flag` y la decisión final permanecen a cargo del inspector.
 - Los identificadores de imagen evitan contar el mismo JSON dos veces; no reconocen un fruto repetido en fotografías diferentes.
 - La confirmación registra nombre, decisión y fecha; no implementa autenticación de identidad ni firma criptográfica.
 - La persistencia es local. No hay conexión en vivo al sistema de recepción ni sincronización entre equipos. Descarga los reportes para conservar copias independientes.
 - La exportación mantiene la estructura QC, pero no certifica una paginación idéntica en todas las versiones de Excel, navegadores o impresoras.
+
+La [guía de la segunda prueba de usuario](docs/user_feedback_v2.md) describe los cambios, compatibilidad, métricas adjudicadas y recorrido de demostración.

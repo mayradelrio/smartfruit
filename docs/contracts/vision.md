@@ -32,7 +32,9 @@ Un duplicado idéntico se conserva en los registros para trazabilidad, pero no a
 
 ## Agregación existente
 
-`aggregate_vision_sample` suma `total_fruits` y `oleocellosis_count` de imágenes únicas. El porcentaje agregado es `100 * suma_afectados / suma_frutos`, no la media de porcentajes de imágenes. La confianza agregada se calcula por fruto.
+`aggregate_vision_sample` suma `total_fruits` de imágenes únicas y cuenta únicamente los positivos confirmados por QC. El campo original `oleocellosis_count` de cada JSON sigue siendo la salida cruda del modelo. La agregación informa `suspected_oleocellosis_count`, `confirmed_oleocellosis_count`, `pending_review_count` y la auditoría `vision_review`. El porcentaje operativo es `100 * confirmados / suma_frutos`; no se promedian porcentajes de imágenes. La confianza se conserva para auditoría y no representa exactitud.
+
+Desde el 18/11/2026 cada predicción puede incluir `review_status` (pending/confirmed/rejected), `reviewed_by`, `reviewed_at`, `override_label` y `override_reason`. Un positivo sin esos campos queda pendiente. Confirmar o rechazar exige revisor y fecha; un rechazo conserva clase/probabilidad originales y su corrección humana. Las etiquetas styler/scar/inking/clean/other no alimentan automáticamente defectos manuales. La evaluación se bloquea hasta revisar todos los positivos. Ver [segunda prueba de usuario](../user_feedback_v2.md).
 
 La integración produce `vision_summary` con `images_processed`, `image_ids`, `total_fruits`, `oleocellosis_count`, `oleocellosis_pct`, `mean_confidence`, `low_confidence_threshold`, `low_confidence_count`, `low_confidence_items` y `duplicate_image_ids_ignored`.
 

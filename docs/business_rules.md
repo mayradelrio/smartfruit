@@ -28,7 +28,9 @@ Porcentajes en escala 0–100.
 
 El notebook explica que la imagen no fija inequívocamente las fronteras exactas. Tanto el notebook como la integración ofrecen `higher` (igualdad al nivel superior) y `lower` (igualdad al nivel inferior). La demo usa `higher`. Se conservará de forma explícita y trazable; su aprobación operativa por QC sigue pendiente. No elegir silenciosamente otra política.
 
-`evaluate_business_severity` usa el nivel máximo entre los ocho defectos y mapea 1 → STANDARD, 2 → EXPAND, 3 → ESCALATE. Los motivos son los nombres de los defectos que alcanzan el máximo cuando es mayor que 1. La referencia original deja STANDARD sin motivos; el MVP añade la explicación de que los ocho defectos con regla están en Nivel 1, sin introducir nuevos criterios.
+`evaluate_business_severity` conserva el nivel máximo entre los ocho defectos. Desde la validación QC del 18/11/2026, la primera caja mapea 1 → STANDARD y 2/3 → EXTEND. La segunda caja completada produce COMPLETE y no permite una tercera. Los motivos son los defectos que alcanzan el máximo cuando es mayor que 1. Level 3 y el Level Flag humano se conservan; no se convierten en decisiones comerciales del inspector. La versión de reglas queda en el reporte.
+
+La dominancia `Decay > Styler > Yellow Color > defectos superficiales` procede de `QC user validation 2026-11-18`, no de la matriz histórica. `defect_dominance.py` solo la aplica a etiquetas de un mismo fruto explícitamente identificado. Los conteos agregados independientes permanecen intactos.
 
 El notebook también construye sumas y conteos de severidad para experimentos predictivos. Esas features no constituyen nuevos thresholds operativos para recomendar.
 
