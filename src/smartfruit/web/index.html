@@ -31,13 +31,12 @@
 <header>
   <div class="topbar">
     <div class="company-brand"><img class="company-logo" src="/assets/agroperu-logo.png" alt="AgroPeru"><div><div class="brand">SmartFruit QC</div><p>Control de calidad · inspección por lote</p></div></div>
-    <span id="predictive-badge" class="badge">Predictive: cargando…</span>
   </div>
 </header>
 <main>
   <div class="page-heading">
     <div><h1>QUALITY INSPECTION</h1><p>Abre tu lote, carga las fotografías y completa la inspección de cada paleta.</p></div>
-    <div class="actions"><button id="new-inspection-button" class="quiet" type="button" hidden>Nueva inspección</button><button id="demo-button" class="secondary" type="button" disabled>Cargar demo técnica</button></div>
+    <div class="actions"><button id="new-inspection-button" class="quiet" type="button" hidden>Nueva inspección</button></div>
   </div>
   <div id="app-error" class="error" role="alert" hidden></div>
   <div id="app-status" class="visually-hidden" role="status" aria-live="polite"></div>
@@ -56,8 +55,11 @@
   <section id="reception-card" class="card workflow-panel" data-workflow-step="1" aria-labelledby="reception-title" hidden>
     <h2 id="reception-title"><span class="step" aria-hidden="true">1</span>Cargar manifiesto y abrir lote</h2>
     <p class="hint">El manifiesto trae las paletas y sus datos de recepción. Si contiene un solo lote, lo seleccionamos automáticamente.</p>
-    <label for="manifest-file">Cargar manifiesto CSV</label>
-    <input id="manifest-file" class="file-input" type="file" accept=".csv,text/csv" disabled>
+    <div class="actions file-input">
+      <button id="select-manifest-button" class="secondary" type="button" aria-describedby="manifest-filename" disabled>Cargar manifiesto CSV</button>
+      <span id="manifest-filename" class="muted" style="overflow-wrap:anywhere" aria-live="polite">Ningún manifiesto seleccionado</span>
+      <input id="manifest-file" type="file" accept=".csv,text/csv" hidden disabled>
+    </div>
     <p id="manifest-status" class="reception-status" role="status">Todavía no hay un manifiesto cargado.</p>
     <p id="manifest-storage-status" class="hint" hidden></p>
     <div class="actions"><button id="forget-manifest" class="quiet" type="button" hidden>Borrar manifiesto guardado en este navegador</button></div>
@@ -117,7 +119,7 @@
     <div id="saved-report" class="notice success" hidden><strong>Inspección confirmada y guardada.</strong><p id="saved-description" class="hint"></p><div id="download-links" class="actions download-links"></div></div>
   </section>
 </main>
-<footer>Vision automatiza únicamente oleocelosis. Los otros defectos se registran manualmente. Predictive es experimental y no sustituye las reglas ni la decisión del inspector.</footer>
+<footer>Vision automatiza únicamente oleocelosis. Los otros defectos se registran manualmente. La decisión final corresponde al inspector.</footer>
 <script src="/assets/drafts.js"></script>
 <script src="/assets/field_sources.js"></script>
 <script src="/assets/vision_defaults.js"></script>
@@ -300,11 +302,13 @@
   function refreshReceptionControls() {
     const ready=Boolean(state.config)&&state.draftReady&&!state.busy;const hasManifest=ready&&typeof state.manifestCsv==="string";
     byId("manifest-file").disabled=!ready;
+    byId("select-manifest-button").disabled=!ready;
+    byId("select-manifest-button").textContent=state.manifestCsv===null?"Cargar manifiesto CSV":"Cambiar manifiesto CSV";
+    byId("manifest-filename").textContent=state.manifestFilename||"Ningún manifiesto seleccionado";
     for(const id of ["scan-input","scan-lot","resolve-scan-button"])byId(id).disabled=!hasManifest;
     byId("open-lot-button").disabled=!hasManifest||!byId("scan-lot").value;
     byId("start-qc").disabled=!ready||!state.receptionSelection||Boolean(state.pendingDraft);
     byId("resume-draft").hidden=!state.pendingDraft;byId("resume-draft").disabled=!ready;byId("start-new-from-draft").hidden=!state.pendingDraft;byId("start-new-from-draft").disabled=!ready;
-    byId("demo-button").disabled=!ready||Boolean(state.pendingDraft);
     byId("forget-manifest").hidden=!state.manifestCsv&&!state.storedManifestPresent;
     byId("forget-manifest").disabled=!ready;
     byId("forget-manifest").textContent=state.storedManifestPresent?"Borrar manifiesto guardado en este navegador":"Retirar manifiesto de esta sesión";
@@ -675,7 +679,7 @@
   }
   async function busy(action) {
     if(state.busy)return;state.busy=true;clearError();
-    const nodes=["evaluate-button","demo-button","draft-button","finalize-button","manifest-file","resolve-scan-button","open-lot-button","start-qc","forget-manifest","new-inspection-button","add-sample","save-draft-now"].map(byId);
+    const nodes=["evaluate-button","draft-button","finalize-button","manifest-file","select-manifest-button","resolve-scan-button","open-lot-button","start-qc","forget-manifest","new-inspection-button","add-sample","save-draft-now"].map(byId);
     nodes.push(...document.querySelectorAll("#final-header-fields input,#final-header-fields select,#final-header-fields textarea,#reason-panel textarea,#reason-panel button,#summary-fields input,#summary-fields select,#summary-fields textarea,#inspection-observations,#results select,#results .additional-review input,#results .additional-review textarea,#results .additional-review button"));
     const controls=Array.from(new Set(nodes)).map(control=>[control,control.disabled]);for(const [control]of controls)control.disabled=true;
     try{await action();}catch(e){error(e.message||"No se pudo completar la operación.");}finally{state.busy=false;for(const [control,disabled]of controls)control.disabled=disabled;updateCapturePresentation();refreshReceptionControls();}
@@ -766,8 +770,10 @@
       const vision=sample.inspection_summary||{};body.append(element("p",`Vision: ${vision.total_fruits??"—"} frutos · ${vision.oleocellosis_count??"—"} con oleocelosis · ${vision.oleocellosis_pct===undefined?"—":numberText(vision.oleocellosis_pct,4)+" %"}`,"result-detail"));
       if(sample.box_inspections?.length){const counts=element("section",undefined,"rule-note");counts.append(element("h4","Conteo por caja frente al manifiesto"));for(const box of sample.box_inspections){const difference=box.count_difference;counts.append(element("p",box.sample_box_id+" · Esperados: "+(box.expected_count_per_box??"No disponible")+" · Detectados: "+box.actual_count+" · Diferencia: "+(difference===null?"—":(difference>0?"+":"")+difference)+" · Desviación: "+(box.count_deviation_pct===null?"—":numberText(box.count_deviation_pct,2)+" %")+(box.missing_count>0?" · Unidades menos detectadas: "+box.missing_count:"")));}body.append(counts);}
       if(vision.duplicate_image_ids_ignored?.length)body.append(element("p","Fotografías duplicadas ignoradas: "+vision.duplicate_image_ids_ignored.length,"result-detail"));
-      if(sample.evidence_photos?.length){const gallery=element("section",undefined,"vision-positive-gallery");gallery.append(element("h4","Evidencia de oleocelosis"));const grid=element("div",undefined,"vision-positive-grid");for(const photo of sample.evidence_photos){if(photo.defect!=="oleocellosis"||!/^data:image\/(?:jpeg|png);base64,/.test(photo.image_data_url||""))continue;const figure=element("figure",undefined,"vision-positive-card"),image=element("img");image.src=photo.image_data_url;image.alt="Oleocelosis · "+(photo.sample_box_id||"Caja inspeccionada");image.loading="lazy";figure.append(image,element("figcaption",(photo.sample_box_id||"Caja inspeccionada")+" · Oleocelosis"+(photo.view==="scene"?" · Fotografía del grupo":"")));grid.append(figure);}gallery.append(grid);body.append(gallery);}else if(sample.evidence_summary?.positive_fruits>0)body.append(element("p","No hay fotografías disponibles para adjuntar como evidencia de los frutos con oleocelosis.","hint"));
-      const predictive=sample.predictive||{enabled:false};body.append(element("p","Predictive: "+(predictive.enabled?"ON - Experimental":"OFF"),"result-detail"));if(predictive.enabled){if(predictive.predicted_loss_pct!==null&&predictive.predicted_loss_pct!==undefined)body.append(element("p","predicted_loss_pct: "+numberText(predictive.predicted_loss_pct,4)+" %","result-detail"));else body.append(element("p","Señal predictiva no disponible; la recomendación sigue basada en las reglas.","result-detail"));}
+      if(vision.oleocellosis_count>0){
+        const photos=(sample.evidence_photos||[]).filter(photo=>{const reviews=photo.vision_reviews;return photo.defect==="oleocellosis"&&/^data:image\/(?:jpeg|png);base64,/.test(photo.image_data_url||"")&&(!Array.isArray(reviews)||!reviews.length||reviews.some(review=>review?.review_status==="confirmed"&&review.qc_included!==false));});
+        if(photos.length){const gallery=element("section",undefined,"vision-positive-gallery");gallery.append(element("h4","Evidencia de oleocelosis"));const grid=element("div",undefined,"vision-positive-grid");for(const photo of photos){const figure=element("figure",undefined,"vision-positive-card"),image=element("img");image.src=photo.image_data_url;image.alt="Oleocelosis · "+(photo.sample_box_id||"Caja inspeccionada");image.loading="lazy";figure.append(image,element("figcaption",(photo.sample_box_id||"Caja inspeccionada")+" · Oleocelosis"+(photo.view==="scene"?" · Fotografía del grupo":"")));grid.append(figure);}gallery.append(grid);body.append(gallery);}else if(sample.evidence_summary?.positive_fruits>0)body.append(element("p","No hay fotografías disponibles para adjuntar como evidencia de los frutos con oleocelosis.","hint"));
+      }
       const uncovered=sample.rule_coverage?.not_evaluated||state.config.rule_coverage?.not_evaluated||[];if(uncovered.length)body.append(element("div","Cobertura parcial de reglas. Registrados sin evaluación automática de severidad: "+uncovered.join(", ")+". Revisa estos defectos antes de confirmar tu decisión.","notice"));
       if(model){if(model.reviewHistory?.additional?.length)model.inspectorChoice="COMPLETE";model.inspectorChoice=canonicalDecision(model.inspectorChoice||sample.review_choice);const choice=element("div",undefined,"pallet-choice");model.inspectorStatus=element("p","Estado inspector: "+decisionLabel(model.inspectorChoice),"inspector-status");choice.append(model.inspectorStatus);const final=field("review_choice","Actualizar estado de esta paleta","decision-"+model.serial,{options:[["","Selecciona tu decisión"],...(model.reviewHistory?.additional?.length?["COMPLETE"]:["STANDARD","EXTEND"]).map(value=>[value,decisionLabel(value)])]});final.input.value=model.inspectorChoice;final.input.dataset.sampleId=String(sample.sample_id);final.input.addEventListener("change",()=>setInspectorChoice(sample.sample_id,final.input.value));model.choiceControl=final.input;choice.append(final.wrap);body.append(choice);const history=renderReviewHistory(model,sample);if(history)body.append(history);body.append(renderAdditionalReview(model));}box.append(body);area.append(box);
     }
@@ -776,6 +782,7 @@
   }
   function ensureCurrent() {if(!state.payload||!state.report||state.evaluatedRevision!==state.revision||JSON.stringify(collectPayload())!==JSON.stringify(state.payload))throw Error("Los datos han cambiado. Evalúa de nuevo antes de generar o confirmar el reporte.");}
   function safeDownloadURL(raw){const u=new URL(raw,window.location.origin);if(u.origin!==window.location.origin||!u.pathname.startsWith("/api/reports/"))throw Error("El servidor devolvió una ruta de descarga no válida.");return u.href;}
+  byId("select-manifest-button").addEventListener("click",()=>{if(!state.busy)byId("manifest-file").click();});
   byId("manifest-file").addEventListener("change",event=>{
     const file=event.target.files?.[0];if(!file)return;
     busy(async()=>{
@@ -848,22 +855,6 @@
     }catch(e){if(!state.finalized){state.draftPaused=false;scheduleDraft(true);}throw e;}
     finally{unlock();if(state.finalized)for(const sample of state.samples)if(sample.choiceControl)sample.choiceControl.disabled=true;}
   }));
-  byId("demo-button").addEventListener("click",()=>busy(async()=>{
-    if(state.samples.length)throw Error("Hay una inspección abierta. Usa Nueva inspección antes de cargar la demo; los datos actuales se conservan.");
-    const demo=await (await request("/api/demo")).json();
-    state.restoring=true;let sample;
-    try{
-      invalidate();byId("sample-list").replaceChildren();byId("qc-editor-list").replaceChildren();state.samples=[];state.nextSample=1;state.activeReception=null;state.lotReception=null;state.workflowStep=2;state.generatedReason="";state.reasonSource="defect_summary";state.demoMode=true;state.finalized=false;state.draftPaused=false;
-      for(const [key,control]of Object.entries(headerControls)){control.value=demo.qc_header?.[key]??(key==="inspection_date"?todayInLima():"");control.readOnly=false;}
-      for(const control of Object.values(summaryControls))control.value="";
-      sample=addSample({sample_id:demo.sample_id,pallet_id:demo.pallet_id,demo:true});
-      byId("inspection-observations").value="Demo técnica: datos manuales simulados; sin asociación a un lote comercial real.";
-      byId("demo-notice").hidden=false;byId("draft-recovery-note").hidden=true;byId("inspection-form").hidden=false;
-    }finally{state.restoring=false;}
-    try{await importVisionRecords(sample,demo.records);}catch(e){captureChanged(true);throw e;}
-    refreshReceptionControls();status("Demo técnica cargada; JSON validados y asociados. Los defectos manuales son datos de ejemplo en cero.");
-  }));
-
   function setStep(step) {
     if(step>1&&!state.samples.length)throw Error("Primero carga el manifiesto y abre un lote.");
     state.workflowStep=step;refreshWorkflow();scheduleDraft();
@@ -977,8 +968,7 @@
 
   async function init(){
     try{
-      state.config=await (await request("/api/config")).json();const on=Boolean(state.config.use_predictive);
-      byId("predictive-badge").textContent="Predictive: "+(on?"ON - Experimental":"OFF");if(on)byId("predictive-badge").classList.add("experimental");
+      state.config=await (await request("/api/config")).json();
       renderHeader();renderSummary();renderTableHead();
       const coverage=state.config.rule_coverage||{};const evaluated=coverage.evaluated||[];const missing=coverage.not_evaluated||[];
       byId("coverage-summary").textContent="Cobertura de Business Severity: "+(evaluated.length||8)+" de 16 defectos";
@@ -986,8 +976,8 @@
       byId("boundary-description").textContent="Política de frontera: "+String(state.config.boundary_policy||"higher")+" (referencia actual de integración; pendiente de confirmación operativa de QC).";
       byId("loading").textContent="Recuperando el manifiesto guardado en este navegador…";await restoreManifest();
       byId("loading").textContent="Recuperando el borrador de inspección…";await restoreDraft();
-      byId("loading").hidden=true;byId("workflow-nav").hidden=false;byId("demo-button").disabled=false;refreshWorkflow();
-      updateCapturePresentation();refreshReceptionControls();status(state.samples.length?"Borrador recuperado. Revisa los datos y evalúa de nuevo antes de confirmar.":"Carga el manifiesto y abre tu lote, o prueba la demo técnica.");
+      byId("loading").hidden=true;byId("workflow-nav").hidden=false;refreshWorkflow();
+      updateCapturePresentation();refreshReceptionControls();status(state.samples.length?"Borrador recuperado. Revisa los datos y evalúa de nuevo antes de confirmar.":"Carga el manifiesto y abre tu lote para comenzar la inspección.");
     }catch(e){byId("loading").textContent="No se pudo preparar el formulario.";error(e.message);}
   }
   init();

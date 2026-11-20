@@ -7,6 +7,7 @@ import time
 from copy import deepcopy
 from io import BytesIO
 from pathlib import Path
+from zipfile import ZipFile
 
 import pytest
 from fastapi.testclient import TestClient
@@ -15,6 +16,8 @@ from review_helpers import confirm_vision_records
 
 from smartfruit.app import create_app
 from smartfruit.inspection import MANUAL_DEFECTS
+from smartfruit.print_report import render_qc_print
+from smartfruit.qc_report import export_qc_xlsx
 from smartfruit.report_evidence import attach_report_evidence
 from smartfruit.vision_capture import VisionCapture
 from smartfruit.workflow import evaluate_inspection
@@ -117,7 +120,7 @@ def test_ready_scene_attaches_only_positive_aligned_crops_without_source_names(l
     assert sample["evidence_summary"] == {
         "status": "available", "positive_fruits": 2, "attached_fruits": 2,
         "attached_photos": 2, "unavailable_fruits": 0,
-        "message": "Evidencia de Vision adjunta con revisión QC.",
+        "message": "Evidencia de oleocelosis confirmada por QC adjunta.",
     }
     first, second = sample["evidence_photos"]
     for photo in (first, second):
@@ -154,6 +157,111 @@ def test_historical_crop_names_resolve_only_positive_fruits(local):
     assert len(sample["evidence_photos"]) == 1
     assert sample["evidence_summary"]["positive_fruits"] == 1
     assert decoded(sample["evidence_photos"][0]).getpixel((20, 20))[0] > 180
+
+
+@pytest.mark.parametrize("filename", ["BAD_L01.jpg", "GROUP.jpg"])
+def test_unchecking_every_positive_removes_photos_from_evaluation_exports_and_final_report(
+    local, filename,
+):
+    client, manager = local
+    payload = capture(ready(manager, filename)["records"])
+    for prediction in payload["samples"][0]["vision_records"][0]["fruit_predictions"]:
+        if prediction["predicted_class"] == "con_oleocelosis":
+            prediction.update(review_status="rejected", qc_included=False, override_label="clean")
+    before = deepcopy(payload)
+    response = client.post("/api/evaluate", json=payload)
+    assert response.status_code == 200, response.text
+    report = response.json()
+    sample = report["samples"][0]
+    assert sample["inspection_summary"]["oleocellosis_count"] == 0
+    assert sample["inspection_summary"]["raw_oleocellosis_count"] > 0
+    assert sample["evidence_photos"] == []
+    assert sample["evidence_summary"]["status"] == "no_defects"
+    assert sample["evidence_summary"]["positive_fruits"] == 0
+    assert sample["evidence_summary"]["attached_fruits"] == 0
+    assert sample["evidence_summary"]["unavailable_fruits"] == 0
+    html = render_qc_print(report)
+    assert html.count("<img ") == 1  # Only the QC logo.
+    assert "No se adjuntaron fotografías" not in html
+    with ZipFile(BytesIO(export_qc_xlsx(report))) as archive:
+        assert len([name for name in archive.namelist() if name.startswith("xl/media/")]) == 1
+    saved = client.post("/api/finalize", json={
+        **payload, "inspector_name": "QC TEST", "confirmed": True,
+        "final_decisions": {"S1": "STANDARD"},
+    })
+    assert saved.status_code == 200, saved.text
+    confirmed = client.get(saved.json()["downloads"]["json"]).json()["samples"][0]
+    assert confirmed["evidence_photos"] == []
+    assert confirmed["evidence_summary"]["positive_fruits"] == 0
+    assert payload == before  # Raw predictions and QC audit stay intact.
+
+
+@pytest.mark.parametrize("aligned_crops", [True, False])
+def test_partial_qc_exclusion_keeps_only_confirmed_photographic_evidence(local, aligned_crops):
+    client, manager = local
+    if aligned_crops:
+        source = ready(manager, "GROUP.jpg")["records"][0]
+    else:
+        photo = next(p for p in manager.catalog()["photos"] if p["name"] == "GROUP.jpg")
+        source = record(photo["image_id"], (0, 2), 3, {
+            "input_kind": "scene", "source_filename": "GROUP.jpg", "image_size": [90, 30],
+        })
+    payload = capture([source])
+    payload["samples"][0]["vision_records"][0]["fruit_predictions"][0].update(
+        review_status="rejected", qc_included=False, override_label="clean",
+    )
+    response = client.post("/api/evaluate", json=payload)
+    assert response.status_code == 200, response.text
+    sample = response.json()["samples"][0]
+    assert sample["inspection_summary"]["oleocellosis_count"] == 1
+    assert sample["inspection_summary"]["raw_oleocellosis_count"] == 2
+    assert sample["evidence_summary"]["positive_fruits"] == 1
+    assert sample["evidence_summary"]["attached_fruits"] == 1
+    assert sample["evidence_summary"]["unavailable_fruits"] == 0
+    photo, = sample["evidence_photos"]
+    assert photo["affected_fruits"] == 1
+    assert photo["vision_reviews"] == [{
+        "detection_index": 3, "review_status": "confirmed", "override_label": None,
+    }]
+    if aligned_crops:
+        assert photo["view"] == "fruit_crop"
+        blue = decoded(photo).getpixel((15, 15))
+        assert blue[2] > 180 and blue[0] < 80
+    else:
+        assert photo["view"] == "scene"
+
+
+def test_rejected_initial_box_photos_do_not_return_when_an_additional_box_is_added(local):
+    client, manager = local
+    payload = capture(ready(manager, "BAD_L01.jpg")["records"])
+    payload["samples"][0]["vision_records"][0]["fruit_predictions"][0].update(
+        review_status="rejected", qc_included=False, override_label="clean",
+    )
+    payload["samples"][0]["qc_fields"]["scars"] = 1
+    additional = confirm_vision_records(ready(manager, "GROUP.jpg")["records"])
+    additional[0]["fruit_predictions"][0].update(
+        review_status="rejected", qc_included=False, override_label="clean",
+    )
+    response = client.post("/api/inspection/additional-review", json={
+        **payload, "sample_id": "S1", "inspector_decision": "EXTEND",
+        "additional_review": {
+            "vision_records": additional,
+            "manual_defects": {column["key"]: 0 for column in MANUAL_DEFECTS},
+            "box_inspection": {
+                "sample_box_id": "BOX_002", "status": "completed", "coverage_confirmed": True,
+            },
+        },
+    })
+    assert response.status_code == 200, response.text
+    sample = response.json()["report"]["samples"][0]
+    assert sample["inspection_summary"]["oleocellosis_count"] == 1
+    assert sample["evidence_summary"]["positive_fruits"] == 1
+    photo, = sample["evidence_photos"]
+    assert photo["sample_box_id"] == "BOX_002"
+    assert photo["vision_reviews"][0]["detection_index"] == 3
+    assert sample["review_history"]["initial"]["vision_records"][0]["fruit_predictions"][0][
+        "review_status"
+    ] == "rejected"
 
 
 @pytest.mark.parametrize("filename", ["../outside.jpg", "https://example.invalid/outside.jpg", "C:\\outside.jpg"])

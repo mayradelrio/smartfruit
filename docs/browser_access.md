@@ -10,7 +10,7 @@ Para ejecutar la aplicación localmente, sigue la [instalación del README](../R
 4. Revisar el lote y pulsar **Siguiente · cargar Vision**. Se prepara una fila por cada paleta del lote. Seleccionar cada paleta de destino antes de cargar sus JSON; luego avanzar a la tabla QC. La importación rechaza archivos conflictivos y conserva la captura anterior si falla algún JSON. Registrar los demás defectos de la muestra.
 5. Evaluar, revisar motivos/cobertura y seleccionar la decisión final por muestra. Indicar inspector y confirmar; los botones permiten descargar Excel y JSON.
 
-Para una prueba técnica del tramo QC se mantiene **Cargar demo técnica**: 36 frutos y 3 con oleocelosis; recomendación EXPAND. Esta demo está identificada y no implica una asociación real con las paletas del CSV.
+Para probar QC con ejemplos, carga el manifiesto dummy y selecciona una paleta; importa en ella `examples/vision/IMG_6426.json`, `IMG_6427.json` e `IMG_6428.json` y registra los demás campos. Son 36 frutos y 3 sospechas de oleocelosis que deben revisarse. Omite las paletas que no inspeccionarás. El botón **Cargar demo técnica** se retiró; sus recursos y API se conservan para pruebas técnicas.
 
 Los datos de la demo son técnicos/simulados y no están asociados a un lote comercial. Para una inspección real, registrar sus datos y cargar sus propios JSON en la misma interfaz.
 
@@ -34,7 +34,7 @@ Las etiquetas Recepción, Vision e Inspector y el listado de pendientes ayudan a
 
 ## Implementación y publicación
 
-`hosting/browser/` adapta el transporte de la interfaz y empaqueta los módulos Python mediante una lista explícita, junto con la plantilla saneada y los ejemplos técnicos. Los assets `drafts.js` y `field_sources.js` proporcionan persistencia de borrador y presentación de procedencia. Pyodide y sus dependencias se sirven desde el mismo Site. Predictive permanece OFF; no se ha conectado ni reentrenado ningún modelo.
+`hosting/browser/` adapta el transporte de la interfaz y empaqueta los módulos Python mediante una lista explícita, junto con la plantilla saneada y los ejemplos técnicos. Los assets `drafts.js` y `field_sources.js` proporcionan persistencia de borrador y presentación de procedencia. Pyodide y sus dependencias se sirven desde el mismo Site. Predictive permanece OFF y no muestra indicadores en pantalla; no se ha conectado ni reentrenado ningún modelo.
 
 La evidencia técnica y sus límites se documentan en [validation.md](validation.md). No se certificó una sesión de navegador del despliegue ni una igualdad visual o de paginación del Excel.
 

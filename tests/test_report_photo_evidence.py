@@ -111,6 +111,36 @@ def test_no_defects_produces_no_missing_defect_photo_notice(report):
     assert "photo-evidence\"><h4>" not in html
 
 
+@pytest.mark.parametrize("keep_photo", [True, False])
+def test_zero_confirmed_count_hides_stale_photos_and_stale_availability_notices(report, keep_photo):
+    sample = report["samples"][0]
+    sample["inspection_summary"]["oleocellosis_count"] = 0
+    sample["qc_fields"]["oleocellosis"] = 0
+    if not keep_photo:
+        sample["evidence_photos"] = []
+    book = openpyxl.load_workbook(BytesIO(export_qc_xlsx(report)))
+    html = render_qc_print(report)
+    assert book.sheetnames == ["Report"]
+    assert html.count("<img ") == 1
+    assert "No se adjuntaron fotografías" not in html
+    assert "No se adjuntaron fotografías" not in all_text(book)
+
+
+def test_saved_rejected_photo_is_hidden_while_confirmed_photo_stays(report):
+    confirmed = report["samples"][0]["evidence_photos"][0]
+    confirmed["vision_reviews"] = [{"review_status": "confirmed"}]
+    rejected = deepcopy(confirmed)
+    rejected["sample_box_id"] = "BOX_REJECTED"
+    rejected["vision_reviews"] = [{"review_status": "rejected", "qc_included": False}]
+    report["samples"][0]["evidence_photos"].append(rejected)
+    book = openpyxl.load_workbook(BytesIO(export_qc_xlsx(report)))
+    html = render_qc_print(report)
+    assert len(book["Evidencia"]._images) == 1
+    assert html.count("<img ") == 2  # QC logo and the confirmed photo.
+    assert "BOX_REJECTED" not in html
+    assert "BOX_REJECTED" not in all_text(book)
+
+
 @pytest.mark.parametrize("change", [
     {"defect": "healthy"}, {"affected_fruits": 0},
     {"image_data_url": "https://example.invalid/PRIVATE_FRUIT_PHOTO.jpg"},

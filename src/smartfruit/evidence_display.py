@@ -8,9 +8,17 @@ import binascii
 
 def evidence_photos(sample):
     """Accept only embedded raster photos already identified as oleocellosis."""
+    if (sample.get("inspection_summary") or {}).get("oleocellosis_count") == 0:
+        return []
     result = []
     for photo in sample.get("evidence_photos") or []:
         if not isinstance(photo, dict) or photo.get("defect") != "oleocellosis":
+            continue
+        reviews = photo.get("vision_reviews") or []
+        if reviews and not any(
+            review.get("review_status") == "confirmed" and review.get("qc_included") is not False
+            for review in reviews
+        ):
             continue
         affected = photo.get("affected_fruits")
         if isinstance(affected, bool) or not isinstance(affected, int) or affected <= 0:
@@ -53,6 +61,8 @@ def evidence_caption(sample, photo, number):
 
 def evidence_notice(sample, attached_count):
     """Describe unavailable positive evidence without relabeling healthy fruit."""
+    if (sample.get("inspection_summary") or {}).get("oleocellosis_count") == 0:
+        return ""
     summary = sample.get("evidence_summary") or {}
     positive = summary.get("positive_fruits")
     if not isinstance(positive, (int, float)) or isinstance(positive, bool):

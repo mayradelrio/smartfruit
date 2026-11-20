@@ -39,17 +39,17 @@ python -m smartfruit.app
 
 Abre **http://127.0.0.1:3000** en el mismo equipo. Mantén el servidor encendido mientras usas la aplicación. El comando `smartfruit` es un punto de entrada equivalente.
 
-## Primera prueba: demo técnica
+## Primera prueba con datos de ejemplo
 
-1. Pulsa **Cargar demo técnica**. Se cargan tres JSON de Vision existentes y datos manuales simulados.
-2. Las fotos/detecciones positivas aparecen marcadas. Desmarca las que no sean oleocelosis, registra el revisor una sola vez y pulsa **Aplicar selección**. Completa los campos pendientes.
-3. Evalúa la captura y revisa la sugerencia de cada paleta. La demo contiene 36 frutos y 3 sospechas; solo las confirmadas cuentan como oleocelosis.
+1. Carga `examples/reception/SmartFruit_reception_manifest_demo.csv`, abre su lote y selecciona una paleta para la prueba. Omite las demás si no vas a inspeccionarlas.
+2. Importa en esa paleta `examples/vision/IMG_6426.json`, `IMG_6427.json` e `IMG_6428.json`. Las fotos/detecciones positivas aparecen marcadas. Desmarca las que no sean oleocelosis, registra el revisor y pulsa **Aplicar selección**. Completa los campos QC pendientes con datos de prueba y confirma el cierre de la caja.
+3. Evalúa la captura y revisa la sugerencia de la paleta. Los tres JSON contienen 36 frutos y 3 sospechas; solo las confirmadas cuentan como oleocelosis.
 4. Para ensayar una ampliación, elige **EXTEND** y carga `examples/vision/DEMO_ADDITIONAL_BOX_001.json`. Contiene 12 frutos ficticios y 2 sospechas. Revísalas y completa los defectos de esta segunda caja; la paleta queda **COMPLETE**, sin tercera caja.
 5. Revisa el reporte, registra el inspector y sus decisiones y confirma expresamente cuando corresponda. Puedes descargar Excel/JSON y abrir la vista imprimible.
 
-Esta demo usa JSON incluidos en el paquete: **no necesita fotografías, datasets completos, pesos, PyTorch ni acceso a sistemas de AgroPeru**. Los JSON de Vision de evaluación no acreditan su asociación a un lote comercial; el contexto y los defectos manuales de la demo son simulados.
+Esta prueba usa JSON incluidos en el paquete: **no necesita fotografías, datasets completos, pesos, PyTorch ni acceso a sistemas de AgroPeru**. Los JSON de Vision de evaluación no acreditan su asociación a las paletas del CSV ni a un lote comercial; la asociación y los defectos manuales de la prueba son simulados.
 
-Para ensayar la recepción, carga manualmente `examples/reception/SmartFruit_reception_manifest_demo.csv` y selecciona el lote y la paleta en la interfaz. Este manifiesto dummy autorizado es un ejemplo de demostración, separado de los tres JSON del botón; no debe confundirse con un manifiesto operativo. La demo técnica del botón funciona también sin cargar un manifiesto.
+El manifiesto dummy autorizado es un ejemplo de demostración; no debe confundirse con un manifiesto operativo. La interfaz ya no ofrece el botón **Cargar demo técnica**; los recursos y la API de demo se conservan para pruebas técnicas.
 
 ## Flujo de inspección
 
@@ -106,7 +106,7 @@ Los trabajos de Vision generan copias de entrada, contexto y JSON en `data/local
 | `SMARTFRUIT_VISION_PYTHON` | Intérprete opcional que tenga instaladas las dependencias de Vision |
 | `SMARTFRUIT_VISION_BATCH_SIZE` | `32`; admite enteros de 1 a 128 |
 
-Con `USE_PREDICTIVE=True`, la interfaz identifica Predictive como experimental. En esta versión no hay un artefacto predictivo conectado: informa indisponibilidad y conserva la evaluación por reglas; no fabrica una predicción de pérdida.
+`USE_PREDICTIVE` se conserva como configuración experimental del backend. En esta versión no hay un artefacto predictivo conectado: con `True`, la API informa indisponibilidad y conserva la evaluación por reglas; no fabrica una predicción de pérdida. La interfaz no muestra indicadores Predictive.
 
 ## Archivos del proyecto
 
@@ -140,7 +140,7 @@ npm ci
 npm test
 ```
 
-Las pruebas JavaScript usan Node.js y `fake-indexeddb`. Algunas comparaciones con originales privados se omiten si esos archivos no están disponibles; los originales no son requisito para ejecutar la demo técnica. `legacy/integration/smartfruit_integration_v1.py` se mantiene como referencia para las pruebas de reglas; su script de demo histórico no es el punto de entrada de la aplicación.
+Las pruebas JavaScript usan Node.js y `fake-indexeddb`. Algunas comparaciones con originales privados se omiten si esos archivos no están disponibles; los originales no son requisito para probar los ejemplos incluidos. `legacy/integration/smartfruit_integration_v1.py` se mantiene como referencia para las pruebas de reglas; su script de demo histórico no es el punto de entrada de la aplicación.
 
 ## Límites del MVP
 

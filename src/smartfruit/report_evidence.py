@@ -14,6 +14,8 @@ from copy import deepcopy
 from io import BytesIO
 from typing import Any, Callable
 
+from .vision_review import review_status
+
 ImageResolver = Callable[[dict[str, Any], int, dict[str, str]], dict[str, Any] | None]
 MAX_IMAGE_BYTES = 20 * 1024 * 1024
 MAX_IMAGE_PIXELS = 40_000_000
@@ -86,7 +88,7 @@ def _box_records(sample):
 
 
 def attach_report_evidence(report, payload, resolver: ImageResolver | None = None):
-    """Rebuild attachments from source predictions, ignoring injected report data.
+    """Rebuild attachments from QC-confirmed positives, ignoring injected report data.
 
     Missing images leave an explicit availability summary. A complete group photo
     is labeled honestly when individual positive crops cannot be established.
@@ -105,7 +107,9 @@ def attach_report_evidence(report, payload, resolver: ImageResolver | None = Non
                     continue
                 seen_images.add(record["image_id"])
                 positives = [index for index, prediction in enumerate(record["fruit_predictions"])
-                             if prediction["predicted_class"] == "con_oleocelosis"]
+                             if prediction["predicted_class"] == "con_oleocelosis"
+                             and review_status(prediction) == "confirmed"
+                             and prediction.get("qc_included") is not False]
                 positive_fruits += len(positives)
                 scene_photos = {}
                 for index in positives:
@@ -136,9 +140,9 @@ def attach_report_evidence(report, payload, resolver: ImageResolver | None = Non
                         "affected_fruits": 1,
                         "vision_reviews": [audit],
                         "caption": (
-                            "Sospecha de oleocelosis de Vision; ver revisión QC."
+                            "Oleocelosis confirmada por revisión QC."
                             if attachment["view"] == "fruit_crop" else
-                            "Foto grupal con sospechas de Vision; ver revisión QC."
+                            "Foto grupal con oleocelosis confirmada por revisión QC."
                         ),
                         **attachment,
                     }
@@ -157,11 +161,11 @@ def attach_report_evidence(report, payload, resolver: ImageResolver | None = Non
             "attached_fruits": attached_fruits, "attached_photos": len(photos),
             "unavailable_fruits": unavailable,
             "message": (
-                "Vision no indicó sospechas de oleocelosis." if status == "no_defects" else
-                "No hay fotografías disponibles de las sospechas de Vision."
+                "No hay oleocelosis confirmada por QC." if status == "no_defects" else
+                "No hay fotografías disponibles de la oleocelosis confirmada por QC."
                 if status == "unavailable" else
                 "Parte de la evidencia fotográfica no está disponible."
-                if status == "partial" else "Evidencia de Vision adjunta con revisión QC."
+                if status == "partial" else "Evidencia de oleocelosis confirmada por QC adjunta."
             ),
         }
     return result

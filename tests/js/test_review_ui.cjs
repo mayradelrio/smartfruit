@@ -170,3 +170,72 @@ test("editing final metadata cannot accept an unassessed change to pallet measur
   assert.equal(state.report,null);
 });
 
+test("a pallet with no QC-confirmed oleocellosis hides stale photos without hiding another pallet's evidence",()=>{
+  const {context,state,byId}=setup(reviewFunctions);
+  const report=reportFor(state);
+  const rejected={defect:"oleocellosis",sample_box_id:"BOX_001",view:"fruit_crop",
+    image_data_url:"data:image/png;base64,iVBORw0KGgo=",affected_fruits:1,
+    vision_reviews:[{review_status:"rejected"}]};
+  report.samples[0].evidence_photos=[rejected];
+  report.samples[0].evidence_summary={status:"available",positive_fruits:1};
+  report.samples[1].qc_fields.oleocellosis=1;
+  report.samples[1].inspection_summary.oleocellosis_count=1;
+  report.samples[1].inspection_summary.oleocellosis_pct=100/12;
+  report.samples[1].evidence_photos=[{...rejected,vision_reviews:[{review_status:"confirmed"}]}];
+  report.samples[1].evidence_summary={status:"available",positive_fruits:1};
+  context.renderResults(report);
+  const [healthy,positive]=byId("results").querySelectorAll("article");
+  assert.equal(healthy.querySelectorAll("img").length,0);
+  assert.equal(healthy.querySelectorAll(".vision-positive-gallery").length,0);
+  assert.doesNotMatch(healthy.textContent,/Evidencia de oleocelosis|No hay fotografías disponibles/);
+  assert.equal(positive.querySelectorAll("img").length,1);
+  assert.equal(positive.querySelectorAll(".vision-positive-gallery").length,1);
+  assert.match(positive.textContent,/Evidencia de oleocelosis/);
+});
+
+test("a pallet with no QC-confirmed oleocellosis does not report missing photos from a stale evidence summary",()=>{
+  const {context,state,byId}=setup(reviewFunctions);
+  const report=reportFor(state);
+  report.samples[0].evidence_photos=[];
+  report.samples[0].evidence_summary={status:"unavailable",positive_fruits:2,unavailable_fruits:2};
+  context.renderResults(report);
+  const healthy=byId("results").querySelectorAll("article")[0];
+  assert.equal(healthy.querySelectorAll(".vision-positive-gallery").length,0);
+  assert.doesNotMatch(healthy.textContent,/No hay fotografías disponibles/);
+});
+
+test("a partially corrected pallet displays only its confirmed photographic evidence",()=>{
+  const {context,state,byId}=setup(reviewFunctions);
+  const report=reportFor(state),sample=report.samples[0];
+  sample.inspection_summary.oleocellosis_count=1;
+  sample.evidence_summary={status:"available",positive_fruits:2};
+  sample.evidence_photos=[
+    {defect:"oleocellosis",image_data_url:"data:image/jpeg;base64,REJECTED",
+      vision_reviews:[{review_status:"rejected"}]},
+    {defect:"oleocellosis",image_data_url:"data:image/jpeg;base64,CONFIRMED",
+      vision_reviews:[{review_status:"confirmed"}]},
+  ];
+  context.renderResults(report);
+  const images=byId("results").querySelectorAll("article")[0].querySelectorAll("img");
+  assert.equal(images.length,1);
+  assert.equal(images[0].src,"data:image/jpeg;base64,CONFIRMED");
+});
+
+test("explicitly excluded audited photos are hidden while mixed groups and legacy attachments remain visible",()=>{
+  const {context,state,byId}=setup(reviewFunctions);
+  const report=reportFor(state),sample=report.samples[0];
+  sample.inspection_summary.oleocellosis_count=2;
+  sample.evidence_photos=[
+    {defect:"oleocellosis",image_data_url:"data:image/jpeg;base64,EXCLUDED",
+      vision_reviews:[{review_status:"confirmed",qc_included:false}]},
+    {defect:"oleocellosis",view:"scene",image_data_url:"data:image/jpeg;base64,GROUP",
+      vision_reviews:[{review_status:"rejected"},{review_status:"confirmed",qc_included:true}]},
+    {defect:"oleocellosis",image_data_url:"data:image/jpeg;base64,LEGACY"},
+  ];
+  context.renderResults(report);
+  const images=byId("results").querySelectorAll("article")[0].querySelectorAll("img");
+  assert.deepEqual(images.map(image=>image.src),[
+    "data:image/jpeg;base64,GROUP","data:image/jpeg;base64,LEGACY",
+  ]);
+});
+

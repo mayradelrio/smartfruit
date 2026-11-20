@@ -4,9 +4,9 @@ El QC Report en Excel y la vista imprimible muestran cantidades de fotografías,
 
 ## Qué fotografías se adjuntan
 
-La app local busca fotografías disponibles que correspondan a los resultados validados de Vision. Solo incorpora evidencia de **oleocelosis detectada**; los demás defectos siguen siendo observaciones manuales sin una clasificación fotográfica automática.
+La app local busca fotografías disponibles que correspondan a los resultados validados de Vision. Solo incorpora evidencia de **oleocelosis confirmada e incluida por QC**. Una detección desmarcada o rechazada deja de aportar fotografías y conteos a la evidencia; su predicción original y su revisión se conservan para trazabilidad. Los demás defectos siguen siendo observaciones manuales sin una clasificación fotográfica automática.
 
-Cuando está disponible el recorte correspondiente a un fruto clasificado con oleocelosis, se adjunta ese recorte. Si existe una foto de grupo y no se puede establecer un recorte individual fiable, se presenta como **Grupo con detección**. Esto no atribuye el defecto a todos los frutos visibles. Las fotografías de frutos clasificados como sanos no se seleccionan como evidencia de oleocelosis.
+Cuando está disponible el recorte correspondiente a un fruto confirmado con oleocelosis, se adjunta ese recorte. Si existe una foto de grupo y no se puede establecer un recorte individual fiable, se presenta como **Grupo con detección** solo si conserva alguna detección confirmada por QC. Esto no atribuye el defecto a todos los frutos visibles. Las fotografías de frutos clasificados como sanos o descartados por QC no se seleccionan como evidencia de oleocelosis.
 
 Las imágenes se normalizan a JPEG de hasta 1024 píxeles por lado, sin metadatos EXIF. Los pies de foto indican paleta, caja cuando está identificada, oleocelosis y un número de fotografía; no muestran rutas ni nombres de archivo.
 
@@ -16,9 +16,9 @@ Las imágenes se normalizan a JPEG de hasta 1024 píxeles por lado, sin metadato
 - **Vista imprimible / PDF:** las fotografías se incorporan dentro del HTML mediante imágenes de datos; no necesitan consultar una URL ni acceder de nuevo a la carpeta original. El diálogo de impresión permite guardar la vista como PDF.
 - **JSON:** conserva los resultados originales, la trazabilidad y las imágenes normalizadas adjuntas. El reporte confirmado puede volver a imprimirse a partir de ese registro sin buscar otra vez los originales.
 
-Si Vision detectó oleocelosis pero no hay fotografía disponible, el reporte indica **No se adjuntaron fotografías de los frutos con oleocelosis detectada.** La ausencia de una fotografía no cambia los conteos, los porcentajes ni la recomendación. Cuando solo parte de los frutos positivos cuenta con fotografía, el reporte identifica la disponibilidad parcial.
+Si QC confirmó oleocelosis pero no hay fotografía disponible, el reporte indica **No se adjuntaron fotografías de los frutos con oleocelosis detectada.** La ausencia de una fotografía no cambia los conteos, los porcentajes ni la recomendación. Cuando solo parte de los frutos confirmados cuenta con fotografía, el reporte identifica la disponibilidad parcial.
 
-Una muestra sin oleocelosis no muestra un aviso de fotografías de defecto faltantes. No se genera ni sustituye evidencia con una imagen de ejemplo.
+Una muestra con cero frutos confirmados con oleocelosis no muestra galería ni aviso de fotografías de defecto faltantes, incluso si había sospechas originales o adjuntos antiguos. Esto se aplica a resultados en pantalla, Excel y vista imprimible. No se genera ni sustituye evidencia con una imagen de ejemplo.
 
 ## Disponibilidad local y en navegador
 
